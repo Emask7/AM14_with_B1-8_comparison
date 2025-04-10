@@ -131,150 +131,177 @@
   resultsNames(dds_B18trans)
   resultsNames(dds_AM14MRLlpr)
   
-# Get results (default methods) ------------------------------------------------
-  res_PL23 <- results(dds_AM14trans, contrast = c("Treatment", "PL23_2DG", "PL23"))
-  res_PL23 <- data.frame(subset(res_PL23, !is.na(padj)))
-  summary_v2(res_PL23, "PL2-3+2DG vs PL2-3", lfc_cutoff = 1, p_cutoff = 0.05)
+# Get DESeq2 results -----------------------------------------------------------
+  get_res <- function(dds, cons, IDs){
+    res <- results(dds, contrast = cons)
+    res <- data.frame(subset(res, !is.na(padj)))
+      # Note: There are a few reasons why a p value or padj value would be NA
+      # According to the DESeq2 manual, these are the reasons:
+      # If within a row, all samples have zero counts, the baseMean column will be zero, and the LFC estimates, p value and padj will all be NA.
+      # If a row contains a sample with an extreme count outlier then the p value and padj will be set to NA.
+      # If a row is filtered by automatic independent filtering, for having a low mean normalized count, then only padj will be set to NA.
+    tempcols <- colnames(res)
+    res <- data.frame(rownames(res), res)
+    colnames(res) <- c("ensembl_gene_id", tempcols)
+    return(right_join(IDs, res))
+  }
   
-  res_R848 <- results(dds_AM14trans, contrast = c("Treatment", "R848_2DG", "R848"))
-  res_R848 <- data.frame(subset(res_R848, !is.na(padj)))
-  summary_v2(res_R848, "R848+2DG vs R848", lfc_cutoff = 1, p_cutoff = 0.05)
+  deseq_res <- list(
+    AM14transfer = list(
+      PL23_2DG_v_Ctrl = get_res(dds_AM14trans, c("Treatment", "PL23_2DG", "PL23"), gene_IDs$AM14trans),
+      R848_2DG_v_Ctrl = get_res(dds_AM14trans, c("Treatment", "R848_2DG", "R848"), gene_IDs$AM14trans),
+      PL23_vs_R848 = get_res(dds_AM14trans, c("Treatment", "PL23", "R848"), gene_IDs$AM14trans)),
+    B18transfer = get_res(dds_B18trans, c("Treatment", "NP_2DG", "NP"), gene_IDs$B18trans),
+    AM14MRLlpr = get_res(dds_AM14MRLlpr, c("Treatment", "2DG", "Control"), gene_IDs$AM14MRLlpr)
+  )
   
-  res_PL23vR848 <- results(dds_AM14trans, contrast = c("Treatment", "PL23", "R848"))
-  res_PL23vR848 <- data.frame(subset(res_PL23vR848, !is.na(padj)))
-  summary_v2(res_PL23vR848, "PL2-3 vs R848", lfc_cutoff = 1, p_cutoff = 0.05)
-  
-  res_2DG_PL23vR848 <- results(dds_AM14trans, contrast = c("Treatment", "PL23_2DG", "R848_2DG"))
-  res_2DG_PL23vR848 <- data.frame(subset(res_2DG_PL23vR848, !is.na(padj)))
-  summary_v2(res_2DG_PL23vR848, "PL2-3+2DG vs R848+2DG", lfc_cutoff = 1, p_cutoff = 0.05)
-  
-    # Note: There are a few reasons why a p value or padj value would be NA
-    # According to the DESeq2 manual, these are the reasons:
-    # If within a row, all samples have zero counts, the baseMean column will be zero, and the LFC estimates, p value and padj will all be NA.
-    # If a row contains a sample with an extreme count outlier then the p value and padj will be set to NA.
-    # If a row is filtered by automatic independent filtering, for having a low mean normalized count, then only padj will be set to NA.
-    
-  # Make DEG lists and export to CSV files -------------------------------------
-    write_DEG_CSV(res_PL23, 1, "PL2-3_2DG_vs_Control")
-    write_DEG_CSV(res_R848, 1, "R848_2DG_vs_Control")
-    write_DEG_CSV(res_PL23vR848, 1, "PL2-3_Ctrl_vs_R848_Ctrl")
-    write_DEG_CSV(res_2DG_PL23vR848, 1, "PL2-3_2DG_vs_R848_2DG")
+  head(deseq_res$AM14transfer$PL23_2DG_v_Ctrl)
+  head(deseq_res$B18transfer)
+  head(deseq_res$AM14MRLlpr)
 
-# # Get results (Threshold-Based Wald tests) -----------------------------------
-#   res_PL23_lfc <- results(dds, contrast = c("Treatment", "PL2-3+2DG", "PL2-3"),
-#                           lfcThreshold = 0.6, altHypothesis = "greaterAbs", alpha = 0.05)
-#   res_R848_lfc <- results(dds, contrast = c("Treatment", "R848+2DG", "R848"),
-#                           lfcThreshold = 0.6, altHypothesis = "greaterAbs", alpha = 0.05)
-#   res_PL23vR848_lfc <- results(dds, contrast = c("Treatment", "PL2-3", "R848"),
-#                                lfcThreshold = 0.6, altHypothesis = "greaterAbs", alpha = 0.05)
-#   res_2DG_PL23vR848_lfc <- results(dds, contrast = c("Treatment", "PL2-3+2DG", "R848+2DG"),
-#                                    lfcThreshold = 1, altHypothesis = "greaterAbs", alpha = 0.05)
-# 
-#   summary(res_PL23_lfc)
-#   summary(res_R848_lfc)
-#   summary(res_PL23vR848_lfc)
-#   summary(res_2DG_PL23vR848_lfc)
+# Make a data.frame that summarizes the numbers of DEGs detected -------------
+  full_summary <- join_all(list(summary_wrapper(deseq_res$AM14transfer$PL23_2DG_v_Ctrl, "PL2-3+2DG vs PL2-3", "AM14 Adoptive Transfer"),
+                                summary_wrapper(deseq_res$AM14transfer$R848_2DG_v_Ctrl, "R848+2DG vs R848", "AM14 Adoptive Transfer"),
+                                summary_wrapper(deseq_res$AM14transfer$PL23_vs_R848, "PL2-3 vs R848", "AM14 Adoptive Transfer"),
+                                summary_wrapper(deseq_res$B18transfer, "NP+2DG vs NP", "B1-8 Adoptive Transfer"),
+                                summary_wrapper(deseq_res$AM14MRLlpr, "2DG vs Control", "AM14 MRL/lpr")), 
+                           type = "full")
+  full_summary 
+  
+  
+# Save results to an Excel file ----------------------------------------------
+  wb <- createWorkbook("Output/DESeq2_results.xlsx")
+  
+  addWorksheet(wb, "DEG Summaries")
+  addWorksheet(wb, "AM14 - PL23_2DG_vs_Ctrl")
+  addWorksheet(wb, "AM14 - R848_2DG_vs_Ctrl")
+  addWorksheet(wb, "AM14 - PL23_vs_R848")
+  addWorksheet(wb, "B1-8 - 2DG_vs_Ctrl")
+  addWorksheet(wb, "AM14 MRLlpr - 2DG_vs_Ctrl")
+  
+  writeData(wb, "DEG Summaries", full_summary)
+  writeData(wb, "AM14 - PL23_2DG_vs_Ctrl", deseq_res$AM14transfer$PL23_2DG_v_Ctrl)
+  writeData(wb, "AM14 - R848_2DG_vs_Ctrl", deseq_res$AM14transfer$R848_2DG_v_Ctrl)
+  writeData(wb, "AM14 - PL23_vs_R848", deseq_res$AM14transfer$PL23_vs_R848)
+  writeData(wb, "B1-8 - 2DG_vs_Ctrl", deseq_res$B18transfer)
+  writeData(wb, "AM14 MRLlpr - 2DG_vs_Ctrl", deseq_res$AM14MRLlpr)
+  
+  saveWorkbook(wb, "Output/DESeq2_results.xlsx", overwrite = TRUE)
+  rm(wb)
+  
+  
+  wb <- createWorkbook("Output/DESeq2_gene_counts.xlsx")
+  
+  addWorksheet(wb, "Raw_Counts - AM14 transfer")
+  addWorksheet(wb, "Norm_Counts - AM14 transfer")
+  addWorksheet(wb, "Raw_Counts - B1-8 transfer")
+  addWorksheet(wb, "Norm_Counts - B1-8 transfer")
+  addWorksheet(wb, "Raw_Counts - AM14 MRLlpr")
+  addWorksheet(wb, "Norm_Counts - AM14 MRLlpr")
+  
+  writeData(wb, "Raw_Counts - AM14 transfer", counts(dds_AM14trans, normalized = FALSE), rowNames = TRUE)
+  writeData(wb, "Norm_Counts - AM14 transfer", counts(dds_AM14trans, normalized = TRUE), rowNames = TRUE)
+  writeData(wb, "Raw_Counts - B1-8 transfer", counts(dds_B18trans, normalized = FALSE), rowNames = TRUE)
+  writeData(wb, "Norm_Counts - B1-8 transfer", counts(dds_B18trans, normalized = TRUE), rowNames = TRUE)
+  writeData(wb, "Raw_Counts - AM14 MRLlpr", counts(dds_AM14MRLlpr, normalized = FALSE), rowNames = TRUE)
+  writeData(wb, "Norm_Counts - AM14 MRLlpr", counts(dds_AM14MRLlpr, normalized = TRUE), rowNames = TRUE)
+  
+  saveWorkbook(wb, "Output/DESeq2_gene_counts.xlsx", overwrite = TRUE)
+  rm(wb)
 
-# Save count data to Excel file ------------------------------------------------
-  # Add columns with alternative gene identifiers to the DESeq2 results --------
-    res_PL23_full <- tibble::rownames_to_column(res_PL23, var = "ensembl_gene_id")
-    res_PL23_full <- right_join(gene_IDs$AM14trans, res_PL23_full)
-    head(res_PL23_full)
-    
-    res_R848_full <- tibble::rownames_to_column(res_R848, var = "ensembl_gene_id")
-    res_R848_full <- right_join(gene_IDs$AM14trans, res_R848_full)
-    head(res_R848_full)
-    
-    res_PL23vR848_full <- tibble::rownames_to_column(res_PL23vR848, var = "ensembl_gene_id")
-    res_PL23vR848_full <- right_join(gene_IDs$AM14trans, res_PL23vR848_full)
-    head(res_PL23vR848_full)
-    
-    res_2DG_PL23vR848_full <- tibble::rownames_to_column(res_2DG_PL23vR848, var = "ensembl_gene_id")
-    res_2DG_PL23vR848_full <- right_join(gene_IDs$AM14trans, res_2DG_PL23vR848_full)
-    head(res_2DG_PL23vR848_full)
-    
-  # Make a data.frame that summarizes the numbers of DEGs detected -------------
-    full_summary <- full_join(summary_v2(res_PL23, "PL2-3+2DG vs PL2-3"), 
-                                summary_v2(res_PL23, "PL2-3+2DG vs PL2-3", lfc_cutoff = 1))
-    
-    full_summary_2 <- full_join(summary_v2(res_R848, "R848+2DG vs R848"), 
-                                summary_v2(res_R848, "R848+2DG vs R848", lfc_cutoff = 1))
-    
-    full_summary_3 <- full_join(summary_v2(res_PL23vR848, "PL2-3 vs R848"), 
-                                summary_v2(res_PL23vR848, "PL2-3 vs R848", lfc_cutoff = 1))
-    
-    full_summary_4 <- full_join(summary_v2(res_2DG_PL23vR848, "PL2-3+2DG vs R848+2DG"), 
-                                summary_v2(res_2DG_PL23vR848, "PL2-3+2DG vs R848+2DG", lfc_cutoff = 1))
-    
-    full_summary <- full_join(full_summary, full_summary_2)
-    full_summary <- full_join(full_summary, full_summary_3)
-    full_summary <- full_join(full_summary, full_summary_4)
-    full_summary
-    
-    rm(full_summary_2, full_summary_3, full_summary_4)
-    
-    
-  # Save results to an Excel file ----------------------------------------------
-    wb <- createWorkbook("Output/DESeq2_results.xlsx")
-    
-    addWorksheet(wb, "DEG Summaries")
-    addWorksheet(wb, "PL23_2DG_vs_Ctrl")
-    addWorksheet(wb, "R848_2DG_vs_Ctrl")
-    addWorksheet(wb, "PL23_Ctrl_vs_R848_Ctrl")
-    addWorksheet(wb, "PL23_2DG_vs_R848_2DG")
-    addWorksheet(wb, "Raw_Gene_Counts")
-    addWorksheet(wb, "Normalized_Gene_Counts")
-    
-    writeData(wb, "DEG Summaries", full_summary)
-    writeData(wb, "PL23_2DG_vs_Ctrl", res_PL23_full)
-    writeData(wb, "R848_2DG_vs_Ctrl", res_R848_full)
-    writeData(wb, "PL23_Ctrl_vs_R848_Ctrl", res_PL23vR848_full)
-    writeData(wb, "PL23_2DG_vs_R848_2DG", res_2DG_PL23vR848_full)
-    writeData(wb, "Raw_Gene_Counts", 
-              counts(dds, normalized = FALSE), rowNames = TRUE)
-    writeData(wb, "Normalized_Gene_Counts", 
-              counts(dds, normalized = TRUE), rowNames = TRUE)
-    
-    saveWorkbook(wb, "Output/DESeq2_results.xlsx", overwrite = TRUE)
+# # Make DEG lists and export to CSV files -------------------------------------
+#   write_DEG_CSV(res_PL23, 1, "PL2-3_2DG_vs_Control")
+#   write_DEG_CSV(res_R848, 1, "R848_2DG_vs_Control")
+#   write_DEG_CSV(res_PL23vR848, 1, "PL2-3_Ctrl_vs_R848_Ctrl")
+#   write_DEG_CSV(res_2DG_PL23vR848, 1, "PL2-3_2DG_vs_R848_2DG")
     
 # Make DEG Venn Diagram --------------------------------------------------------
   DEG_lists <- list(
-    # PL23_2DGvsCtrl = write_DEG_CSV(res_PL23_full, 1, "PL2-3_2DG_vs_Control"),
-    # R848_2DGvsCtrl = write_DEG_CSV(res_R848_full, 1, "R848_2DG_vs_Control"),
-    # PL23vR848 = write_DEG_CSV(res_PL23vR848_full, 1, "PL2-3_Ctrl_vs_R848_Ctrl")
-    PL23_2DGvsCtrl = write_sig_LFCs(res_PL23_full, 1, "external_gene_name", "PL2-3_2DG_vs_Control"),
-    R848_2DGvsCtrl = write_sig_LFCs(res_R848_full, 1, "external_gene_name", "R848_2DG_vs_Control"),
-    PL23vR848 = write_sig_LFCs(res_PL23vR848_full, 1, "external_gene_name", "PL2-3_Ctrl_vs_R848_Ctrl")
+    PL23_2DG_vs_Ctrl = deg_list_for_venn(deseq_res$AM14transfer$PL23_2DG_v_Ctrl, 1),
+    R848_2DG_vs_Ctrl = deg_list_for_venn(deseq_res$AM14transfer$R848_2DG_v_Ctrl, 1),
+    PL23_vs_R848 = deg_list_for_venn(deseq_res$AM14transfer$PL23_vs_R848, 1),
+    B18 = deg_list_for_venn(deseq_res$B18transfer, 1),
+    MRLlpr = deg_list_for_venn(deseq_res$AM14MRLlpr, 1)
   )
-  nrow(DEG_lists$PL23_2DGvsCtrl$down)
-  nrow(DEG_lists$R848_2DGvsCtrl$down)
-  nrow(DEG_lists$PL23vR848$down)
+  head(DEG_lists$B18$up)
   
-  head(DEG_lists$PL23_2DGvsCtrl)
-  
-  
-  write_DEG_CSV(res_PL23, 1, "PL2-3_2DG_vs_Control")
-  write_DEG_CSV(res_R848, 1, "R848_2DG_vs_Control")
-  write_DEG_CSV(res_PL23vR848, 1, "PL2-3_Ctrl_vs_R848_Ctrl")
-  write_DEG_CSV(res_2DG_PL23vR848, 1, "PL2-3_2DG_vs_R848_2DG")
-  
-    
-  venn_up <- venndetail(list("PL2-3+2DG vs PL2-3" = DEG_lists$PL23_2DGvsCtrl$up$ensembl_gene_id,
-                             "R848+2DG vs R848" = DEG_lists$R848_2DGvsCtrl$up$ensembl_gene_id,
-                             "PL2-3 vs R848" = DEG_lists$PL23vR848$up$ensembl_gene_id))
-  plot(venn_up, mycol = c("goldenrod1", "darkorange1", "red"), 
+  venn_up <- venndetail(list("AM14 Transfer:\nPL2-3 + 2DG\nvs PL2-3\n" = DEG_lists$PL23_2DG_vs_Ctrl$up,
+                             "AM14 Transfer:\nR848 + 2DG\nvs R848\n" = DEG_lists$R848_2DG_vs_Ctrl$up,
+                             "AM14 MRL/lpr:\n2DG vs Control\n" = DEG_lists$MRLlpr$up,
+                             "B1-8 Transfer:\nNP+2DG vs NP\n" = DEG_lists$B18$up))
+  plot(venn_up, mycol = met.brewer("Johnson", n = 8, direction = 1),
        filename = "Output/venn_diagram_upreg.png",
-       margin = 0.1, cat.cex = 0.5)
+       margin = 0.05, cat.cex = 1, cex = 1.5)
   dev.off()
-  detail(venn_up)
   
-
-    
-  venn_down <- venndetail(list("PL2-3+2DG vs PL2-3" = DEG_lists$PL23_2DGvsCtrl$down$ensembl_gene_id,
-                               "R848+2DG vs R848" = DEG_lists$R848_2DGvsCtrl$down$ensembl_gene_id,
-                               "PL2-3 vs R848" = DEG_lists$PL23vR848$down$ensembl_gene_id))
-  plot(venn_down, mycol = c("darkseagreen1", "dodgerblue", "orchid"), 
+  venn_down <- venndetail(list("AM14 Transfer:\nPL2-3 + 2DG\nvs PL2-3\n" = DEG_lists$PL23_2DG_vs_Ctrl$down,
+                               "AM14 Transfer:\nR848 + 2DG\nvs R848\n" = DEG_lists$R848_2DG_vs_Ctrl$down,
+                               "AM14 MRL/lpr:\n2DG vs Control\n" = DEG_lists$MRLlpr$down,
+                               "B1-8 Transfer:\nNP + 2DG vs NP\n" = DEG_lists$B18$down))
+  plot(venn_down,  mycol = met.brewer("Johnson", n = 8, direction = -1),
        filename = "Output/venn_diagram_downreg.png",
-       margin = 0.1, cat.cex = 0.5)
+       margin = 0.05, cat.cex = 1, cex = 1.5)
   dev.off()
+
+  detail(venn_up)
   detail(venn_down)
+
+# Volcano plots ----------------------------------------------------------------
+  vp_data = list(
+      AM14transfer = list(
+        PL23_2DG_v_Ctrl = deseq_res$AM14transfer$PL23_2DG_v_Ctrl[, c(2, 6, 10)],
+        R848_2DG_v_Ctrl = deseq_res$AM14transfer$R848_2DG_v_Ctrl[, c(2, 6, 10)],
+        PL23_vs_R848 = deseq_res$AM14transfer$PL23_vs_R848[, c(2, 6, 10)]),
+      B18transfer = deseq_res$B18transfer[, c(2, 6, 10)],
+      AM14MRLlpr = deseq_res$AM14MRLlpr[, c(2, 6, 10)])
+  head(vp_data$AM14MRLlpr)
+
+  volcano_wrapper <- function(dat, plot_title, x_limits, y_limits, file_name){
+    if(missing(x_limits)) {
+      x_min <- min(dat$log2FoldChange)
+      x_max <- max(dat$log2FoldChange)
+      x_limits <- c(floor(x_min), ceiling(x_max))
+      print(stri_join("x_min = ", x_min))
+      print(stri_join("x_max = ", x_max))
+    }
+    if(missing(y_limits)) {
+      y_max <- -log10(min(dat$padj))
+      y_limits <- c(0, ceiling(y_max))
+      print(stri_join("y_max = ", y_max))
+    }
+    
+    vp <- EnhancedVolcano(dat, lab = dat$external_gene_name, 
+                          pCutoff = 0.05, FCcutoff = 1,
+                          x = 'log2FoldChange', y = 'padj', 
+                          xlim = x_limits, ylim = y_limits, 
+                          title = plot_title, subtitle = "(Adjusted p-values)", 
+                          legendLabels = c("NS", expression(Log[2] ~ FC > 1),
+                                           expression(p - value < ~ 0.05),
+                                           expression(p - value < ~ 0.05 ~ and ~ log[2] ~ FC > ~ 1)),
+                          drawConnectors = TRUE, min.segment.length = 1, 
+                          max.overlaps = 12, labSize = 4)
+    
+    if(!missing(file_name)){
+      if(file_name != FALSE & !is.null(file_name)){
+        ggsave(stri_join("Output/Volcano_plots/Volcano plot - ", file_name, ".png"),
+               units = "px", width = 3000, height = 3000, dpi = 300)
+      } 
+    } 
+    vp
+  }  
+  
+  volcano_wrapper(vp_data$AM14transfer$PL23_2DG_v_Ctrl, "AM14 Transfer: PL2-3 + 2DG vs PL2-3", 
+                  c(-10, 5), c(0, 8), "AM14_Transfer-PL2-3_2DG_vs_Control")
+  
+  volcano_wrapper(vp_data$AM14transfer$R848_2DG_v_Ctrl, "AM14 Transfer: R848 + 2DG vs R848", 
+                  c(-10, 5), c(0, 5), "AM14_Transfer-R848_2DG_vs_Control")
+  
+  volcano_wrapper(vp_data$AM14transfer$PL23_vs_R848, "AM14 Transfer: PL2-3 vs R848", 
+                  c(-11, 6), c(0, 6), "AM14_Transfer-PL2-3_vs_R848")
+  
+  volcano_wrapper(vp_data$B18transfer, "B1-8 Transfer: NP + 2DG vs NP", 
+                  c(-5, 3), c(0, 8), "B1-8_Transfer-NP_2DG_vs_NP")
+  
+  volcano_wrapper(vp_data$AM14MRLlpr, "AM14 MRL/lpr: 2DG vs Control", 
+                  c(-5, 2.5), c(0, 15), "AM14_MRLlpr")
+  
