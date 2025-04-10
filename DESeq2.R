@@ -223,16 +223,31 @@
     B18 = deg_list_for_venn(deseq_res$B18transfer, 1),
     MRLlpr = deg_list_for_venn(deseq_res$AM14MRLlpr, 1)
   )
-  head(DEG_lists$B18$up)
-  
+
   venn_up <- venndetail(list("AM14 Transfer:\nPL2-3 + 2DG\nvs PL2-3\n" = DEG_lists$PL23_2DG_vs_Ctrl$up,
                              "AM14 Transfer:\nR848 + 2DG\nvs R848\n" = DEG_lists$R848_2DG_vs_Ctrl$up,
                              "AM14 MRL/lpr:\n2DG vs Control\n" = DEG_lists$MRLlpr$up,
                              "B1-8 Transfer:\nNP+2DG vs NP\n" = DEG_lists$B18$up))
   plot(venn_up, mycol = met.brewer("Johnson", n = 8, direction = 1),
-       filename = "Output/venn_diagram_upreg.png",
+       # filename = "Output/venn_diagram_upreg.png",
        margin = 0.05, cat.cex = 1, cex = 1.5)
   dev.off()
+  
+  # dev.off()
+  # plot(venn_up, mycol = moma.colors("Panton", 8, direction = -1),
+  #      # filename = "Output/venn_diagram_upreg.png",
+  #      margin = 0.05, cat.cex = 1, cex = 1.5)
+  # 
+  # dev.off()
+  # plot(venn_up, mycol = moma.colors("ustwo", 8, direction = 1),
+  #      # filename = "Output/venn_diagram_upreg.png",
+  #      margin = 0.05, cat.cex = 1, cex = 1.5)
+  # 
+  # dev.off()
+  # plot(venn_up, mycol = moma.colors("OKeeffe", 8, direction = 1),
+  #      # filename = "Output/venn_diagram_upreg.png",
+  #      margin = 0.05, cat.cex = 1, cex = 1.5)
+  
   
   venn_down <- venndetail(list("AM14 Transfer:\nPL2-3 + 2DG\nvs PL2-3\n" = DEG_lists$PL23_2DG_vs_Ctrl$down,
                                "AM14 Transfer:\nR848 + 2DG\nvs R848\n" = DEG_lists$R848_2DG_vs_Ctrl$down,
