@@ -1,3 +1,105 @@
+count_matrix_heatmap <- function(dds, file_name_start, col_factors){
+  # Transform data -------------------------------------------------------------
+    vsd <- vst(dds)
+    rld <- rlog(dds)
+    ntd <- normTransform(dds)
+  
+  # Heatmap of count matrix ----------------------------------------------------
+    select <- order(rowMeans(counts(dds,normalized=TRUE)), 
+                    decreasing=TRUE)[1:20]
+    df <- as.data.frame(colData(dds)[, c("Treatment", "Cohort")])
+    
+    png(filename = stri_join(c("QC_results/Heatmaps/", file_name_start,
+                               " - Normalized Counts Transformation.png"),
+                             collapse = ""),
+        width = 1200, height = 1200, units = "px", pointsize = 10, res = 200,
+        bg = "white", family = "", type = "windows", symbolfamily="default")
+    pheatmap(assay(ntd)[select,], cluster_rows=FALSE, show_rownames=FALSE, 
+             cluster_cols=TRUE, annotation_col=df,
+             labels_col = colData(dds)$Label_Name,
+             main = "Normalized Counts Transformation")
+    dev.off()
+    
+    png(filename = stri_join(c("QC_results/Heatmaps/", file_name_start,
+                               " - Variance Stabilizing Transformation.png"),
+                             collapse = ""),
+        width = 1200, height = 1200, units = "px", pointsize = 10, res = 200,
+        bg = "white", family = "", type = "windows", symbolfamily="default")
+    pheatmap(assay(vsd)[select,], cluster_rows=FALSE, show_rownames=FALSE,
+             cluster_cols=TRUE, annotation_col=df,
+             labels_col = colData(dds)$Label_Name,
+             main = "Variance Stabilizing Transformation")
+    dev.off()
+
+    png(filename = stri_join(c("QC_results/Heatmaps/", file_name_start,
+                               " - Regularized Log Transformation.png"),
+                             collapse = ""),
+        width = 1200, height = 1200, units = "px", pointsize = 10, res = 200,
+        bg = "white", family = "", type = "windows", symbolfamily="default")
+    pheatmap(assay(rld)[select,], cluster_rows=FALSE, show_rownames=FALSE,
+             cluster_cols=TRUE, annotation_col=df,
+             labels_col = colData(dds)$Label_Name,
+             main = "Regularized Log Transformation")
+    dev.off()
+}
+
+
+
+
+# Heatmap of sample-to-sample distances --------------------------------------
+sampleDists <- dist(t(assay(vsd)))
+sampleDistMatrix <- as.matrix(sampleDists)
+rownames(sampleDistMatrix) <- paste(vsd$Label_Name)
+colnames(sampleDistMatrix) <- NULL
+
+png(filename = "QC_results/Heatmap - Sample-to-Sample Distances.png", 
+    width = 1200, height = 1200, units = "px", pointsize = 10, res = 200, 
+    bg = "white", family = "", type = "windows", symbolfamily="default")
+pheatmap(sampleDistMatrix,
+         clustering_distance_rows=sampleDists,
+         clustering_distance_cols=sampleDists,
+         col=colorRampPalette( rev(brewer.pal(9, "Blues")) )(255),
+         main = "Sample-to-Sample Distances")
+dev.off()
+
+# Principal component plot ---------------------------------------------------
+pcaData <- plotPCA(vsd, intgroup=c("Treatment", "Cohort"), returnData=TRUE)
+percentVar <- round(100 * attr(pcaData, "percentVar"))
+
+png(filename = "Output/PCA Plot - Before Batch Correction.png", 
+    width = 1500, height = 1500, units = "px", pointsize = 10, res = 200, 
+    bg = "white", family = "", type = "windows", symbolfamily="default")
+ggplot(pcaData, aes(PC1, PC2, color=Treatment, shape=Cohort)) +
+  geom_point(size=3) +
+  xlab(paste0("PC1: ",percentVar[1],"% variance")) +
+  ylab(paste0("PC2: ",percentVar[2],"% variance")) +
+  coord_fixed() +
+  labs(title = "Before correcting for batch effects_AM14trans")
+dev.off()
+
+# PCA plot removing batch effects_AM14trans --------------------------------------------
+mat <- assay(vsd)
+mm <- model.matrix(~Treatment, colData(vsd))
+mat <- removeBatchEffect(mat, batch=vsd$Cohort, design=mm)
+assay(vsd) <- mat
+pcaData <- plotPCA(vsd, intgroup=c("Treatment", "Cohort"), returnData=TRUE)
+percentVar <- round(100 * attr(pcaData, "percentVar"))
+
+png(filename = "Output/PCA Plot - After Batch Correction.png", 
+    width = 1500, height = 1500, units = "px", pointsize = 10, res = 200, 
+    bg = "white", family = "", type = "windows", symbolfamily="default")
+ggplot(pcaData, aes(PC1, PC2, color=Treatment, shape=Cohort)) +
+  geom_point(size=3) +
+  xlab(paste0("PC1: ",percentVar[1],"% variance")) +
+  ylab(paste0("PC2: ",percentVar[2],"% variance")) +
+  coord_fixed() +
+  labs(title = "After correcting for batch effects_AM14trans")
+dev.off()
+
+
+
+
+
 summary_v2 <- function(res, title, p_cutoff, lfc_cutoff){
   if(missing(p_cutoff)) p_cutoff <- 0.05
   if(missing(lfc_cutoff)) lfc_cutoff <- 0.6

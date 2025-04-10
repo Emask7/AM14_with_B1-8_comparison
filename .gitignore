@@ -50,3 +50,6 @@ rsconnect/
 
 # Raw data
 raw_data/
+
+# QC results
+QC_results/
