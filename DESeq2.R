@@ -100,9 +100,9 @@
   rm(keep)
   
 # Run QC steps -----------------------------------------------------------------
-  QC_heatmaps(dds_AM14trans, "AM14_Adoptive_Transfer", c("Treatment", "Cohort"))
-  QC_heatmaps(dds_B18trans, "B18_Adoptive_Transfer", c("Treatment", "Cohort"))
-  QC_heatmaps(dds_AM14MRLlpr, "AM14_MRLlpr", c("Treatment", "Cohort"))
+  QC_heatmaps(dds_AM14trans, "AM14_Adoptive_Transfer", "AM14 Adoptive Transfer", c("Treatment", "Cohort"))
+  QC_heatmaps(dds_B18trans, "B18_Adoptive_Transfer", "B1-8 Adoptive Transfer", c("Treatment", "Cohort"))
+  QC_heatmaps(dds_AM14MRLlpr, "AM14_MRLlpr", "AM14 MRL/lpr +/- 2DG", c("Treatment", "Cohort"))
   
   QC_PCAplot(dds_AM14trans, "AM14_Adoptive_Transfer-Before_Batch_Correction", 
              "AM14 Adoptive Transfer\n(Before Batch Correction)", 

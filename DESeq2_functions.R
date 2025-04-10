@@ -1,4 +1,4 @@
-QC_heatmaps <- function(dds, filename_start, col_factors){
+QC_heatmaps <- function(dds, filename_start, plot_title, col_factors){
   # Transform data -------------------------------------------------------------
     vsd <- vst(dds)
     rld <- rlog(dds)
@@ -18,7 +18,7 @@ QC_heatmaps <- function(dds, filename_start, col_factors){
     pheatmap(assay(ntd)[select,], cluster_rows=FALSE, show_rownames=FALSE, 
              cluster_cols=TRUE, annotation_col=df,
              labels_col = colData(dds)$Label_Name,
-             main = "Normalized Counts Transformation")
+             main = stri_join(c(plot_title, "(Normalized Counts Transformation)"), collapse = "\n"))
     dev.off()
     
     png(filename = stri_join(c("QC_results/Heatmaps/", filename_start,
@@ -30,7 +30,7 @@ QC_heatmaps <- function(dds, filename_start, col_factors){
     pheatmap(assay(vsd)[select,], cluster_rows=FALSE, show_rownames=FALSE,
              cluster_cols=TRUE, annotation_col=df,
              labels_col = colData(dds)$Label_Name,
-             main = "Variance Stabilizing Transformation")
+             main = stri_join(c(plot_title, "(Variance Stabilizing Transformation)"), collapse = "\n"))
     dev.off()
 
     png(filename = stri_join(c("QC_results/Heatmaps/", filename_start,
@@ -42,7 +42,8 @@ QC_heatmaps <- function(dds, filename_start, col_factors){
     pheatmap(assay(rld)[select,], cluster_rows=FALSE, show_rownames=FALSE,
              cluster_cols=TRUE, annotation_col=df,
              labels_col = colData(dds)$Label_Name,
-             main = "Regularized Log Transformation")
+             main = stri_join(c(plot_title, "(Regularized Log Transformation)"), collapse = "\n"))
+
     dev.off()
     
   # Heatmap of sample-to-sample distances --------------------------------------
@@ -61,7 +62,7 @@ QC_heatmaps <- function(dds, filename_start, col_factors){
              clustering_distance_rows=sampleDists,
              clustering_distance_cols=sampleDists,
              col=colorRampPalette(rev(brewer.pal(9, "Blues")))(255),
-             main = "Sample-to-Sample Distances")
+             main = stri_join(c(plot_title, "(Sample-to-Sample Distances)"), collapse = "\n"))
     dev.off()
 }
 
@@ -74,15 +75,13 @@ QC_PCAplot <- function(dds, filename_start, plot_title, batch_effect){
     png(filename = stri_join(c("QC_results/PCA_plots/", filename_start, ".png"),
                              collapse = ""),
         width = 1500, height = 1500, units = "px", pointsize = 10, res = 200,
-        bg = "white", family = "", # type = "windows", 
-        symbolfamily="default")
+        bg = "white", family = "", symbolfamily="default")
     ggplot(pcaData, aes(PC1, PC2, color=Treatment, shape=Cohort)) +
       geom_point(size=3) +
       xlab(paste0("PC1: ",percentVar[1],"% variance")) +
       ylab(paste0("PC2: ",percentVar[2],"% variance")) +
       coord_fixed() +
       labs(title = plot_title)
-    # dev.off()
   } else if(batch_effect == TRUE){
     mat <- assay(vsd)
     mm <- model.matrix(~Treatment, colData(vsd))
@@ -94,8 +93,7 @@ QC_PCAplot <- function(dds, filename_start, plot_title, batch_effect){
     png(filename = stri_join(c("QC_results/PCA_plots/", filename_start, ".png"),
                              collapse = ""),
         width = 1500, height = 1500, units = "px", pointsize = 10, res = 200,
-        bg = "white", family = "", # type = "windows", 
-        symbolfamily="default")
+        bg = "white", family = "", symbolfamily="default")
     ggplot(pcaData, aes(PC1, PC2, color=Treatment, shape=Cohort)) +
       geom_point(size=3) +
       xlab(paste0("PC1: ",percentVar[1],"% variance")) +
