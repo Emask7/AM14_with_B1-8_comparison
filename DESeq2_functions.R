@@ -13,7 +13,8 @@ QC_heatmaps <- function(dds, filename_start, col_factors){
                                " - Normalized Counts Transformation.png"),
                              collapse = ""),
         width = 1200, height = 1200, units = "px", pointsize = 10, res = 200,
-        bg = "white", family = "", type = "windows", symbolfamily="default")
+        bg = "white", family = "", # type = "windows", 
+        symbolfamily="default")
     pheatmap(assay(ntd)[select,], cluster_rows=FALSE, show_rownames=FALSE, 
              cluster_cols=TRUE, annotation_col=df,
              labels_col = colData(dds)$Label_Name,
@@ -24,7 +25,8 @@ QC_heatmaps <- function(dds, filename_start, col_factors){
                                " - Variance Stabilizing Transformation.png"),
                              collapse = ""),
         width = 1200, height = 1200, units = "px", pointsize = 10, res = 200,
-        bg = "white", family = "", type = "windows", symbolfamily="default")
+        bg = "white", family = "", # type = "windows", 
+        symbolfamily="default")
     pheatmap(assay(vsd)[select,], cluster_rows=FALSE, show_rownames=FALSE,
              cluster_cols=TRUE, annotation_col=df,
              labels_col = colData(dds)$Label_Name,
@@ -35,7 +37,8 @@ QC_heatmaps <- function(dds, filename_start, col_factors){
                                " - Regularized Log Transformation.png"),
                              collapse = ""),
         width = 1200, height = 1200, units = "px", pointsize = 10, res = 200,
-        bg = "white", family = "", type = "windows", symbolfamily="default")
+        bg = "white", family = "", # type = "windows", 
+        symbolfamily="default")
     pheatmap(assay(rld)[select,], cluster_rows=FALSE, show_rownames=FALSE,
              cluster_cols=TRUE, annotation_col=df,
              labels_col = colData(dds)$Label_Name,
@@ -52,7 +55,8 @@ QC_heatmaps <- function(dds, filename_start, col_factors){
                                " - Sample-to-Sample Distances.png"),
                              collapse = ""),
         width = 1200, height = 1200, units = "px", pointsize = 10, res = 200, 
-        bg = "white", family = "", type = "windows", symbolfamily="default")
+        bg = "white", family = "", # type = "windows", 
+        symbolfamily="default")
     pheatmap(sampleDistMatrix,
              clustering_distance_rows=sampleDists,
              clustering_distance_cols=sampleDists,
@@ -61,73 +65,45 @@ QC_heatmaps <- function(dds, filename_start, col_factors){
     dev.off()
 }
 
-QC_PCAplot <- function(dds, filename_start, batch_effect){
+QC_PCAplot <- function(dds, filename_start, plot_title, batch_effect){
   vsd <- vst(dds)
-  
-  if(batch_effect == TRUE){
-    filename_before_batch <- stri_join(c("QC_results/PCA_plots/", filename_start,
-                                         " - Before Batch Correction.png"), 
-                                       collapse = "")
-    before_title <- stri_join(c(filename_start, "(Before Batch Correction)"), 
-                              collapse = "\n")
-    
-    filename_after_batch <- stri_join(c("QC_results/PCA_plots/", filename_start,
-                                        " - After Batch Correction.png"), 
-                                      collapse = "")
-    after_title <- stri_join(c(filename_start, "(After Batch Correction)"), 
-                             collapse = "\n")
-  } else {
-    filename_before_batch <- stri_join(c("QC_results/PCA_plots/", filename_start, ".png"), 
-                                       collapse = "")
-    before_title <- filename_start
-  }
-  
-  # Principal component plot ---------------------------------------------------
+  if(batch_effect == FALSE){
     pcaData <- plotPCA(vsd, intgroup=c("Treatment", "Cohort"), returnData=TRUE)
     percentVar <- round(100 * attr(pcaData, "percentVar"))
     
-    png(filename = filename_before_batch,
+    png(filename = stri_join(c("QC_results/PCA_plots/", filename_start, ".png"),
+                             collapse = ""),
         width = 1500, height = 1500, units = "px", pointsize = 10, res = 200,
-        bg = "white", family = "", type = "windows", symbolfamily="default")
+        bg = "white", family = "", # type = "windows", 
+        symbolfamily="default")
     ggplot(pcaData, aes(PC1, PC2, color=Treatment, shape=Cohort)) +
       geom_point(size=3) +
       xlab(paste0("PC1: ",percentVar[1],"% variance")) +
       ylab(paste0("PC2: ",percentVar[2],"% variance")) +
       coord_fixed() +
-      labs(title = before_title)
+      labs(title = plot_title)
     # dev.off()
-  
-  # # PCA plot removing batch effects --------------------------------------------
-  #   if(batch_effect == TRUE){
-  #     mat <- assay(vsd)
-  #     mm <- model.matrix(~Treatment, colData(vsd))
-  #     mat <- removeBatchEffect(mat, batch=vsd$Cohort, design=mm)
-  #     assay(vsd) <- mat
-  #     pcaData <- plotPCA(vsd, intgroup=c("Treatment", "Cohort"), returnData=TRUE)
-  #     percentVar <- round(100 * attr(pcaData, "percentVar"))
-  # 
-  #     dev.off()
-  #     png(filename = filename_after_batch,
-  #         width = 1500, height = 1500, units = "px", pointsize = 10, res = 200,
-  #         bg = "white", family = "", type = "windows", symbolfamily="default")
-  #     ggplot(pcaData, aes(PC1, PC2, color=Treatment, shape=Cohort)) +
-  #       geom_point(size=3) +
-  #       xlab(paste0("PC1: ",percentVar[1],"% variance")) +
-  #       ylab(paste0("PC2: ",percentVar[2],"% variance")) +
-  #       coord_fixed() +
-  #       labs(title = after_title)
-  #   }
-  #   dev.off()
+  } else if(batch_effect == TRUE){
+    mat <- assay(vsd)
+    mm <- model.matrix(~Treatment, colData(vsd))
+    mat <- removeBatchEffect(mat, batch=vsd$Cohort, design=mm)
+    assay(vsd) <- mat
+    pcaData <- plotPCA(vsd, intgroup=c("Treatment", "Cohort"), returnData=TRUE)
+    percentVar <- round(100 * attr(pcaData, "percentVar"))
+
+    png(filename = stri_join(c("QC_results/PCA_plots/", filename_start, ".png"),
+                             collapse = ""),
+        width = 1500, height = 1500, units = "px", pointsize = 10, res = 200,
+        bg = "white", family = "", # type = "windows", 
+        symbolfamily="default")
+    ggplot(pcaData, aes(PC1, PC2, color=Treatment, shape=Cohort)) +
+      geom_point(size=3) +
+      xlab(paste0("PC1: ",percentVar[1],"% variance")) +
+      ylab(paste0("PC2: ",percentVar[2],"% variance")) +
+      coord_fixed() +
+      labs(title = plot_title)
+  } else print("batch_effect must be either TRUE or FALSE")
 }
-
-
-
-
-
-
-
-
-
 
 summary_v2 <- function(res, title, p_cutoff, lfc_cutoff){
   if(missing(p_cutoff)) p_cutoff <- 0.05

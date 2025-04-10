@@ -21,12 +21,6 @@
   cts_B18trans <- import_Rosalind_data("raw_data/B1-8_Adoptive_Transfer_rawCountsWithAnnotations.txt")
   cts_AM14MRLlpr <- import_Rosalind_data("raw_data/AM14_MRLlpr_rawCountsWithAnnotations.txt")
 
-  # cts <- full_join(cts_AM14trans, cts_B18trans)
-  # cts <- full_join(cts, cts_AM14MRLlpr)
-  # colnames(cts)
-  # head(cts)
-  # nrow(cts)
-  
   # Save a table of gene IDs in case they need to be converted later -----------
     gene_IDs <- list(AM14trans = cts_AM14trans[, c(1:4)],
                      B18trans = cts_B18trans[, c(1:4)],
@@ -40,41 +34,6 @@
     head(cts_AM14trans)
     head(cts_B18trans)
     head(cts_AM14MRLlpr)
-    
-# # Set row names to Ensembl IDs -----------------------------------------------
-#   cts_dups <- cts[duplicated(cts$ensembl_gene_id), ]
-#   nrow(cts_dups)
-#   cts_dups
-#   rowSums(cts_dups > 0)
-#   
-#   cts <- cts[!duplicated(cts$ensembl_gene_id), ]
-#   nrow(cts)
-#   cts <- cts[!is.na(cts$ensembl_gene_id), ]
-#   nrow(cts)
-#   rownames(cts) <- cts$ensembl_gene_id
-# 
-#   # Save a table of gene IDs in case they need to be converted later ---------
-#     gene_IDs <- cts[, c(1:4)]
-#     head(gene_IDs)
-#     
-#   # Remove extra columns from cts --------------------------------------------
-#     cts <- cts[, c(5:50)]
-# 
-# # For gene symbols as row names ----------------------------------------------
-#   cts_AM14trans <- cts_AM14trans[!duplicated(cts_AM14trans$external_gene_name), ]
-#   nrow(cts_AM14trans)
-#   cts_AM14trans <- cts_AM14trans[!is.na(cts_AM14trans$external_gene_name), ]
-#   nrow(cts_AM14trans)
-#   rownames(cts_AM14trans) <- cts_AM14trans$external_gene_name
-#   nrow(cts_AM14trans)
-# 
-# # For Entrez IDs as row names ------------------------------------------------
-#   cts_AM14trans <- cts_AM14trans[!duplicated(cts_AM14trans$entrezgene), ]
-#   nrow(cts_AM14trans)
-#   cts_AM14trans <- cts_AM14trans[!is.na(cts_AM14trans$entrezgene), ]
-#   nrow(cts_AM14trans)
-#   rownames(cts_AM14trans) <- cts_AM14trans$entrezgene
-#   nrow(cts_AM14trans)
 
 # Set up experimental factors --------------------------------------------------
   coldata <- read.csv("raw_data/sample_info.csv")
@@ -144,66 +103,50 @@
   
 # Run QC steps -----------------------------------------------------------------
   QC_heatmaps(dds_AM14trans, "AM14_Adoptive_Transfer", c("Treatment", "Cohort"))
-  QC_PCAplot(dds_AM14trans, "AM14 Adoptive Transfer", batch_effect = TRUE)               
+  QC_heatmaps(dds_B18trans, "B18_Adoptive_Transfer", c("Treatment", "Cohort"))
+  QC_heatmaps(dds_AM14MRLlpr, "AM14_MRLlpr", c("Treatment", "Cohort"))
+  
+  QC_PCAplot(dds_AM14trans, "AM14_Adoptive_Transfer-Before_Batch_Correction", 
+             "AM14 Adoptive Transfer\n(Before Batch Correction)", 
+             batch_effect = FALSE)               
   dev.off()
-  QC_PCAplot(dds_B18trans, "B1-8 Adoptive Transfer", batch_effect = FALSE)               
-  
-  
-  filename_start <- "AM14 Adoptive Transfer"
-  vsd <- vst(dds_AM14trans)
-  
-  if(batch_effect == TRUE){
-    filename_before_batch <- stri_join(c("QC_results/PCA_plots/", filename_start,
-                                         " - Before Batch Correction.png"), 
-                                       collapse = "")
-    before_title <- stri_join(c(filename_start, "(Before Batch Correction)"), 
-                              collapse = "\n")
-    
-    filename_after_batch <- stri_join(c("QC_results/PCA_plots/", filename_start,
-                                        " - After Batch Correction.png"), 
-                                      collapse = "")
-    after_title <- stri_join(c(filename_start, "(After Batch Correction)"), 
-                             collapse = "\n")
-  } else {
-    filename_before_batch <- stri_join(c("QC_results/PCA_plots/", filename_start, ".png"), 
-                                       collapse = "")
-    before_title <- filename_start
-  }
-  
-  # Principal component plot ---------------------------------------------------
-  pcaData <- plotPCA(vsd, intgroup=c("Treatment", "Cohort"), returnData=TRUE)
-  percentVar <- round(100 * attr(pcaData, "percentVar"))
-  
-  png(filename = filename_before_batch,
-      width = 1500, height = 1500, units = "px", pointsize = 10, res = 200,
-      bg = "white", family = "", type = "windows", symbolfamily="default")
-  ggplot(pcaData, aes(PC1, PC2, color=Treatment, shape=Cohort)) +
-    geom_point(size=3) +
-    xlab(paste0("PC1: ",percentVar[1],"% variance")) +
-    ylab(paste0("PC2: ",percentVar[2],"% variance")) +
-    coord_fixed() +
-    labs(title = before_title)
+  QC_PCAplot(dds_AM14trans, "AM14_Adoptive_Transfer-After_Batch_Correction", 
+             "AM14 Adoptive Transfer\n(After Batch Correction)", 
+             batch_effect = TRUE)               
   dev.off()
   
-
+  QC_PCAplot(dds_B18trans, "B1-8_Adoptive_Transfer","B1-8 Adoptive Transfer", 
+             batch_effect = FALSE)               
+  dev.off()
+  
+  QC_PCAplot(dds_AM14MRLlpr, "AM14_MRLlpr-Before_Batch_Correction", 
+             "AM14 MRL/lpr mice +/- 2DG\n(Before Batch Correction)", 
+             batch_effect = FALSE)               
+  dev.off()
+  QC_PCAplot(dds_AM14MRLlpr, "AM14_MRLlpr-After_Batch_Correction", 
+             "AM14 MRL/lpr mice +/- 2DG\n(After Batch Correction)", 
+             batch_effect = TRUE)               
+  dev.off()
   
 # Differential Expression Analysis ---------------------------------------------
-  resultsNames(dds)
-    
+  resultsNames(dds_AM14trans)
+  resultsNames(dds_B18trans)
+  resultsNames(dds_AM14MRLlpr)
+  
 # Get results (default methods) ------------------------------------------------
-  res_PL23 <- results(dds, contrast = c("Treatment", "PL2-3+2DG", "PL2-3"))
+  res_PL23 <- results(dds_AM14trans, contrast = c("Treatment", "PL23_2DG", "PL23"))
   res_PL23 <- data.frame(subset(res_PL23, !is.na(padj)))
   summary_v2(res_PL23, "PL2-3+2DG vs PL2-3")
   
-  res_R848 <- results(dds, contrast = c("Treatment", "R848+2DG", "R848"))
+  res_R848 <- results(dds_AM14trans, contrast = c("Treatment", "R848_2DG", "R848"))
   res_R848 <- data.frame(subset(res_R848, !is.na(padj)))
   summary_v2(res_R848, "R848+2DG vs R848")
   
-  res_PL23vR848 <- results(dds, contrast = c("Treatment", "PL2-3", "R848"))
+  res_PL23vR848 <- results(dds_AM14trans, contrast = c("Treatment", "PL2-3", "R848"))
   res_PL23vR848 <- data.frame(subset(res_PL23vR848, !is.na(padj)))
   summary_v2(res_PL23vR848, "PL2-3 vs R848")
   
-  res_2DG_PL23vR848 <- results(dds, contrast = c("Treatment", "PL2-3+2DG", "R848+2DG"))
+  res_2DG_PL23vR848 <- results(dds_AM14trans, contrast = c("Treatment", "PL2-3+2DG", "R848+2DG"))
   res_2DG_PL23vR848 <- data.frame(subset(res_2DG_PL23vR848, !is.na(padj)))
   summary_v2(res_2DG_PL23vR848, "PL2-3+2DG vs R848+2DG")
   
