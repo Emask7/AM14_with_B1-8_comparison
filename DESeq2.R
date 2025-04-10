@@ -9,8 +9,6 @@
       filter(!grepl("5S_rRNA", external_gene_name))
     temp_cts <- temp_cts[, c(1:4, 12:ncol(temp_cts))]
     temp_cts <- temp_cts[!duplicated(temp_cts), ]
-    # keep <- rowSums(temp_cts[, 5:ncol(temp_cts)]) > 0
-    # temp_cts <- temp_cts[keep,]
     temp_cts <- temp_cts[!duplicated(temp_cts$ensembl_gene_id), ]
     rownames(temp_cts) <- temp_cts$ensembl_gene_id
     return(temp_cts)
@@ -136,29 +134,25 @@
 # Get results (default methods) ------------------------------------------------
   res_PL23 <- results(dds_AM14trans, contrast = c("Treatment", "PL23_2DG", "PL23"))
   res_PL23 <- data.frame(subset(res_PL23, !is.na(padj)))
-  summary_v2(res_PL23, "PL2-3+2DG vs PL2-3")
+  summary_v2(res_PL23, "PL2-3+2DG vs PL2-3", lfc_cutoff = 1, p_cutoff = 0.05)
   
   res_R848 <- results(dds_AM14trans, contrast = c("Treatment", "R848_2DG", "R848"))
   res_R848 <- data.frame(subset(res_R848, !is.na(padj)))
-  summary_v2(res_R848, "R848+2DG vs R848")
+  summary_v2(res_R848, "R848+2DG vs R848", lfc_cutoff = 1, p_cutoff = 0.05)
   
-  res_PL23vR848 <- results(dds_AM14trans, contrast = c("Treatment", "PL2-3", "R848"))
+  res_PL23vR848 <- results(dds_AM14trans, contrast = c("Treatment", "PL23", "R848"))
   res_PL23vR848 <- data.frame(subset(res_PL23vR848, !is.na(padj)))
-  summary_v2(res_PL23vR848, "PL2-3 vs R848")
+  summary_v2(res_PL23vR848, "PL2-3 vs R848", lfc_cutoff = 1, p_cutoff = 0.05)
   
-  res_2DG_PL23vR848 <- results(dds_AM14trans, contrast = c("Treatment", "PL2-3+2DG", "R848+2DG"))
+  res_2DG_PL23vR848 <- results(dds_AM14trans, contrast = c("Treatment", "PL23_2DG", "R848_2DG"))
   res_2DG_PL23vR848 <- data.frame(subset(res_2DG_PL23vR848, !is.na(padj)))
-  summary_v2(res_2DG_PL23vR848, "PL2-3+2DG vs R848+2DG")
+  summary_v2(res_2DG_PL23vR848, "PL2-3+2DG vs R848+2DG", lfc_cutoff = 1, p_cutoff = 0.05)
   
     # Note: There are a few reasons why a p value or padj value would be NA
     # According to the DESeq2 manual, these are the reasons:
-    # If within a row, all samples have zero counts, the baseMean column will
-    # be zero, and the LFC estimates, p value and padj will all be NA.
-    # If a row contains a sample with an extreme count outlier then the 
-    # p value and padj will be set to NA.
-    # If a row is filtered by automatic independent filtering, for having a 
-    # low mean normalized count, then only padj will be set to NA.
-    
+    # If within a row, all samples have zero counts, the baseMean column will be zero, and the LFC estimates, p value and padj will all be NA.
+    # If a row contains a sample with an extreme count outlier then the p value and padj will be set to NA.
+    # If a row is filtered by automatic independent filtering, for having a low mean normalized count, then only padj will be set to NA.
     
   # Make DEG lists and export to CSV files -------------------------------------
     write_DEG_CSV(res_PL23, 1, "PL2-3_2DG_vs_Control")
@@ -184,19 +178,19 @@
 # Save count data to Excel file ------------------------------------------------
   # Add columns with alternative gene identifiers to the DESeq2 results --------
     res_PL23_full <- tibble::rownames_to_column(res_PL23, var = "ensembl_gene_id")
-    res_PL23_full <- right_join(gene_IDs, res_PL23_full)
+    res_PL23_full <- right_join(gene_IDs$AM14trans, res_PL23_full)
     head(res_PL23_full)
     
     res_R848_full <- tibble::rownames_to_column(res_R848, var = "ensembl_gene_id")
-    res_R848_full <- right_join(gene_IDs, res_R848_full)
+    res_R848_full <- right_join(gene_IDs$AM14trans, res_R848_full)
     head(res_R848_full)
     
     res_PL23vR848_full <- tibble::rownames_to_column(res_PL23vR848, var = "ensembl_gene_id")
-    res_PL23vR848_full <- right_join(gene_IDs, res_PL23vR848_full)
+    res_PL23vR848_full <- right_join(gene_IDs$AM14trans, res_PL23vR848_full)
     head(res_PL23vR848_full)
     
     res_2DG_PL23vR848_full <- tibble::rownames_to_column(res_2DG_PL23vR848, var = "ensembl_gene_id")
-    res_2DG_PL23vR848_full <- right_join(gene_IDs, res_2DG_PL23vR848_full)
+    res_2DG_PL23vR848_full <- right_join(gene_IDs$AM14trans, res_2DG_PL23vR848_full)
     head(res_2DG_PL23vR848_full)
     
   # Make a data.frame that summarizes the numbers of DEGs detected -------------
