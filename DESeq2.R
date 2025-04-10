@@ -78,7 +78,7 @@
 
 # Set up experimental factors --------------------------------------------------
   coldata <- read.csv("raw_data/sample_info.csv")
-  coldata <- coldata[, c(1, 3, 5:6)]
+  coldata <- coldata[, c(1:3, 5:6)]
   coldata
   
   cd_AM14trans <- coldata[1:20, ]
@@ -86,7 +86,8 @@
   cd_AM14trans$Treatment <- factor(cd_AM14trans$Treatment)
   cd_AM14trans
   
-  cd_B18trans <- coldata[21:29,  c(1, 2, 4)]
+  cd_B18trans <- coldata[21:29, ]
+  cd_B18trans$Cohort <- factor(cd_B18trans$Cohort)
   cd_B18trans$Treatment <- factor(cd_B18trans$Treatment)
   cd_B18trans
   
@@ -142,13 +143,49 @@
   rm(keep)
   
 # Run QC steps -----------------------------------------------------------------
+  QC_heatmaps(dds_AM14trans, "AM14_Adoptive_Transfer", c("Treatment", "Cohort"))
+  QC_PCAplot(dds_AM14trans, "AM14 Adoptive Transfer", batch_effect = TRUE)               
+  dev.off()
+  QC_PCAplot(dds_B18trans, "B1-8 Adoptive Transfer", batch_effect = FALSE)               
   
-  # col_factors = c("Treatment", "Cohort")
   
-  # count_matrix_heatmap <- function(dds, folder_name, file_name_start, col_factors)
+  filename_start <- "AM14 Adoptive Transfer"
+  vsd <- vst(dds_AM14trans)
   
-  count_matrix_heatmap(dds_AM14trans, "AM14_Adoptive_Transfer", c("Treatment", "Cohort"))
-                                   
+  if(batch_effect == TRUE){
+    filename_before_batch <- stri_join(c("QC_results/PCA_plots/", filename_start,
+                                         " - Before Batch Correction.png"), 
+                                       collapse = "")
+    before_title <- stri_join(c(filename_start, "(Before Batch Correction)"), 
+                              collapse = "\n")
+    
+    filename_after_batch <- stri_join(c("QC_results/PCA_plots/", filename_start,
+                                        " - After Batch Correction.png"), 
+                                      collapse = "")
+    after_title <- stri_join(c(filename_start, "(After Batch Correction)"), 
+                             collapse = "\n")
+  } else {
+    filename_before_batch <- stri_join(c("QC_results/PCA_plots/", filename_start, ".png"), 
+                                       collapse = "")
+    before_title <- filename_start
+  }
+  
+  # Principal component plot ---------------------------------------------------
+  pcaData <- plotPCA(vsd, intgroup=c("Treatment", "Cohort"), returnData=TRUE)
+  percentVar <- round(100 * attr(pcaData, "percentVar"))
+  
+  png(filename = filename_before_batch,
+      width = 1500, height = 1500, units = "px", pointsize = 10, res = 200,
+      bg = "white", family = "", type = "windows", symbolfamily="default")
+  ggplot(pcaData, aes(PC1, PC2, color=Treatment, shape=Cohort)) +
+    geom_point(size=3) +
+    xlab(paste0("PC1: ",percentVar[1],"% variance")) +
+    ylab(paste0("PC2: ",percentVar[2],"% variance")) +
+    coord_fixed() +
+    labs(title = before_title)
+  dev.off()
+  
+
   
 # Differential Expression Analysis ---------------------------------------------
   resultsNames(dds)

@@ -1,4 +1,4 @@
-count_matrix_heatmap <- function(dds, file_name_start, col_factors){
+QC_heatmaps <- function(dds, filename_start, col_factors){
   # Transform data -------------------------------------------------------------
     vsd <- vst(dds)
     rld <- rlog(dds)
@@ -9,7 +9,7 @@ count_matrix_heatmap <- function(dds, file_name_start, col_factors){
                     decreasing=TRUE)[1:20]
     df <- as.data.frame(colData(dds)[, c("Treatment", "Cohort")])
     
-    png(filename = stri_join(c("QC_results/Heatmaps/", file_name_start,
+    png(filename = stri_join(c("QC_results/Heatmaps/", filename_start,
                                " - Normalized Counts Transformation.png"),
                              collapse = ""),
         width = 1200, height = 1200, units = "px", pointsize = 10, res = 200,
@@ -20,7 +20,7 @@ count_matrix_heatmap <- function(dds, file_name_start, col_factors){
              main = "Normalized Counts Transformation")
     dev.off()
     
-    png(filename = stri_join(c("QC_results/Heatmaps/", file_name_start,
+    png(filename = stri_join(c("QC_results/Heatmaps/", filename_start,
                                " - Variance Stabilizing Transformation.png"),
                              collapse = ""),
         width = 1200, height = 1200, units = "px", pointsize = 10, res = 200,
@@ -31,7 +31,7 @@ count_matrix_heatmap <- function(dds, file_name_start, col_factors){
              main = "Variance Stabilizing Transformation")
     dev.off()
 
-    png(filename = stri_join(c("QC_results/Heatmaps/", file_name_start,
+    png(filename = stri_join(c("QC_results/Heatmaps/", filename_start,
                                " - Regularized Log Transformation.png"),
                              collapse = ""),
         width = 1200, height = 1200, units = "px", pointsize = 10, res = 200,
@@ -41,60 +41,89 @@ count_matrix_heatmap <- function(dds, file_name_start, col_factors){
              labels_col = colData(dds)$Label_Name,
              main = "Regularized Log Transformation")
     dev.off()
+    
+  # Heatmap of sample-to-sample distances --------------------------------------
+    sampleDists <- dist(t(assay(vsd)))
+    sampleDistMatrix <- as.matrix(sampleDists)
+    rownames(sampleDistMatrix) <- paste(vsd$Label_Name)
+    colnames(sampleDistMatrix) <- NULL
+    
+    png(filename = stri_join(c("QC_results/Heatmaps/", filename_start,
+                               " - Sample-to-Sample Distances.png"),
+                             collapse = ""),
+        width = 1200, height = 1200, units = "px", pointsize = 10, res = 200, 
+        bg = "white", family = "", type = "windows", symbolfamily="default")
+    pheatmap(sampleDistMatrix,
+             clustering_distance_rows=sampleDists,
+             clustering_distance_cols=sampleDists,
+             col=colorRampPalette(rev(brewer.pal(9, "Blues")))(255),
+             main = "Sample-to-Sample Distances")
+    dev.off()
+}
+
+QC_PCAplot <- function(dds, filename_start, batch_effect){
+  vsd <- vst(dds)
+  
+  if(batch_effect == TRUE){
+    filename_before_batch <- stri_join(c("QC_results/PCA_plots/", filename_start,
+                                         " - Before Batch Correction.png"), 
+                                       collapse = "")
+    before_title <- stri_join(c(filename_start, "(Before Batch Correction)"), 
+                              collapse = "\n")
+    
+    filename_after_batch <- stri_join(c("QC_results/PCA_plots/", filename_start,
+                                        " - After Batch Correction.png"), 
+                                      collapse = "")
+    after_title <- stri_join(c(filename_start, "(After Batch Correction)"), 
+                             collapse = "\n")
+  } else {
+    filename_before_batch <- stri_join(c("QC_results/PCA_plots/", filename_start, ".png"), 
+                                       collapse = "")
+    before_title <- filename_start
+  }
+  
+  # Principal component plot ---------------------------------------------------
+    pcaData <- plotPCA(vsd, intgroup=c("Treatment", "Cohort"), returnData=TRUE)
+    percentVar <- round(100 * attr(pcaData, "percentVar"))
+    
+    png(filename = filename_before_batch,
+        width = 1500, height = 1500, units = "px", pointsize = 10, res = 200,
+        bg = "white", family = "", type = "windows", symbolfamily="default")
+    ggplot(pcaData, aes(PC1, PC2, color=Treatment, shape=Cohort)) +
+      geom_point(size=3) +
+      xlab(paste0("PC1: ",percentVar[1],"% variance")) +
+      ylab(paste0("PC2: ",percentVar[2],"% variance")) +
+      coord_fixed() +
+      labs(title = before_title)
+    # dev.off()
+  
+  # # PCA plot removing batch effects --------------------------------------------
+  #   if(batch_effect == TRUE){
+  #     mat <- assay(vsd)
+  #     mm <- model.matrix(~Treatment, colData(vsd))
+  #     mat <- removeBatchEffect(mat, batch=vsd$Cohort, design=mm)
+  #     assay(vsd) <- mat
+  #     pcaData <- plotPCA(vsd, intgroup=c("Treatment", "Cohort"), returnData=TRUE)
+  #     percentVar <- round(100 * attr(pcaData, "percentVar"))
+  # 
+  #     dev.off()
+  #     png(filename = filename_after_batch,
+  #         width = 1500, height = 1500, units = "px", pointsize = 10, res = 200,
+  #         bg = "white", family = "", type = "windows", symbolfamily="default")
+  #     ggplot(pcaData, aes(PC1, PC2, color=Treatment, shape=Cohort)) +
+  #       geom_point(size=3) +
+  #       xlab(paste0("PC1: ",percentVar[1],"% variance")) +
+  #       ylab(paste0("PC2: ",percentVar[2],"% variance")) +
+  #       coord_fixed() +
+  #       labs(title = after_title)
+  #   }
+  #   dev.off()
 }
 
 
 
 
-# Heatmap of sample-to-sample distances --------------------------------------
-sampleDists <- dist(t(assay(vsd)))
-sampleDistMatrix <- as.matrix(sampleDists)
-rownames(sampleDistMatrix) <- paste(vsd$Label_Name)
-colnames(sampleDistMatrix) <- NULL
 
-png(filename = "QC_results/Heatmap - Sample-to-Sample Distances.png", 
-    width = 1200, height = 1200, units = "px", pointsize = 10, res = 200, 
-    bg = "white", family = "", type = "windows", symbolfamily="default")
-pheatmap(sampleDistMatrix,
-         clustering_distance_rows=sampleDists,
-         clustering_distance_cols=sampleDists,
-         col=colorRampPalette( rev(brewer.pal(9, "Blues")) )(255),
-         main = "Sample-to-Sample Distances")
-dev.off()
-
-# Principal component plot ---------------------------------------------------
-pcaData <- plotPCA(vsd, intgroup=c("Treatment", "Cohort"), returnData=TRUE)
-percentVar <- round(100 * attr(pcaData, "percentVar"))
-
-png(filename = "Output/PCA Plot - Before Batch Correction.png", 
-    width = 1500, height = 1500, units = "px", pointsize = 10, res = 200, 
-    bg = "white", family = "", type = "windows", symbolfamily="default")
-ggplot(pcaData, aes(PC1, PC2, color=Treatment, shape=Cohort)) +
-  geom_point(size=3) +
-  xlab(paste0("PC1: ",percentVar[1],"% variance")) +
-  ylab(paste0("PC2: ",percentVar[2],"% variance")) +
-  coord_fixed() +
-  labs(title = "Before correcting for batch effects_AM14trans")
-dev.off()
-
-# PCA plot removing batch effects_AM14trans --------------------------------------------
-mat <- assay(vsd)
-mm <- model.matrix(~Treatment, colData(vsd))
-mat <- removeBatchEffect(mat, batch=vsd$Cohort, design=mm)
-assay(vsd) <- mat
-pcaData <- plotPCA(vsd, intgroup=c("Treatment", "Cohort"), returnData=TRUE)
-percentVar <- round(100 * attr(pcaData, "percentVar"))
-
-png(filename = "Output/PCA Plot - After Batch Correction.png", 
-    width = 1500, height = 1500, units = "px", pointsize = 10, res = 200, 
-    bg = "white", family = "", type = "windows", symbolfamily="default")
-ggplot(pcaData, aes(PC1, PC2, color=Treatment, shape=Cohort)) +
-  geom_point(size=3) +
-  xlab(paste0("PC1: ",percentVar[1],"% variance")) +
-  ylab(paste0("PC2: ",percentVar[2],"% variance")) +
-  coord_fixed() +
-  labs(title = "After correcting for batch effects_AM14trans")
-dev.off()
 
 
 
