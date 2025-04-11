@@ -168,7 +168,6 @@
                            type = "full")
   full_summary 
   
-  
 # Save results to an Excel file ----------------------------------------------
   wb <- createWorkbook("Output/DESeq2_results.xlsx")
   
