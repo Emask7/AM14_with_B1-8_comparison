@@ -2,7 +2,7 @@
 ## https://guangchuangyu.github.io/software/clusterProfiler/
 ## https://yulab-smu.top/biomedical-knowledge-mining-book/index.html
 
-## GO analysis
+# GO Enrichment Analysis -------------------------------------------------------
 ## background info: http://geneontology.org/docs/ontology-documentation/
 enrichGO_wrapper <- function(dds_res){
   # Create background dataset for hypergeometric testing using all genes tested for significance in the results
@@ -49,7 +49,7 @@ rm(wb)
 # plot(barplot(enrichGO_results$AM14trans$PL23_2DG_v_Ctrl$eGO, showCateGOry=25))
 # goplot(enrichGO_results$AM14trans$PL23_2DG_v_Ctrl$eGO)
 
-## Dotplot 
+# Dotplot Wrapper Function -----------------------------------------------------
 dotplot_wrapper <- function(eGO_res, n, plot_title, file_name, h){
   if(missing(n)) n <- 25
   if(missing(h)) h <- 2200
@@ -63,8 +63,7 @@ dotplot_wrapper <- function(eGO_res, n, plot_title, file_name, h){
       png(filename = stri_join(c("Output/Functional_analyses/", file_name, ".png"),
                                collapse = ""),
           width = 1200, height = h, units = "px", pointsize = 10, res = 200,
-          bg = "white", family = "", type = "windows",
-          symbolfamily="default")
+          bg = "white", family = "", symbolfamily="default")
       dotplot(eGO_res, showCategory = eGO_top, title = plot_title)
     } else dotplot(eGO_res, showCategory = eGO_top, title = plot_title)
   } else dotplot(eGO_res, showCategory = eGO_top, title = plot_title)
@@ -104,9 +103,8 @@ dev.off()
 
 
 
-## KEGG pathway over-representation analysis
+# KEGG pathway over-representation analysis ------------------------------------
 # see https://www.genome.jp/kegg/ for information about KEGG
-# Kyoto Encyclopedia of Genes and Genomes
 enrichKEGG_wrapper <- function(dds_res){
   sig <- dplyr::filter(dds_res, padj < 0.05)
   sig <- as.character(sig$entrezgene)
@@ -139,72 +137,88 @@ nrow(enrichKEGG_results$AM14MRLlpr)
 # # set limit to 3 for optimal color scale - change this as needed
 
 
-## Gene set enrichment analysis
+# GO Gene set enrichment analysis ----------------------------------------------
 gseGO_wrapper <- function(dds_res){
   sig <- dplyr::filter(dds_res, padj < 0.05)
-
   sig_ordered <- sig[sig$baseMean > 50,]
   sig_ordered <- sig_ordered[order(-sig_ordered$stat), ]
-  
-  # Extract gene names + stat value
   gene_list <- sig_ordered$stat
   names(gene_list) <- sig_ordered$ensembl_gene_id
   
-  # run GSEA
-  gse <- gseGO(gene_list, ont = "BP", keyType = "ENSEMBL", 
-               OrgDb = "org.Mm.eg.db", eps = 1e-300)
-  return(list(gse = gse, gse_summary = as.data.frame(gse)))
+  if(length(gene_list) <= 0) return(NULL)
+  else {
+    gse <- gseGO(gene_list, ont = "BP", keyType = "ENSEMBL", 
+                 OrgDb = "org.Mm.eg.db", eps = 1e-300)
+    return(list(gse = gse, gse_summary = as.data.frame(gse)))
+  }
 }
 
-gseGO_results <- gseGO_wrapper(deseq_res$AM14transfer$PL23_2DG_v_Ctrl)
-
-
-
-<- list(
+gseGO_results <- list(
   AM14trans = list(
     PL23_2DG_v_Ctrl = gseGO_wrapper(deseq_res$AM14transfer$PL23_2DG_v_Ctrl),
     R848_2DG_v_Ctrl = gseGO_wrapper(deseq_res$AM14transfer$R848_2DG_v_Ctrl),
     PL23_vs_R848 = gseGO_wrapper(deseq_res$AM14transfer$PL23_vs_R848)),
-  B18trans = gseGO_wrapper(gseGO_wrapper$B18transfer),
+  B18trans = gseGO_wrapper(deseq_res$B18transfer),
   AM14MRLlpr = gseGO_wrapper(deseq_res$AM14MRLlpr)
 )
-head(gseGO_results$gse)
-nrow(gseGO_results$gse)
+nrow(gseGO_results$AM14trans$PL23_2DG_v_Ctrl$gse_summary)
+nrow(gseGO_results$AM14trans$R848_2DG_v_Ctrl$gse_summary)
+nrow(gseGO_results$AM14trans$PL23_vs_R848$gse_summary)
+nrow(gseGO_results$B18trans$gse_summary)
+nrow(gseGO_results$AM14MRLlpr$gse_summary)
 
 # visualize results
-gseaplot(gse, geneSetID = 1)
+gseaplot(gseGO_results$AM14trans$PL23_2DG_v_Ctrl$gse, geneSetID = 1, 
+         title = gseGO_results$AM14trans$PL23_2DG_v_Ctrl$gse$Description[1])
+gseaplot2(gseGO_results$AM14trans$PL23_2DG_v_Ctrl$gse, geneSetID = 1, 
+          title = gseGO_results$AM14trans$PL23_2DG_v_Ctrl$gse$Description[1])
+gseaplot2(gseGO_results$AM14trans$PL23_2DG_v_Ctrl$gse, geneSetID = 1:4)
+head(gseGO_results$AM14trans$PL23_2DG_v_Ctrl$gse)
 
 
-## Reactome pathway over-representation analysis
 
+
+# Reactome pathway over-representation analysis --------------------------------
 # using ClusterProfiler
+gsePathway_wrapper <- function(dds_res){
+  sig <- dplyr::filter(dds_res, padj < 0.05)
 
-# first extract all genes that are upregulated (log2 fold change > 0)
-# then remove rows with duplicate gene names
-# finally sort in decreasing order
-sig_sorted <- sig[sig$log2FoldChange > 0,]
+  sig_up <- sig[sig$log2FoldChange > 0,]
+  sig_up = sig_up[order(sig_up[,'entrezgene']),]
+  sig_up = sig_up[!duplicated(sig_up$entrezgene),]
+  sig_up <- sig_up[order(-sig_up$log2FoldChange), ]
+  sig_up <- na.omit(sig_up)
 
-sig_sorted = sig_sorted[order(sig_sorted[,'ENTREZID']),]
-sig_sorted = sig_sorted[!duplicated(sig_sorted$ENTREZID),]
+  genes_up <- sig_up$log2FoldChange
+  names(genes_up) <- sig_up$entrezgene
 
-sig_sorted <- sig_sorted[order(-sig_sorted$log2FoldChange), ]
-sig_sorted <- na.omit(sig_sorted)
+  pathway_up <- gsePathway(genes_up, organism = "mouse",
+                           pvalueCutoff = 0.2, pAdjustMethod = "BH",
+                           verbose = FALSE, scoreType="pos")
 
-genes_sorted <- sig_sorted$log2FoldChange
-names(genes_sorted) <- sig_sorted$ENTREZID
-head(genes_sorted)
+  sig_down <- sig[sig$log2FoldChange < 0,]
+  sig_down = sig_down[order(sig_down[,'entrezgene']),]
+  sig_down = sig_down[!duplicated(sig_down$entrezgene),]
+  sig_down <- sig_down[order(-sig_down$log2FoldChange), ]
+  sig_down <- na.omit(sig_down)
 
+  genes_down <- sig_down$log2FoldChange
+  names(genes_down) <- sig_down$entrezgene
 
-pathway <- gsePathway(genes_sorted, 
-                      pvalueCutoff = 0.2,
-                      pAdjustMethod = "BH", 
-                      verbose = FALSE,
-                      scoreType="pos")
-head(pathway)
+  pathway_down <- gsePathway(genes_down, organism = "mouse",
+                             pvalueCutoff = 0.2, pAdjustMethod = "BH",
+                             verbose = FALSE, scoreType="pos")
 
-viewPathway("Signaling by GPCR", 
-            readable = TRUE, 
-            foldChange = genes_sorted)
+  return(list(up = pathway_up, down = pathway_down))
+}
+
+gsePathway_res <- gsePathway_wrapper(deseq_res$AM14transfer$PL23_2DG_v_Ctrl)
+gsePathway_res
+# head(pathway)
+# 
+# viewPathway("Signaling by GPCR", 
+#             readable = TRUE, 
+#             foldChange = genes_sorted)
 
 
 # using the packaged "ReactomePA"
