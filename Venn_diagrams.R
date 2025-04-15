@@ -1,3 +1,10 @@
+deg_list_for_venn <- function(res, lfc_cutoff){
+  list(up = subset(res, res$padj <= 0.05 & res$log2FoldChange >= lfc_cutoff)[, 1], 
+       down = subset(res, res$padj <= 0.05 & res$log2FoldChange <= (-1*lfc_cutoff))[, 1], 
+       all = subset(res, res$padj <= 0.05 & abs(res$log2FoldChange) >= lfc_cutoff)[, 1])
+}
+
+
 DEG_lists <- list(
   PL23_2DG_vs_Ctrl = deg_list_for_venn(deseq_res$AM14transfer$PL23_2DG_v_Ctrl, 1),
   R848_2DG_vs_Ctrl = deg_list_for_venn(deseq_res$AM14transfer$R848_2DG_v_Ctrl, 1),
@@ -11,7 +18,7 @@ venn_up_1 <- venndetail(list("AM14 Transfer:\nPL2-3 + 2DG\nvs PL2-3\n" = DEG_lis
                              "AM14 MRL/lpr:\n2DG vs Control\n" = DEG_lists$MRLlpr$up,
                              "B1-8 Transfer:\nNP+2DG vs NP\n" = DEG_lists$B18$up))
 plot(venn_up_1, mycol = met.brewer("Johnson", n = 8, direction = 1),
-     # filename = "Output/venn_diagram_upreg.png",
+     filename = "Output/venn_diagram_upreg.png",
      margin = 0.05, cat.cex = 1, cex = 1.5)
 dev.off()
 detail(venn_up_1)

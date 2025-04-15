@@ -1,3 +1,18 @@
+import_Rosalind_data <- function(res_file){
+  temp_cts <- read.delim(res_file)
+  temp_cts <- temp_cts %>%
+    filter(!grepl("Igh", external_gene_name)) %>%
+    filter(!grepl("Igk", external_gene_name)) %>%
+    filter(!grepl("7SK", external_gene_name)) %>%
+    filter(!grepl("5_8S_rRNA", external_gene_name)) %>%
+    filter(!grepl("5S_rRNA", external_gene_name))
+  temp_cts <- temp_cts[, c(1:4, 12:ncol(temp_cts))]
+  temp_cts <- temp_cts[!duplicated(temp_cts), ]
+  temp_cts <- temp_cts[!duplicated(temp_cts$ensembl_gene_id), ]
+  rownames(temp_cts) <- temp_cts$ensembl_gene_id
+  return(temp_cts)
+}
+
 QC_heatmaps <- function(dds, filename_start, plot_title, col_factors){
   # Transform data -------------------------------------------------------------
     vsd <- vst(dds)
@@ -68,14 +83,33 @@ QC_heatmaps <- function(dds, filename_start, plot_title, col_factors){
 
 QC_PCAplot <- function(dds, filename_start, plot_title, batch_effect){
   vsd <- vst(dds)
-  if(batch_effect == FALSE){
+  
+  if(is.null(batch_effect)){
+    pcaData <- plotPCA(vsd, intgroup=c("Treatment"), returnData=TRUE)
+    percentVar <- round(100 * attr(pcaData, "percentVar"))
+    
+    if(!is.null(plot_title)){
+      png(filename = stri_join(c("QC_results/PCA_plots/", filename_start, ".png"),
+                               collapse = ""),
+          width = 1500, height = 1500, units = "px", pointsize = 10, res = 200,
+          bg = "white", family = "", symbolfamily="default")
+    }
+    ggplot(pcaData, aes(PC1, PC2, color=Treatment)) +
+      geom_point(size=3) +
+      xlab(paste0("PC1: ",percentVar[1],"% variance")) +
+      ylab(paste0("PC2: ",percentVar[2],"% variance")) +
+      coord_fixed() +
+      labs(title = plot_title)
+  } else if(batch_effect == FALSE){
     pcaData <- plotPCA(vsd, intgroup=c("Treatment", "Cohort"), returnData=TRUE)
     percentVar <- round(100 * attr(pcaData, "percentVar"))
     
-    png(filename = stri_join(c("QC_results/PCA_plots/", filename_start, ".png"),
-                             collapse = ""),
-        width = 1500, height = 1500, units = "px", pointsize = 10, res = 200,
-        bg = "white", family = "", symbolfamily="default")
+    if(!is.null(plot_title)){
+      png(filename = stri_join(c("QC_results/PCA_plots/", filename_start, ".png"),
+                               collapse = ""),
+          width = 1500, height = 1500, units = "px", pointsize = 10, res = 200,
+          bg = "white", family = "", symbolfamily="default")
+    }
     ggplot(pcaData, aes(PC1, PC2, color=Treatment, shape=Cohort)) +
       geom_point(size=3) +
       xlab(paste0("PC1: ",percentVar[1],"% variance")) +
@@ -90,10 +124,12 @@ QC_PCAplot <- function(dds, filename_start, plot_title, batch_effect){
     pcaData <- plotPCA(vsd, intgroup=c("Treatment", "Cohort"), returnData=TRUE)
     percentVar <- round(100 * attr(pcaData, "percentVar"))
 
-    png(filename = stri_join(c("QC_results/PCA_plots/", filename_start, ".png"),
+    if(!is.null(plot_title)){
+      png(filename = stri_join(c("QC_results/PCA_plots/", filename_start, ".png"),
                              collapse = ""),
         width = 1500, height = 1500, units = "px", pointsize = 10, res = 200,
         bg = "white", family = "", symbolfamily="default")
+    }
     ggplot(pcaData, aes(PC1, PC2, color=Treatment, shape=Cohort)) +
       geom_point(size=3) +
       xlab(paste0("PC1: ",percentVar[1],"% variance")) +
@@ -103,23 +139,19 @@ QC_PCAplot <- function(dds, filename_start, plot_title, batch_effect){
   } else print("batch_effect must be either TRUE or FALSE")
 }
 
-# summary_v2 <- function(res, comparison, experiment, p_cutoff, lfc_cutoff){
-#   if(missing(p_cutoff)) p_cutoff <- 0.05
-#   if(missing(lfc_cutoff)) lfc_cutoff <- 1
-#   # if(missing(title)) title <- "# Genes"
-#   
-#   up_string <- stri_join(c("Up (LFC >= ", lfc_cutoff, "p-adj <= ", p_cutoff, ")"), collapse = "")
-#   down_string <- stri_join(c("Down (LFC <= -", lfc_cutoff, "p-adj <= ", p_cutoff,  ")"), collapse = "")
-#   
-#   DEG_summary <- data.frame(c("Experiment", up_string, down_string),
-#                             c(experiment,
-#                               nrow(subset(res, res$padj <= p_cutoff & res$log2FoldChange >= lfc_cutoff)),
-#                               nrow(subset(res, res$padj <= p_cutoff & res$log2FoldChange <= (-1*lfc_cutoff)))))
-#   
-#   # col1_name <- stri_join(c("padj <= ", p_cutoff), collapse = "")
-#   colnames(DEG_summary) <- c("Comparison", comparison)
-#   DEG_summary
-# }
+results_wrapper <- function(dds, cons, IDs){
+  res <- results(dds, contrast = cons)
+  res <- data.frame(subset(res, !is.na(padj)))
+  # Note: There are a few reasons why a p value or padj value would be NA
+  # According to the DESeq2 manual, these are the reasons:
+  # If within a row, all samples have zero counts, the baseMean column will be zero, and the LFC estimates, p value and padj will all be NA.
+  # If a row contains a sample with an extreme count outlier then the p value and padj will be set to NA.
+  # If a row is filtered by automatic independent filtering, for having a low mean normalized count, then only padj will be set to NA.
+  tempcols <- colnames(res)
+  res <- data.frame(rownames(res), res)
+  colnames(res) <- c("ensembl_gene_id", tempcols)
+  return(right_join(IDs, res))
+}
 
 summary_wrapper <- function(res, comparison, experiment, p_cutoff, lfc_cutoff){
   if(missing(p_cutoff)) p_cutoff <- 0.05
@@ -136,12 +168,31 @@ summary_wrapper <- function(res, comparison, experiment, p_cutoff, lfc_cutoff){
   DEG_summary
 }
 
-deg_list_for_venn <- function(res, lfc_cutoff){
-  list(up = subset(res, res$padj <= 0.05 & res$log2FoldChange >= lfc_cutoff)[, 1], 
-       down = subset(res, res$padj <= 0.05 & res$log2FoldChange <= (-1*lfc_cutoff))[, 1], 
-       all = subset(res, res$padj <= 0.05 & abs(res$log2FoldChange) >= lfc_cutoff)[, 1])
-}
 
+sig_DEG_table <- function(res, ID_type, lfc_cutoff, padj_cutoff, file_start){
+  if (missing(lfc_cutoff)) lfc_cutoff <- 1
+  if (missing(padj_cutoff)) padj_cutoff <- 0.05
+  
+  dat <- subset(res, res$padj <= 0.05 & abs(res$log2FoldChange) >= lfc_cutoff)
+  
+  if(missing(ID_type)) print("specify ID type: ensembl_gene_id, external_gene_name, entrezgene, or all")
+  else if(ID_type == "ensembl_gene_id") dat <- dat[, c(1, 6, 10)]
+  else if(ID_type == "external_gene_name") dat <- dat[, c(2, 6, 10)]
+  else if(ID_type == "entrezgene") dat <- dat[, c(4, 6, 10)]
+  else if (ID_type == "all") dat <- dat[, c(1, 2, 4, 6, 10)]
+  else print("specify ID type: ensembl_gene_id, external_gene_name, entrezgene, or all")
+  
+  # colnames(dat) <- c("#", "LogFoldChange")
+  
+  if(missing(file_start)) file_start <- NULL
+  if(!is.null(file_start)){
+    write.table(dat,
+                file = stri_join(c("Output/Gene_Lists/", file_start, "_LFC_values.csv"), collapse = ""),
+                sep = ",", quote = FALSE, row.names = FALSE, col.names = TRUE)
+  }
+  
+  dat
+}
 
 
 # write_DEG_CSV <- function(res, lfc_cutoff, file_start){
@@ -164,23 +215,4 @@ deg_list_for_venn <- function(res, lfc_cutoff){
 #   return(list(up = up, down = down, all = all))
 # }
 
-# write_sig_LFCs <- function(res, lfc_cutoff, ID_type, file_start){
-#   dat <- subset(res, res$padj <= 0.05 & abs(res$log2FoldChange) >= lfc_cutoff)
-#   
-#   if(missing(ID_type)) print("specify ID type: ensembl_gene_id, external_gene_name, or entrezgene")
-#   else if(ID_type == "ensembl_gene_id") dat <- dat[, c(1, 6)]
-#   else if(ID_type == "external_gene_name") dat <- dat[, c(2, 6)]
-#   else if(ID_type == "entrezgene") dat <- dat[, c(4, 6)]
-#   else print("specify ID type: ensembl_gene_id, external_gene_name, or entrezgene")
-#   
-#   colnames(dat) <- c("#", "LogFoldChange")
-#   
-#   if(!is.null(file_start)){
-#     write.table(dat,
-#                 file = stri_join(c("Output/Gene_Lists/", file_start, "_LFC_values.csv"), collapse = ""),
-#                 sep = ",", quote = FALSE, row.names = FALSE, col.names = TRUE)
-#   }
-#   
-#   dat
-# }
 

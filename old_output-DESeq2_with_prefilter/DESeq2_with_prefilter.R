@@ -57,23 +57,32 @@
                                           colData = cd_AM14trans,
                                           design = ~Cohort + Treatment)
   dds_AM14trans
+  keep <- rowSums(counts(dds_AM14trans) >= 10) >= 5
+  dds_AM14trans <- dds_AM14trans[keep,]
   dds_AM14trans <- DESeq(dds_AM14trans)
   resultsNames(dds_AM14trans)
-
+  rm(keep)
+  
   dds_B18trans <- DESeqDataSetFromMatrix(countData = cts_B18trans, 
                                          colData = cd_B18trans,
                                          design = ~Treatment)
   dds_B18trans
+  keep <- rowSums(counts(dds_B18trans) >= 10) >= 4
+  dds_B18trans <- dds_B18trans[keep,]
   dds_B18trans <- DESeq(dds_B18trans)
   resultsNames(dds_B18trans)
-
+  rm(keep)
+  
   dds_AM14MRLlpr <- DESeqDataSetFromMatrix(countData = cts_AM14MRLlpr,
                                            colData = cd_AM14MRLlpr,
                                            design = ~Cohort + Treatment)
   dds_AM14MRLlpr
+  keep <- rowSums(counts(dds_AM14MRLlpr) >= 10) >= 8
+  dds_AM14MRLlpr <- dds_AM14MRLlpr[keep,]
   dds_AM14MRLlpr <- DESeq(dds_AM14MRLlpr)
   resultsNames(dds_AM14MRLlpr)
-
+  rm(keep)
+  
 # Run QC steps -----------------------------------------------------------------
   QC_heatmaps(dds_AM14trans, "AM14_Adoptive_Transfer", "AM14 Adoptive Transfer", c("Treatment", "Cohort"))
   QC_heatmaps(dds_B18trans, "B18_Adoptive_Transfer", "B1-8 Adoptive Transfer", c("Treatment", "Cohort"))
