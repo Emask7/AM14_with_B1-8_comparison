@@ -13,7 +13,7 @@ import_Rosalind_data <- function(res_file){
   return(temp_cts)
 }
 
-QC_heatmaps <- function(dds, filename_start, plot_title, col_factors){
+QC_heatmaps <- function(dds, filename_start, plot_title){
   # Transform data -------------------------------------------------------------
     vsd <- vst(dds)
     rld <- rlog(dds)
@@ -24,42 +24,50 @@ QC_heatmaps <- function(dds, filename_start, plot_title, col_factors){
                     decreasing=TRUE)[1:20]
     df <- as.data.frame(colData(dds)[, c("Treatment", "Cohort")])
     
-    png(filename = stri_join(c("QC_results/Heatmaps/", filename_start,
-                               " - Normalized Counts Transformation.png"),
-                             collapse = ""),
-        width = 1200, height = 1200, units = "px", pointsize = 10, res = 200,
-        bg = "white", family = "", # type = "windows", 
-        symbolfamily="default")
-    pheatmap(assay(ntd)[select,], cluster_rows=FALSE, show_rownames=FALSE, 
-             cluster_cols=TRUE, annotation_col=df,
-             labels_col = colData(dds)$Label_Name,
-             main = stri_join(c(plot_title, "(Normalized Counts Transformation)"), collapse = "\n"))
-    dev.off()
+    if(!is.null(filename_start)) {
+      png(filename = stri_join(c("QC_results/Heatmaps/", filename_start,
+                                 " - Normalized Counts Transformation.png"),
+                               collapse = ""),
+          width = 1200, height = 1200, units = "px", pointsize = 10, res = 200,
+          bg = "white", family = "", symbolfamily="default")
+      pheatmap(assay(ntd)[select,], cluster_rows=FALSE, show_rownames=FALSE, 
+               cluster_cols=TRUE, annotation_col=df, labels_col = colData(dds)$Label_Name,
+               main = stri_join(c(plot_title, "(Normalized Counts Transformation)"), collapse = "\n"))
+      dev.off()
+      
+      png(filename = stri_join(c("QC_results/Heatmaps/", filename_start,
+                                 " - Variance Stabilizing Transformation.png"),
+                               collapse = ""),
+          width = 1200, height = 1200, units = "px", pointsize = 10, res = 200,
+          bg = "white", family = "", symbolfamily="default")
+      pheatmap(assay(vsd)[select,], cluster_rows=FALSE, show_rownames=FALSE,
+               cluster_cols=TRUE, annotation_col=df, labels_col = colData(dds)$Label_Name,
+               main = stri_join(c(plot_title, "(Variance Stabilizing Transformation)"), collapse = "\n"))
+      dev.off()
+      
+      png(filename = stri_join(c("QC_results/Heatmaps/", filename_start,
+                                 " - Regularized Log Transformation.png"),
+                               collapse = ""),
+          width = 1200, height = 1200, units = "px", pointsize = 10, res = 200,
+          bg = "white", family = "", symbolfamily="default")
+      pheatmap(assay(rld)[select,], cluster_rows=FALSE, show_rownames=FALSE,
+               cluster_cols=TRUE, annotation_col=df, labels_col = colData(dds)$Label_Name,
+               main = stri_join(c(plot_title, "(Regularized Log Transformation)"), collapse = "\n"))
+      dev.off()
+    } else {
+      pheatmap(assay(ntd)[select,], cluster_rows=FALSE, show_rownames=FALSE, 
+               cluster_cols=TRUE, annotation_col=df, labels_col = colData(dds)$Label_Name,
+               main = stri_join(c(plot_title, "(Normalized Counts Transformation)"), collapse = "\n"))
+
+      pheatmap(assay(vsd)[select,], cluster_rows=FALSE, show_rownames=FALSE,
+               cluster_cols=TRUE, annotation_col=df, labels_col = colData(dds)$Label_Name,
+               main = stri_join(c(plot_title, "(Variance Stabilizing Transformation)"), collapse = "\n"))
+
+      pheatmap(assay(rld)[select,], cluster_rows=FALSE, show_rownames=FALSE,
+               cluster_cols=TRUE, annotation_col=df, labels_col = colData(dds)$Label_Name,
+               main = stri_join(c(plot_title, "(Regularized Log Transformation)"), collapse = "\n"))
+    }
     
-    png(filename = stri_join(c("QC_results/Heatmaps/", filename_start,
-                               " - Variance Stabilizing Transformation.png"),
-                             collapse = ""),
-        width = 1200, height = 1200, units = "px", pointsize = 10, res = 200,
-        bg = "white", family = "", # type = "windows", 
-        symbolfamily="default")
-    pheatmap(assay(vsd)[select,], cluster_rows=FALSE, show_rownames=FALSE,
-             cluster_cols=TRUE, annotation_col=df,
-             labels_col = colData(dds)$Label_Name,
-             main = stri_join(c(plot_title, "(Variance Stabilizing Transformation)"), collapse = "\n"))
-    dev.off()
-
-    png(filename = stri_join(c("QC_results/Heatmaps/", filename_start,
-                               " - Regularized Log Transformation.png"),
-                             collapse = ""),
-        width = 1200, height = 1200, units = "px", pointsize = 10, res = 200,
-        bg = "white", family = "", # type = "windows", 
-        symbolfamily="default")
-    pheatmap(assay(rld)[select,], cluster_rows=FALSE, show_rownames=FALSE,
-             cluster_cols=TRUE, annotation_col=df,
-             labels_col = colData(dds)$Label_Name,
-             main = stri_join(c(plot_title, "(Regularized Log Transformation)"), collapse = "\n"))
-
-    dev.off()
     
   # Heatmap of sample-to-sample distances --------------------------------------
     sampleDists <- dist(t(assay(vsd)))
@@ -67,19 +75,57 @@ QC_heatmaps <- function(dds, filename_start, plot_title, col_factors){
     rownames(sampleDistMatrix) <- paste(vsd$Label_Name)
     colnames(sampleDistMatrix) <- NULL
     
-    png(filename = stri_join(c("QC_results/Heatmaps/", filename_start,
-                               " - Sample-to-Sample Distances.png"),
-                             collapse = ""),
-        width = 1200, height = 1200, units = "px", pointsize = 10, res = 200, 
-        bg = "white", family = "", # type = "windows", 
-        symbolfamily="default")
-    pheatmap(sampleDistMatrix,
-             clustering_distance_rows=sampleDists,
-             clustering_distance_cols=sampleDists,
-             col=colorRampPalette(rev(brewer.pal(9, "Blues")))(255),
-             main = stri_join(c(plot_title, "(Sample-to-Sample Distances)"), collapse = "\n"))
-    dev.off()
+    if(!is.null(filename_start)) {
+      png(filename = stri_join(c("QC_results/Heatmaps/", filename_start,
+                                 " - Sample-to-Sample Distances.png"),
+                               collapse = ""),
+          width = 1200, height = 1200, units = "px", pointsize = 10, res = 200, 
+          bg = "white", family = "", symbolfamily="default")
+      pheatmap(sampleDistMatrix,
+               clustering_distance_rows=sampleDists,
+               clustering_distance_cols=sampleDists,
+               col=colorRampPalette(rev(brewer.pal(9, "Blues")))(255),
+               main = stri_join(c(plot_title, "(Sample-to-Sample Distances)"), collapse = "\n"))
+      dev.off()
+    } else {
+      pheatmap(sampleDistMatrix,
+               clustering_distance_rows=sampleDists,
+               clustering_distance_cols=sampleDists,
+               col=colorRampPalette(rev(brewer.pal(9, "Blues")))(255),
+               main = stri_join(c(plot_title, "(Sample-to-Sample Distances)"), collapse = "\n"))
+    }
 }
+
+QC_heatmaps_batch_corrected <- function(dds, filename_start, plot_title){
+  # Transform data -------------------------------------------------------------
+    vsd <- vst(dds)
+    mat <- assay(vsd)
+    mm <- model.matrix(~Treatment, colData(vsd))
+    mat <- removeBatchEffect(mat, batch=vsd$Cohort, design=mm)
+    assay(vsd) <- mat
+
+  # Heatmap of count matrix ----------------------------------------------------
+    select <- order(rowMeans(counts(dds,normalized=TRUE)), 
+                    decreasing=TRUE)[1:20]
+    df <- as.data.frame(colData(dds)[, c("Treatment", "Cohort")])
+    
+    if(!is.null(filename_start)) {
+      png(filename = stri_join(c("QC_results/Heatmaps/", filename_start,
+                                 " - Batch corrected.png"),
+                               collapse = ""),
+          width = 1200, height = 1200, units = "px", pointsize = 10, res = 200,
+          bg = "white", family = "", symbolfamily="default")
+      pheatmap(assay(vsd)[select,], cluster_rows=FALSE, show_rownames=FALSE,
+               cluster_cols=TRUE, annotation_col=df, labels_col = colData(dds)$Label_Name,
+               main = stri_join(c(plot_title, "(Variance Stabilizing Transformation)"), collapse = "\n"))
+      dev.off()
+    } else {
+      pheatmap(assay(vsd)[select,], cluster_rows=FALSE, show_rownames=FALSE,
+               cluster_cols=TRUE, annotation_col=df, labels_col = colData(dds)$Label_Name,
+               main = stri_join(c(plot_title, "(Variance Stabilizing Transformation)"), collapse = "\n"))
+    }
+}
+
 
 QC_PCAplot <- function(dds, filename_start, plot_title, batch_effect){
   vsd <- vst(dds)
@@ -88,7 +134,7 @@ QC_PCAplot <- function(dds, filename_start, plot_title, batch_effect){
     pcaData <- plotPCA(vsd, intgroup=c("Treatment"), returnData=TRUE)
     percentVar <- round(100 * attr(pcaData, "percentVar"))
     
-    if(!is.null(plot_title)){
+    if(!is.null(filename_start)){
       png(filename = stri_join(c("QC_results/PCA_plots/", filename_start, ".png"),
                                collapse = ""),
           width = 1500, height = 1500, units = "px", pointsize = 10, res = 200,
@@ -104,7 +150,7 @@ QC_PCAplot <- function(dds, filename_start, plot_title, batch_effect){
     pcaData <- plotPCA(vsd, intgroup=c("Treatment", "Cohort"), returnData=TRUE)
     percentVar <- round(100 * attr(pcaData, "percentVar"))
     
-    if(!is.null(plot_title)){
+    if(!is.null(filename_start)){
       png(filename = stri_join(c("QC_results/PCA_plots/", filename_start, ".png"),
                                collapse = ""),
           width = 1500, height = 1500, units = "px", pointsize = 10, res = 200,
@@ -124,7 +170,7 @@ QC_PCAplot <- function(dds, filename_start, plot_title, batch_effect){
     pcaData <- plotPCA(vsd, intgroup=c("Treatment", "Cohort"), returnData=TRUE)
     percentVar <- round(100 * attr(pcaData, "percentVar"))
 
-    if(!is.null(plot_title)){
+    if(!is.null(filename_start)){
       png(filename = stri_join(c("QC_results/PCA_plots/", filename_start, ".png"),
                              collapse = ""),
         width = 1500, height = 1500, units = "px", pointsize = 10, res = 200,
@@ -168,10 +214,10 @@ summary_wrapper <- function(res, comparison, experiment, p_cutoff, lfc_cutoff){
   DEG_summary
 }
 
-
 sig_DEG_table <- function(res, ID_type, lfc_cutoff, padj_cutoff, file_start){
   if (missing(lfc_cutoff)) lfc_cutoff <- 1
   if (missing(padj_cutoff)) padj_cutoff <- 0.05
+  if(missing(file_start)) file_start <- NULL
   
   dat <- subset(res, res$padj <= 0.05 & abs(res$log2FoldChange) >= lfc_cutoff)
   
@@ -181,16 +227,12 @@ sig_DEG_table <- function(res, ID_type, lfc_cutoff, padj_cutoff, file_start){
   else if(ID_type == "entrezgene") dat <- dat[, c(4, 6, 10)]
   else if (ID_type == "all") dat <- dat[, c(1, 2, 4, 6, 10)]
   else print("specify ID type: ensembl_gene_id, external_gene_name, entrezgene, or all")
-  
-  # colnames(dat) <- c("#", "LogFoldChange")
-  
-  if(missing(file_start)) file_start <- NULL
+
   if(!is.null(file_start)){
     write.table(dat,
                 file = stri_join(c("Output/Gene_Lists/", file_start, "_LFC_values.csv"), collapse = ""),
                 sep = ",", quote = FALSE, row.names = FALSE, col.names = TRUE)
   }
-  
   dat
 }
 
