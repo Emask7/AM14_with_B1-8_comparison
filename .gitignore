@@ -51,3 +51,7 @@ rsconnect/
 # Results
 QC_results/
 Output/
+
+# Images
+*.jpg
+*.png
