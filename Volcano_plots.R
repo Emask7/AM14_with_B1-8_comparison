@@ -4,10 +4,11 @@ vp_data = list(
     R848_2DG_v_Ctrl = deseq_res$AM14transfer$R848_2DG_v_Ctrl[, c(2, 6, 10)],
     PL23_vs_R848 = deseq_res$AM14transfer$PL23_vs_R848[, c(2, 6, 10)]),
   B18transfer = deseq_res$B18transfer[, c(2, 6, 10)],
+  PL23vNP = deseq_res$PL23_v_NP[, c(2, 6, 10)],
   AM14MRLlpr = deseq_res$AM14MRLlpr[, c(2, 6, 10)])
 head(vp_data$AM14MRLlpr)
 
-volcano_wrapper <- function(dat, plot_title, x_limits, y_limits, file_name){
+volcano_wrapper <- function(dat, plot_title, cap, x_limits, y_limits, file_name){
   if(missing(x_limits)) {
     x_min <- min(dat$log2FoldChange)
     x_max <- max(dat$log2FoldChange)
@@ -26,6 +27,7 @@ volcano_wrapper <- function(dat, plot_title, x_limits, y_limits, file_name){
                         x = 'log2FoldChange', y = 'padj', 
                         xlim = x_limits, ylim = y_limits, 
                         title = plot_title, subtitle = "(Adjusted p-values)", 
+                        caption = cap,
                         legendLabels = c("NS", expression(Log[2] ~ FC > 1),
                                          expression(p - value < ~ 0.05),
                                          expression(p - value < ~ 0.05 ~ and ~ log[2] ~ FC > ~ 1)),
@@ -41,17 +43,33 @@ volcano_wrapper <- function(dat, plot_title, x_limits, y_limits, file_name){
   vp
 }  
 
-volcano_wrapper(vp_data$AM14transfer$PL23_2DG_v_Ctrl, "AM14 Transfer: PL2-3 + 2DG vs PL2-3", 
-                c(-10, 5), c(0, 8), "AM14_Transfer-PL2-3_2DG_vs_Control")
+confirm_foldchange <- function(dds, gene, gene_ID_table){
+  ens_ID <- subset(gene_ID_table, external_gene_name == gene)
+  ens_ID <- ens_ID$ensembl_gene_id
+  cts <- counts(dds, normalized = TRUE)
+  res <- cts[ens_ID, ]
+  res
+}
+confirm_foldchange(dds_AM14trans, "Crisp1", gene_IDs$AM14trans)
+confirm_foldchange(dds_B18trans, "Dmrt2", gene_IDs$B18trans)
+
+
+volcano_wrapper(vp_data$AM14transfer$PL23_2DG_v_Ctrl, "AM14 Transfer: PL2-3 + 2DG vs PL2-3",
+                "Upregulated in PL2-3                                                                                  Upregulated in PL2-3 + 2DG",
+                c(-20, 20), c(0, 8), "AM14_Transfer-PL2-3_2DG_vs_Control")
 
 volcano_wrapper(vp_data$AM14transfer$R848_2DG_v_Ctrl, "AM14 Transfer: R848 + 2DG vs R848", 
-                c(-10, 5), c(0, 5), "AM14_Transfer-R848_2DG_vs_Control")
+                "Upregulated in R848                                                                                  Upregulated in R848 + 2DG",
+                c(-27, 27), c(0, 10), "AM14_Transfer-R848_2DG_vs_Control")
 
 volcano_wrapper(vp_data$AM14transfer$PL23_vs_R848, "AM14 Transfer: PL2-3 vs R848", 
-                c(-11, 6), c(0, 6), "AM14_Transfer-PL2-3_vs_R848")
+                "Upregulated in R848                                                                                            Upregulated in PL2-3",
+                c(-23, 5), c(0, 9), "AM14_Transfer-PL2-3_vs_R848")
 
 volcano_wrapper(vp_data$B18transfer, "B1-8 Transfer: NP + 2DG vs NP", 
+                "Upregulated in NP                                                                                            Upregulated in NP + 2DG",
                 c(-5, 3), c(0, 8), "B1-8_Transfer-NP_2DG_vs_NP")
 
 volcano_wrapper(vp_data$AM14MRLlpr, "AM14 MRL/lpr: 2DG vs Control", 
+                "Upregulated in Control                                                                                         Upregulated in 2DG",
                 c(-5, 2.5), c(0, 15), "AM14_MRLlpr")
