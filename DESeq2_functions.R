@@ -2,10 +2,10 @@ import_Rosalind_data <- function(res_file){
   temp_cts <- read.delim(res_file)
   temp_cts <- temp_cts %>%
     filter(!grepl("Igh", external_gene_name)) %>%
-    filter(!grepl("Igk", external_gene_name)) %>%
-    filter(!grepl("7SK", external_gene_name)) %>%
-    filter(!grepl("5_8S_rRNA", external_gene_name)) %>%
-    filter(!grepl("5S_rRNA", external_gene_name))
+    filter(!grepl("Igk", external_gene_name)) # %>%
+    # filter(!grepl("7SK", external_gene_name)) %>%
+    # filter(!grepl("5_8S_rRNA", external_gene_name)) %>%
+    # filter(!grepl("5S_rRNA", external_gene_name))
   temp_cts <- temp_cts[, c(1:4, 12:ncol(temp_cts))]
   temp_cts <- temp_cts[!duplicated(temp_cts), ]
   temp_cts <- temp_cts[!duplicated(temp_cts$ensembl_gene_id), ]
@@ -214,47 +214,46 @@ summary_wrapper <- function(res, comparison, experiment, p_cutoff, lfc_cutoff){
   DEG_summary
 }
 
-sig_DEG_table <- function(res, ID_type, lfc_cutoff, padj_cutoff, file_start){
-  if (missing(lfc_cutoff)) lfc_cutoff <- 1
-  if (missing(padj_cutoff)) padj_cutoff <- 0.05
+
+sig_DEG_table <- function(res, ID_type, lfc_cutoff, padj_cutoff, file_start, file_format){
+  if(missing(ID_type)) ID_type <- "all"
+  if(missing(lfc_cutoff)) lfc_cutoff <- 1
+  if(missing(padj_cutoff)) padj_cutoff <- 0.05
   if(missing(file_start)) file_start <- NULL
+  if(missing(file_format)) file_format <- "xlsx"
   
-  dat <- subset(res, res$padj <= 0.05 & abs(res$log2FoldChange) >= lfc_cutoff)
-  
-  if(missing(ID_type)) print("specify ID type: ensembl_gene_id, external_gene_name, entrezgene, or all")
-  else if(ID_type == "ensembl_gene_id") dat <- dat[, c(1, 6, 10)]
-  else if(ID_type == "external_gene_name") dat <- dat[, c(2, 6, 10)]
-  else if(ID_type == "entrezgene") dat <- dat[, c(4, 6, 10)]
-  else if (ID_type == "all") dat <- dat[, c(1, 2, 4, 6, 10)]
+  if(ID_type == "ensembl_gene_id") res <- res[, c(1, 6, 10)]
+  else if(ID_type == "external_gene_name") res <- res[, c(2, 6, 10)]
+  else if(ID_type == "entrezgene") res <- res[, c(4, 6, 10)]
+  else if (ID_type == "all") res <- res[, c(1, 2, 4, 6, 10)]
   else print("specify ID type: ensembl_gene_id, external_gene_name, entrezgene, or all")
-
+  
+  up <- subset(res, res$padj <= padj_cutoff & res$log2FoldChange >= lfc_cutoff)
+  down <- subset(res, res$padj <= padj_cutoff & res$log2FoldChange <= (-1*lfc_cutoff))
+  all <- subset(res, res$padj <= padj_cutoff & abs(res$log2FoldChange) >= lfc_cutoff)
+  
   if(!is.null(file_start)){
-    write.table(dat,
-                file = stri_join(c("Output/Gene_Lists/", file_start, "_LFC_values.csv"), collapse = ""),
-                sep = ",", quote = FALSE, row.names = FALSE, col.names = TRUE)
+    if(file_format == "xlsx"){
+      wb <- createWorkbook(stri_join(c("Output/Significant DEGs/", file_start, ".xlsx"), collapse = ""))
+      addWorksheet(wb, "Upregulated DEGs")
+      addWorksheet(wb, "Downregulated DEGs")
+      addWorksheet(wb, "All DEGs")
+      writeData(wb, "Upregulated DEGs", up, rowNames = FALSE)
+      writeData(wb, "Downregulated DEGs", down, rowNames = FALSE)
+      writeData(wb, "All DEGs", all, rowNames = FALSE)
+      saveWorkbook(wb, stri_join(c("Output/Significant DEGs/", file_start, ".xlsx"), collapse = ""), overwrite = TRUE)
+      rm(wb)
+    } else if (file_format == "csv"){
+      write.table(up,
+                  file = stri_join(c("Output/", file_start, "_Up.csv"), collapse = ""),
+                  sep = ",", quote = FALSE, row.names = FALSE, col.names = TRUE)
+      write.table(down,
+                  file = stri_join(c("Output/", file_start, "_Down.csv"), collapse = ""),
+                  sep = ",", quote = FALSE, row.names = FALSE, col.names = TRUE)
+      write.table(all,
+                  file = stri_join(c("Output/", file_start, "_All.csv"), collapse = ""),
+                  sep = ",", quote = FALSE, row.names = FALSE, col.names = TRUE)
+    } else print("specify file type: xlsx or csv")
   }
-  dat
+  return(list(up = up, down = down, all = all))
 }
-
-
-# write_DEG_CSV <- function(res, lfc_cutoff, file_start){
-#   up <- subset(res, res$padj <= 0.05 & res$log2FoldChange >= lfc_cutoff)[, c(1, 2, 4)]
-#   down <- subset(res, res$padj <= 0.05 & res$log2FoldChange <= (-1*lfc_cutoff))[, c(1, 2, 4)]
-#   all <- subset(res, res$padj <= 0.05 & abs(res$log2FoldChange) >= lfc_cutoff)[, c(1, 2, 4)]
-#   
-#   if(!is.null(file_start)){
-#     write.table(up, 
-#                 file = stri_join(c("Output/Gene_Lists/", file_start, "_Up.csv"), collapse = ""),
-#                 sep = ",", quote = FALSE, row.names = FALSE, col.names = TRUE)
-#     write.table(down, 
-#                 file = stri_join(c("Output/Gene_Lists/", file_start, "_Down.csv"), collapse = ""),
-#                 sep = ",", quote = FALSE, row.names = FALSE, col.names = TRUE)
-#     write.table(all,
-#                 file = stri_join(c("Output/Gene_Lists/", file_start, "_All.csv"), collapse = ""),
-#                 sep = ",", quote = FALSE, row.names = FALSE, col.names = TRUE)
-#   }
-#   
-#   return(list(up = up, down = down, all = all))
-# }
-
-

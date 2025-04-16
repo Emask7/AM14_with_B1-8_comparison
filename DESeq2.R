@@ -150,36 +150,36 @@
   QC_heatmaps(dds_AM14trans, "AM14_Adoptive_Transfer", "AM14 Adoptive Transfer")
   QC_heatmaps(dds_B18trans, "B18_Adoptive_Transfer", "B1-8 Adoptive Transfer")
   QC_heatmaps(dds_AM14MRLlpr, "AM14_MRLlpr", "AM14 MRL/lpr +/- 2DG")
-  
+
   # QC_heatmaps_batch_corrected(dds_AM14trans, NULL, "AM14 Adoptive Transfer")
   # QC_heatmaps_batch_corrected(dds_AM14MRLlpr, NULL, "AM14 MRL/lpr +/- 2DG")
-  
-  # QC_PCAplot(dds_PL23vNP, NULL, "PL2-3 vs NP", batch_effect = FALSE)               
-  # QC_PCAplot(dds_PL23vNP, NULL, "PL2-3 vs NP", batch_effect = TRUE)               
-  QC_PCAplot(dds_PL23vNP, "PL23_vs_NP", "PL2-3 vs NP", batch_effect = FALSE)               
+
+  # QC_PCAplot(dds_PL23vNP, NULL, "PL2-3 vs NP", batch_effect = FALSE)
+  # QC_PCAplot(dds_PL23vNP, NULL, "PL2-3 vs NP", batch_effect = TRUE)
+  QC_PCAplot(dds_PL23vNP, "PL23_vs_NP", "PL2-3 vs NP", batch_effect = FALSE)
   dev.off()
-  QC_PCAplot(dds_AM14trans, "AM14_Adoptive_Transfer-Before_Batch_Correction", 
-             "AM14 Adoptive Transfer\n(Before Batch Correction)", 
-             batch_effect = FALSE)               
+  QC_PCAplot(dds_AM14trans, "AM14_Adoptive_Transfer-Before_Batch_Correction",
+             "AM14 Adoptive Transfer\n(Before Batch Correction)",
+             batch_effect = FALSE)
   dev.off()
-  QC_PCAplot(dds_AM14trans, "AM14_Adoptive_Transfer-After_Batch_Correction", 
-             "AM14 Adoptive Transfer\n(After Batch Correction)", 
-             batch_effect = TRUE)               
+  QC_PCAplot(dds_AM14trans, "AM14_Adoptive_Transfer-After_Batch_Correction",
+             "AM14 Adoptive Transfer\n(After Batch Correction)",
+             batch_effect = TRUE)
   dev.off()
-  
-  QC_PCAplot(dds_B18trans, "B1-8_Adoptive_Transfer","B1-8 Adoptive Transfer", 
-             batch_effect = FALSE)               
+
+  QC_PCAplot(dds_B18trans, "B1-8_Adoptive_Transfer","B1-8 Adoptive Transfer",
+             batch_effect = FALSE)
   dev.off()
-  
-  QC_PCAplot(dds_AM14MRLlpr, "AM14_MRLlpr-Before_Batch_Correction", 
-             "AM14 MRL/lpr mice +/- 2DG\n(Before Batch Correction)", 
-             batch_effect = FALSE)               
+
+  QC_PCAplot(dds_AM14MRLlpr, "AM14_MRLlpr-Before_Batch_Correction",
+             "AM14 MRL/lpr mice +/- 2DG\n(Before Batch Correction)",
+             batch_effect = FALSE)
   dev.off()
-  QC_PCAplot(dds_AM14MRLlpr, "AM14_MRLlpr-After_Batch_Correction", 
-             "AM14 MRL/lpr mice +/- 2DG\n(After Batch Correction)", 
-             batch_effect = TRUE)               
+  QC_PCAplot(dds_AM14MRLlpr, "AM14_MRLlpr-After_Batch_Correction",
+             "AM14 MRL/lpr mice +/- 2DG\n(After Batch Correction)",
+             batch_effect = TRUE)
   dev.off()
-  
+
 # Differential Expression Analysis ---------------------------------------------
   resultsNames(dds_PL23vNP)
   resultsNames(dds_AM14trans)
@@ -233,7 +233,6 @@
   saveWorkbook(wb, "Output/DESeq2_results.xlsx", overwrite = TRUE)
   rm(wb)
   
-  
   # wb <- createWorkbook("Output/DESeq2_gene_counts.xlsx")
   # 
   # addWorksheet(wb, "Raw_Counts - AM14 transfer")
@@ -253,8 +252,47 @@
   # saveWorkbook(wb, "Output/DESeq2_gene_counts.xlsx", overwrite = TRUE)
   # rm(wb)
 
-# # Make DEG lists and export to CSV files -------------------------------------
-#   write_DEG_CSV(res_PL23, 1, "PL2-3_2DG_vs_Control")
-#   write_DEG_CSV(res_R848, 1, "R848_2DG_vs_Control")
-#   write_DEG_CSV(res_PL23vR848, 1, "PL2-3_Ctrl_vs_R848_Ctrl")
-#   write_DEG_CSV(res_2DG_PL23vR848, 1, "PL2-3_2DG_vs_R848_2DG")
+# Make DEG lists and export to files -------------------------------------------
+  sig_DEGs <- list(
+    AM14transfer = list(
+      PL23_2DG_v_Ctrl = sig_DEG_table(deseq_res$AM14transfer$PL23_2DG_v_Ctrl, "all", 1, 0.05, "AM14 - PL23_2DG_vs_Ctrl"),
+      R848_2DG_v_Ctrl = sig_DEG_table(deseq_res$AM14transfer$R848_2DG_v_Ctrl, "all", 1, 0.05, "AM14 - R848_2DG_vs_Ctrl"),
+      PL23_vs_R848 = sig_DEG_table(deseq_res$AM14transfer$PL23_vs_R848, "all", 1, 0.05, "AM14 - PL23_vs_R848")),
+    B18transfer = sig_DEG_table(deseq_res$B18transfer, "all", 1, 0.05, "B1-8 - 2DG_vs_Ctrl"),
+    PL23_v_NP = sig_DEG_table(deseq_res$PL23_v_NP, "all", 1, 0.05, "AM14 PL2-3 vs B1-8 NP"),
+    AM14MRLlpr = sig_DEG_table(deseq_res$AM14MRLlpr, "all", 1, 0.05, "AM14 MRLlpr - 2DG_vs_Ctrl")
+  )
+  
+  
+
+  
+  # sig_DEGs_original <- list(
+  #   AM14transfer = list(
+  #     PL23_2DG_v_Ctrl = sig_DEG_table(deseq_res$AM14transfer$PL23_2DG_v_Ctrl, "external_gene_name", 1, 0.05, NULL),
+  #     R848_2DG_v_Ctrl = sig_DEG_table(deseq_res$AM14transfer$R848_2DG_v_Ctrl, "external_gene_name", 1, 0.05, NULL),
+  #     PL23_vs_R848 = sig_DEG_table(deseq_res$AM14transfer$PL23_vs_R848, "external_gene_name", 1, 0.05, NULL)),
+  #   B18transfer = sig_DEG_table(deseq_res$B18transfer, "external_gene_name", 1, 0.05, NULL),
+  #   PL23_v_NP = sig_DEG_table(deseq_res$PL23_v_NP, "external_gene_name", 1, 0.05, NULL),
+  #   AM14MRLlpr = sig_DEG_table(deseq_res$AM14MRLlpr, "external_gene_name", 1, 0.05, NULL)
+  # )
+  # 
+  # sig_DEGs_including_RNAs <- list(
+  #   AM14transfer = list(
+  #     PL23_2DG_v_Ctrl = sig_DEG_table(deseq_res$AM14transfer$PL23_2DG_v_Ctrl, "external_gene_name", 1, 0.05, NULL),
+  #     R848_2DG_v_Ctrl = sig_DEG_table(deseq_res$AM14transfer$R848_2DG_v_Ctrl, "external_gene_name", 1, 0.05, NULL),
+  #     PL23_vs_R848 = sig_DEG_table(deseq_res$AM14transfer$PL23_vs_R848, "external_gene_name", 1, 0.05, NULL)),
+  #   B18transfer = sig_DEG_table(deseq_res$B18transfer, "external_gene_name", 1, 0.05, NULL),
+  #   PL23_v_NP = sig_DEG_table(deseq_res$PL23_v_NP, "external_gene_name", 1, 0.05, NULL),
+  #   AM14MRLlpr = sig_DEG_table(deseq_res$AM14MRLlpr, "external_gene_name", 1, 0.05, NULL)
+  # )
+  # 
+  # full_summary  
+  # summary(comparedf(sig_DEGs_original$PL23_v_NP$up,
+  #           sig_DEGs_including_RNAs$PL23_v_NP$up))
+  # anti_join(sig_DEGs_original$PL23_v_NP$up,
+  #           sig_DEGs_including_RNAs$PL23_v_NP$up,
+  #           by = "external_gene_name")
+  # anti_join(sig_DEGs_including_RNAs$PL23_v_NP$up,
+  #           sig_DEGs_original$PL23_v_NP$up,
+  #           by = "external_gene_name")
+  # 

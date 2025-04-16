@@ -1,7 +1,3 @@
-BiocManager::install("sva")
-library(sva)
-
-
 # Import raw counts from Rosalind output ---------------------------------------
   cts_AM14trans <- import_Rosalind_data("raw_data/AM14_Adoptive_Transfer_rawCountsWithAnnotations.txt")
   cts_B18trans <- import_Rosalind_data("raw_data/B1-8_Adoptive_Transfer_rawCountsWithAnnotations.txt")
