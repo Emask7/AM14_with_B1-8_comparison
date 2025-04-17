@@ -52,6 +52,7 @@ confirm_foldchange <- function(dds, gene, gene_ID_table){
 }
 confirm_foldchange(dds_AM14trans, "Crisp1", gene_IDs$AM14trans)
 confirm_foldchange(dds_B18trans, "Dmrt2", gene_IDs$B18trans)
+confirm_foldchange(dds_PL23vNP, "Lars2", gene_IDs$AM14trans)
 
 
 volcano_wrapper(vp_data$AM14transfer$PL23_2DG_v_Ctrl, "AM14 Transfer: PL2-3 + 2DG vs PL2-3",
@@ -73,3 +74,8 @@ volcano_wrapper(vp_data$B18transfer, "B1-8 Transfer: NP + 2DG vs NP",
 volcano_wrapper(vp_data$AM14MRLlpr, "AM14 MRL/lpr: 2DG vs Control", 
                 "Upregulated in Control                                                                                         Upregulated in 2DG",
                 c(-5, 2.5), c(0, 15), "AM14_MRLlpr")
+
+volcano_wrapper(vp_data$PL23vNP, "AM14 Transfer PL2-3 vs B1-8 Transfer NP", 
+                "Upregulated in NP                                                                                            Upregulated in PL2-3",
+                c(-6.5, 12), c(0, 182), "PL23_vs_NP")
+
