@@ -47,9 +47,9 @@ plot_gseGO <- function(gse, plot_title, showCat){
   if(missing(showCat)) showCat <- nrow(gse)
   else if(nrow(gse) < showCat) showCat <- nrow(gse)
   
-  # gse_top <- gse[1:showCat]
-  # nes_max <- max(gse_top$NES)
-  # nes_min <- min(gse_top$NES)
+  gse_top <- gse[1:showCat]
+  nes_max <- max(gse_top$NES)
+  nes_min <- min(gse_top$NES)
   
   ggplot(gse, showCategory = showCat,
          aes(p.adjust, Description)) +
@@ -61,19 +61,18 @@ plot_gseGO <- function(gse, plot_title, showCat){
     ylab(NULL) +
     scale_y_discrete(labels = lapply(strwrap(gse$Description, width = 70, simplify = FALSE), paste, collapse="\n")) +
     ggtitle(plot_title) +
-    scale_color_manual(values = pnw_palette("Bay", 8, type = "continuous"))
-                          #guide=guide_colorbar(reverse=FALSE, order=1))
-  
-    # if(nes_max < 0) {
-    #   scale_color_gradientn(colours=met.brewer("Hokusai2", direction = -1), 
-    #                         guide=guide_colorbar(reverse=FALSE, order=1))
-    # } else if(nes_min > 0) {
-    #   scale_color_gradientn(colours=met.brewer("Tam", direction = 1), 
-    #                         guide=guide_colorbar(reverse=FALSE, order=1))
-    # } else {
-    #   scale_color_gradientn(colours=met.brewer("Benedictus", direction = -1), 
-    #                         guide=guide_colorbar(reverse=FALSE, order=1))
-    # }
+    # scale_color_brewer(values = pnw_palette("Bay", 8, type = "continuous"))
+    #                       #guide=guide_colorbar(reverse=FALSE, order=1))
+    if(nes_max < 0) {
+      scale_color_gradientn(colours=met.brewer("Hokusai2", direction = -1),
+                            guide=guide_colorbar(reverse=FALSE, order=1))
+    } else if(nes_min > 0) {
+      scale_color_gradientn(colours=met.brewer("Tam", direction = 1),
+                            guide=guide_colorbar(reverse=FALSE, order=1))
+    } else {
+      scale_color_gradientn(colours=met.brewer("Benedictus", direction = -1),
+                            guide=guide_colorbar(reverse=FALSE, order=1))
+    }
   
   # ggplot(gse, showCategory = showCat,
   #        aes(NES, fct_reorder(Description, NES), fill=p.adjust)) +
@@ -161,13 +160,30 @@ gsePathway_wrapper <- function(dds_res){
     gseGO_results$AM14trans$PL23_2DG_v_Ctrl$gse$p.adjust
     
     plot_gseGO(gseGO_results$AM14trans$PL23_2DG_v_Ctrl$gse_simplified, 
-               "AM14 Transfer:\nPL2-3+2DG vs PL2-3\n(GO Biological Process)")
+               "AM14 Transfer:\nPL2-3+2DG vs PL2-3\n(GO Biological Process)", 25)
     
     plot_gseGO(gseGO_results$PL23_v_NP$gse_simplified, 
                "AM14 Transfer + PL2-3 vs B1-8 Transfer + NP\n(GO Biological Process)", 25)
     
     plot_gseGO(gseGO_results$AM14MRLlpr$gse, 
                "AM14 MRL/lpr: 2DG vs Control\n(GO Biological Process)")
+    
+    
+    
+    # ggplot(gseGO_results$AM14trans$PL23_2DG_v_Ctrl$gse_simplified, showCategory = showCat,
+    #        aes(p.adjust, Description)) +
+    #   geom_segment(aes(xend=0, yend = Description)) +
+    #   geom_point(aes(color=NES, size = setSize)) +
+    #   scale_size_continuous(range=c(2, 10)) +
+    #   theme_dose(12) +
+    #   xlab("FDR") +
+    #   ylab(NULL) +
+    #   scale_y_discrete(labels = lapply(strwrap(gseGO_results$AM14trans$PL23_2DG_v_Ctrl$gse_simplified$Description, width = 70, simplify = FALSE), paste, collapse="\n")) +
+    #   ggtitle("plot_title") +
+    #   scale_color_brewer(palette = pnw_palette("Bay"))
+    # #guide=guide_colorbar(reverse=FALSE, order=1))
+    
+    
     
 
 # Reactome pathways ------------------------------------------------------------
