@@ -1,4 +1,4 @@
-# install.packages(c("arsenal", "BiocManager", "dplyr", "ggarchery", "ggplot2", "MetBrewer", "openxlsx", "plyr", "RColorBrewer", "stringi")
+# install.packages(c("arsenal", "BiocManager", "dplyr", "ggarchery", "ggplot2", "MetBrewer", "openxlsx", "plyr", "PNWColors", "RColorBrewer", "stringi")
 # install.packages(c("colorblindcheck", "ggrepel", "grid", "gridBase", "gridExtra", "igraph", "readr", "VennDiagram"))
 
 library(arsenal)
@@ -8,6 +8,7 @@ library(ggplot2)
 library(MetBrewer)
 library(openxlsx)
 library(plyr)
+library(PNWColors)
 library(RColorBrewer)
 library(stringi)
 # library(colorblindcheck)

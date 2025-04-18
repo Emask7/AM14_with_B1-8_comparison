@@ -47,9 +47,9 @@ plot_gseGO <- function(gse, plot_title, showCat){
   if(missing(showCat)) showCat <- nrow(gse)
   else if(nrow(gse) < showCat) showCat <- nrow(gse)
   
-  gse_top <- gse[1:showCat]
-  nes_max <- max(gse_top$NES)
-  nes_min <- min(gse_top$NES)
+  # gse_top <- gse[1:showCat]
+  # nes_max <- max(gse_top$NES)
+  # nes_min <- min(gse_top$NES)
   
   ggplot(gse, showCategory = showCat,
          aes(p.adjust, Description)) +
@@ -61,16 +61,19 @@ plot_gseGO <- function(gse, plot_title, showCat){
     ylab(NULL) +
     scale_y_discrete(labels = lapply(strwrap(gse$Description, width = 70, simplify = FALSE), paste, collapse="\n")) +
     ggtitle(plot_title) +
-    if(nes_max < 0) {
-      scale_color_gradientn(colours=met.brewer("Hokusai2", direction = -1), 
-                            guide=guide_colorbar(reverse=FALSE, order=1))
-    } else if(nes_min > 0) {
-      scale_color_gradientn(colours=met.brewer("Tam", direction = 1), 
-                            guide=guide_colorbar(reverse=FALSE, order=1))
-    } else {
-      scale_color_gradientn(colours=met.brewer("Benedictus", direction = -1), 
-                            guide=guide_colorbar(reverse=FALSE, order=1))
-    }
+    scale_color_manual(values = pnw_palette("Bay", 8, type = "continuous"))
+                          #guide=guide_colorbar(reverse=FALSE, order=1))
+  
+    # if(nes_max < 0) {
+    #   scale_color_gradientn(colours=met.brewer("Hokusai2", direction = -1), 
+    #                         guide=guide_colorbar(reverse=FALSE, order=1))
+    # } else if(nes_min > 0) {
+    #   scale_color_gradientn(colours=met.brewer("Tam", direction = 1), 
+    #                         guide=guide_colorbar(reverse=FALSE, order=1))
+    # } else {
+    #   scale_color_gradientn(colours=met.brewer("Benedictus", direction = -1), 
+    #                         guide=guide_colorbar(reverse=FALSE, order=1))
+    # }
   
   # ggplot(gse, showCategory = showCat,
   #        aes(NES, fct_reorder(Description, NES), fill=p.adjust)) +
@@ -168,24 +171,25 @@ gsePathway_wrapper <- function(dds_res){
     
 
 # Reactome pathways ------------------------------------------------------------
-    test_PWlist <- rank_genes(deseq_res$AM14transfer$PL23_2DG_v_Ctrl, "entrez")
-    head(test_PWlist)
-    length(test_PWlist)
-    test_gsePathway <- gsePathway_wrapper(deseq_res$AM14transfer$PL23_2DG_v_Ctrl)
-    head(test_gsePathway)
-    head(test_gsePathway$all)  
-    head(test_gsePathway$up)  
-    head(test_gsePathway$down)  
-    
-gsePathway_res <- gsePathway_wrapper(deseq_res$AM14transfer$PL23_2DG_v_Ctrl)
-gsePathway_res$up
-gsePathway_res$down
-head(gsePathway_res$down)
+  gsePathway_results <- list(
+    AM14trans = list(
+      PL23_2DG_v_Ctrl = gsePathway_wrapper(deseq_res$AM14transfer$PL23_2DG_v_Ctrl),
+      R848_2DG_v_Ctrl = gsePathway_wrapper(deseq_res$AM14transfer$R848_2DG_v_Ctrl),
+      PL23_vs_R848 = gsePathway_wrapper(deseq_res$AM14transfer$PL23_vs_R848)),
+    B18trans = gsePathway_wrapper(deseq_res$B18transfer),
+    PL23_v_NP = gsePathway_wrapper(deseq_res$PL23_v_NP),
+    AM14MRLlpr = gsePathway_wrapper(deseq_res$AM14MRLlpr)
+  )
+  nrow(gsePathway_results$AM14trans$PL23_2DG_v_Ctrl)
+  nrow(gsePathway_results$AM14trans$R848_2DG_v_Ctrl)
+  nrow(gsePathway_results$AM14trans$PL23_vs_R848)
+  nrow(gsePathway_results$B18trans)
+  nrow(gsePathway_results$PL23_v_NP)
+  nrow(gsePathway_results$AM14MRLlpr)
+
 
 # head(pathway)
 # viewPathway("Signaling by GPCR", readable = TRUE, foldChange = genes_sorted)
-
-
 
 
 
