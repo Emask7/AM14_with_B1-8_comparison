@@ -101,45 +101,45 @@ DEG_lists <- list(
        margin = 0.05, cat.cex = 1, cex = 1.5)
   # detail(down_2DGvCtrl_venn)
 
-# Comparing only gene sets with overlaps ---------------------------------------
-  up_venn <- venndetail(list("AM14 Transfer:\nPL2-3 + 2DG\nvs PL2-3\n" = DEG_lists$PL23_2DG_vs_Ctrl$up,
-                             "AM14 Transfer:\nR848 + 2DG\nvs R848\n" = DEG_lists$R848_2DG_vs_Ctrl$up,
-                             "AM14 Transfer:\nPL2-3 vs R848\n" = DEG_lists$PL23_vs_R848$up,
-                             "AM14/B1-8 Transfers:\nPL2-3 vs NP" = DEG_lists$PL23_vs_NP$up,
-                             "AM14 MRL/lpr:\n2DG vs Control\n" = DEG_lists$MRLlpr$up))
-  dev.off()
-  plot(up_venn, mycol = met.brewer("Johnson", n = 10, direction = 1),
-       # filename = "Output/Venn_diagrams/2DG_vs_Control-Upregulated.png",
-       margin = 0.05, cat.cex = 1, cex = 1.5)
-  # detail(up_venn)
-  
-  down_venn <- venndetail(list("AM14 Transfer:\nPL2-3 + 2DG\nvs PL2-3\n" = DEG_lists$PL23_2DG_vs_Ctrl$down,
-                             "AM14 Transfer:\nR848 + 2DG\nvs R848\n" = DEG_lists$R848_2DG_vs_Ctrl$down,
-                             "AM14 Transfer:\nPL2-3 vs R848\n" = DEG_lists$PL23_vs_R848$down,
-                             "AM14/B1-8 Transfers:\nPL2-3 vs NP" = DEG_lists$PL23_vs_NP$down,
-                             "AM14 MRL/lpr:\n2DG vs Control\n" = DEG_lists$MRLlpr$down))
-  dev.off()
-  plot(down_venn, mycol = met.brewer("Johnson", n = 10, direction = -1),
-       # filename = "Output/Venn_diagrams/2DG_vs_Control-downregulated.png",
-       margin = 0.05, cat.cex = 1, cex = 1.5)
-  # detail(down_venn)
-
-# Comparing autoAg specific response to others ---------------------------------
-  up_PL23_v_others_venn <- venndetail(list("AM14 Transfer:\nPL2-3 + 2DG\nvs PL2-3\n" = DEG_lists$PL23_2DG_vs_Ctrl$up,
-                                           "AM14 Transfer:\nPL2-3\nvs R848\n" = DEG_lists$PL23_vs_R848$up,
-                                           "AM14/B1-8 Transfers:\nPL2-3 vs NP\n" = DEG_lists$PL23_vs_NP$up))
-  dev.off()
-  plot(up_PL23_v_others_venn, mycol = met.brewer("Johnson", n = 8, direction = 1),
-       # filename = "Output/venn_diagram_2DG_vs_Ctrl_up.png",
-       margin = 0.05, cat.cex = 1, cex = 1.5)
-  # detail(up_PL23_v_others_venn)
-  
-  down_PL23_v_others_venn <- venndetail(list("AM14 Transfer:\nPL2-3 + 2DG\nvs PL2-3\n" = DEG_lists$PL23_2DG_vs_Ctrl$down,
-                                           "AM14 Transfer:\nPL2-3\nvs R848\n" = DEG_lists$PL23_vs_R848$down,
-                                           "AM14/B1-8 Transfers:\nPL2-3 vs NP\n" = DEG_lists$PL23_vs_NP$down))
-  dev.off()
-  plot(down_PL23_v_others_venn, mycol = met.brewer("Johnson", n = 8, direction = -1),
-       # filename = "Output/venn_diagram_2DG_vs_Ctrl_down.png",
-       margin = 0.05, cat.cex = 1, cex = 1.5)
-  detail(down_PL23_v_others_venn)
-
+# # Comparing only gene sets with overlaps ---------------------------------------
+#   up_venn <- venndetail(list("AM14 Transfer:\nPL2-3 + 2DG\nvs PL2-3\n" = DEG_lists$PL23_2DG_vs_Ctrl$up,
+#                              "AM14 Transfer:\nR848 + 2DG\nvs R848\n" = DEG_lists$R848_2DG_vs_Ctrl$up,
+#                              "AM14 Transfer:\nPL2-3 vs R848\n" = DEG_lists$PL23_vs_R848$up,
+#                              "AM14/B1-8 Transfers:\nPL2-3 vs NP" = DEG_lists$PL23_vs_NP$up,
+#                              "AM14 MRL/lpr:\n2DG vs Control\n" = DEG_lists$MRLlpr$up))
+#   dev.off()
+#   plot(up_venn, mycol = met.brewer("Johnson", n = 10, direction = 1),
+#        # filename = "Output/Venn_diagrams/2DG_vs_Control-Upregulated.png",
+#        margin = 0.05, cat.cex = 1, cex = 1.5)
+#   # detail(up_venn)
+#   
+#   down_venn <- venndetail(list("AM14 Transfer:\nPL2-3 + 2DG\nvs PL2-3\n" = DEG_lists$PL23_2DG_vs_Ctrl$down,
+#                              "AM14 Transfer:\nR848 + 2DG\nvs R848\n" = DEG_lists$R848_2DG_vs_Ctrl$down,
+#                              "AM14 Transfer:\nPL2-3 vs R848\n" = DEG_lists$PL23_vs_R848$down,
+#                              "AM14/B1-8 Transfers:\nPL2-3 vs NP" = DEG_lists$PL23_vs_NP$down,
+#                              "AM14 MRL/lpr:\n2DG vs Control\n" = DEG_lists$MRLlpr$down))
+#   dev.off()
+#   plot(down_venn, mycol = met.brewer("Johnson", n = 10, direction = -1),
+#        # filename = "Output/Venn_diagrams/2DG_vs_Control-downregulated.png",
+#        margin = 0.05, cat.cex = 1, cex = 1.5)
+#   # detail(down_venn)
+# 
+# # Comparing autoAg specific response to others ---------------------------------
+#   up_PL23_v_others_venn <- venndetail(list("AM14 Transfer:\nPL2-3 + 2DG\nvs PL2-3\n" = DEG_lists$PL23_2DG_vs_Ctrl$up,
+#                                            "AM14 Transfer:\nPL2-3\nvs R848\n" = DEG_lists$PL23_vs_R848$up,
+#                                            "AM14/B1-8 Transfers:\nPL2-3 vs NP\n" = DEG_lists$PL23_vs_NP$up))
+#   dev.off()
+#   plot(up_PL23_v_others_venn, mycol = met.brewer("Johnson", n = 8, direction = 1),
+#        # filename = "Output/venn_diagram_2DG_vs_Ctrl_up.png",
+#        margin = 0.05, cat.cex = 1, cex = 1.5)
+#   # detail(up_PL23_v_others_venn)
+#   
+#   down_PL23_v_others_venn <- venndetail(list("AM14 Transfer:\nPL2-3 + 2DG\nvs PL2-3\n" = DEG_lists$PL23_2DG_vs_Ctrl$down,
+#                                            "AM14 Transfer:\nPL2-3\nvs R848\n" = DEG_lists$PL23_vs_R848$down,
+#                                            "AM14/B1-8 Transfers:\nPL2-3 vs NP\n" = DEG_lists$PL23_vs_NP$down))
+#   dev.off()
+#   plot(down_PL23_v_others_venn, mycol = met.brewer("Johnson", n = 8, direction = -1),
+#        # filename = "Output/venn_diagram_2DG_vs_Ctrl_down.png",
+#        margin = 0.05, cat.cex = 1, cex = 1.5)
+#   detail(down_PL23_v_others_venn)
+# 

@@ -74,6 +74,10 @@
   dds_PL23vNP <- DESeq(dds_PL23vNP)
   resultsNames(dds_PL23vNP)
   
+  dds_PL23vNP_tempRes <- results_wrapper(dds_PL23vNP, c("Treatment", "PL23", "NP"), full_join(gene_IDs$B18trans, gene_IDs$AM14trans))
+  summary_wrapper(dds_PL23vNP_tempRes, "PL2-3 vs NP", "AM14 and B1-8 Adoptive Transfers")
+  
+  
   # Use SVA for PL2-3 vs NP ----------------------------------------------------
     sva_dat  <- counts(dds_PL23vNP, normalized = TRUE)
     idx  <- rowMeans(sva_dat) > 1
@@ -124,27 +128,36 @@
       dds_PL23vNP <- DESeq(dds_PL23vNP)
       resultsNames(dds_PL23vNP)
     
-  dds_AM14trans <- DESeqDataSetFromMatrix(countData = cts_AM14trans, 
-                                          colData = cd_AM14trans,
-                                          design = ~Cohort + Treatment)
-  dds_AM14trans
-  dds_AM14trans <- DESeq(dds_AM14trans)
-  resultsNames(dds_AM14trans)
-
-  dds_B18trans <- DESeqDataSetFromMatrix(countData = cts_B18trans, 
-                                         colData = cd_B18trans,
-                                         design = ~Treatment)
-  dds_B18trans
-  dds_B18trans <- DESeq(dds_B18trans)
-  resultsNames(dds_B18trans)
-
-  dds_AM14MRLlpr <- DESeqDataSetFromMatrix(countData = cts_AM14MRLlpr,
-                                           colData = cd_AM14MRLlpr,
-                                           design = ~Cohort + Treatment)
-  dds_AM14MRLlpr
-  dds_AM14MRLlpr <- DESeq(dds_AM14MRLlpr)
-  resultsNames(dds_AM14MRLlpr)
-
+    dds_AM14trans <- DESeqDataSetFromMatrix(countData = cts_AM14trans, 
+                                            colData = cd_AM14trans,
+                                            design = ~Cohort + Treatment)
+    dds_AM14trans
+    keep <- rowSums(counts(dds_AM14trans) >= 10) >= 5
+    dds_AM14trans <- dds_AM14trans[keep,]
+    dds_AM14trans <- DESeq(dds_AM14trans)
+    resultsNames(dds_AM14trans)
+    rm(keep)
+    
+    dds_B18trans <- DESeqDataSetFromMatrix(countData = cts_B18trans, 
+                                           colData = cd_B18trans,
+                                           design = ~Treatment)
+    dds_B18trans
+    keep <- rowSums(counts(dds_B18trans) >= 10) >= 4
+    dds_B18trans <- dds_B18trans[keep,]
+    dds_B18trans <- DESeq(dds_B18trans)
+    resultsNames(dds_B18trans)
+    rm(keep)
+    
+    dds_AM14MRLlpr <- DESeqDataSetFromMatrix(countData = cts_AM14MRLlpr,
+                                             colData = cd_AM14MRLlpr,
+                                             design = ~Cohort + Treatment)
+    dds_AM14MRLlpr
+    keep <- rowSums(counts(dds_AM14MRLlpr) >= 10) >= 8
+    dds_AM14MRLlpr <- dds_AM14MRLlpr[keep,]
+    dds_AM14MRLlpr <- DESeq(dds_AM14MRLlpr)
+    resultsNames(dds_AM14MRLlpr)
+    rm(keep)
+    
 # Run QC steps -----------------------------------------------------------------
   QC_heatmaps(dds_PL23vNP, "PL23_vs_NP", "PL2-3 vs NP")
   QC_heatmaps(dds_AM14trans, "AM14_Adoptive_Transfer", "AM14 Adoptive Transfer")
