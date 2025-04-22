@@ -5,7 +5,7 @@
 ## Notes on ORA (over-representation analysis) results 
 # geneRatio = ratio of input genes that are annotated in a term
 # BgRatio = ratio of all genes that are annotated in this term
-# RichFactor = ratio of input DEGs anootated to a term to the total number of genes annotated to that term
+# RichFactor = ratio of input DEGs annotated to a term to the total number of genes annotated to that term
 # FoldEnrichment = ratio of the frequency of input genes annotated to a term to the frequency of all genes annotated to that term 
   # (calculated by dividing geneRatio by BgRatio)
 

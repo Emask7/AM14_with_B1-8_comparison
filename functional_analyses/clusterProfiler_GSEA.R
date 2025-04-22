@@ -25,12 +25,12 @@ rank_genes <- function(dds_res, ID_type){
 }
 
 gseGO_wrapper <- function(dds_res, ID_type){
-  if(missing(ID_type)) ID_type <- "ensembl"
+  if(missing(ID_type)) ID_type <- "symbol"
   
   ranked_list <- rank_genes(dds_res, ID_type)
   if(is.null(ranked_list)) {
     print("ranked gene list is NULL (either incorrect ID type or no significant DEGs)")
-    return(list(gse = NULL, gse_simplified = NULL, gse_summary = NULL))
+    return(list(gse = NULL, gse_simplified = NULL, gseGO_summary = NULL))
   } else {
     if(ID_type == "ensembl"){
       gse <- gseGO(ranked_list, ont = "BP", keyType = "ENSEMBL", OrgDb = "org.Mm.eg.db", eps = 1e-300)
@@ -42,12 +42,74 @@ gseGO_wrapper <- function(dds_res, ID_type){
     
     if(nrow(gse) < 1){
       print("ranked gene list length is > 0 but no significant GO terms were detected")
-      return(list(gse = NULL, gse_simplified = NULL, gse_summary = NULL))
+      return(list(gse = NULL, gse_simplified = NULL, gseGO_summary = NULL))
     } else {
       simp <- simplify(gse, cutoff = 0.7)
-      return(list(gse = gse, gse_simplified = simp, gse_summary = as.data.frame(gse)))
+      return(list(gse = gse, gse_simplified = simp))
     }
   }
+}
+
+gsePathway_wrapper <- function(dds_res){
+  ranked_list <- rank_genes(dds_res, "entrez")
+
+  if(is.null(ranked_list)) {
+    print("ranked gene list is NULL (no significant DEGs)")
+    return(NULL)
+  } 
+  gse <- gsePathway(ranked_list, organism = "mouse", pvalueCutoff = 0.1, pAdjustMethod = "BH", verbose = FALSE)
+  
+  if(nrow(gse) > 0) return(gse)
+  else {
+    print("No significant pathways detected")
+    return(NULL)
+  }
+}
+
+# gseKEGG_wrapper <- function(dds_res){
+#   ranked_list <- rank_genes(dds_res, "entrez")
+#   
+#   if(is.null(ranked_list)) {
+#     print("ranked gene list is NULL (no significant DEGs)")
+#     return(NULL)
+#   } 
+#   gse <- gseKEGG(ranked_list, organism = "mmu", pvalueCutoff = 1, 
+#                  pAdjustMethod = "BH", verbose = FALSE, keyType = "ncbi-geneid")
+#   
+#   if(nrow(gse) > 0) return(gse)
+#   else {
+#     print("No significant pathways detected")
+#     return(NULL)
+#   }
+# }
+
+
+gseGO_summary <- function(res, comparison, experiment, p_cutoff, nes_cutoff){
+  if(missing(p_cutoff)) p_cutoff <- 0.05
+  if(missing(nes_cutoff)) nes_cutoff <- 0
+
+  if(is.null(res$gse)) {
+    gse_up <- 0
+    gse_down <- 0
+  } else {
+    gse_up <- nrow(filter(res$gse, p.adjust < p_cutoff & NES > nes_cutoff))
+    gse_down <- nrow(filter(res$gse, p.adjust < p_cutoff & NES < (-1*nes_cutoff)))
+  }
+  
+  if(is.null(res$gse_simplified)) {
+    gseSimp_up <- 0
+    gseSimp_down <- 0
+  } else {
+    gseSimp_up <- nrow(filter(res$gse_simplified, p.adjust < p_cutoff & NES > nes_cutoff))
+    gseSimp_down <- nrow(filter(res$gse_simplified, p.adjust < p_cutoff & NES < (-1*nes_cutoff)))
+  }
+  
+
+  summary <- data.frame(experiment, comparison, nes_cutoff, p_cutoff, 
+                        gse_up, gse_down, gseSimp_up, gseSimp_down)
+  colnames(summary) <- c("Experiment", "Comparison", "NES_cutoff", "P_adj_cutoff",  
+                         "Up (Full)", "Down (Full)", "Up (Simplified)", "Down (Simplified)")
+  summary
 }
 
 gsePlot <- function(gse, plot_title, file_name, showCat, w, h){
@@ -82,53 +144,63 @@ gsePlot <- function(gse, plot_title, file_name, showCat, w, h){
     # scale_color_gradientn(colors = met.brewer("Hiroshige"), limits = c(-1*nes_max, nes_max))
 }
 
-gsePathway_wrapper <- function(dds_res){
-  ranked_list <- rank_genes(dds_res, "entrez")
-
-  if(is.null(ranked_list)) {
-    print("ranked gene list is NULL (no significant DEGs)")
-    return(NULL)
-  } 
-  gse <- gsePathway(ranked_list, organism = "mouse", pvalueCutoff = 0.1, pAdjustMethod = "BH", verbose = FALSE)
-  
-  if(nrow(gse) > 0) return(gse)
-  else {
-    print("No significant pathways detected")
-    return(NULL)
-  }
-}
-
-# ranked_genelist <- rank_genes(deseq_res$AM14transfer$PL23_2DG_v_Ctrl, "ensembl")
-# head(ranked_genelist)
-
-
 # GO Gene set enrichment analysis ----------------------------------------------
-  # list object with results ---------------------------------------------------
-    gseGO_results <- list(
-      AM14trans = list(
-        PL23_2DG_v_Ctrl = gseGO_wrapper(deseq_res$AM14transfer$PL23_2DG_v_Ctrl),
-        R848_2DG_v_Ctrl = gseGO_wrapper(deseq_res$AM14transfer$R848_2DG_v_Ctrl),
-        PL23_vs_R848 = gseGO_wrapper(deseq_res$AM14transfer$PL23_vs_R848)),
-      B18trans = gseGO_wrapper(deseq_res$B18transfer),
-      PL23_v_NP = gseGO_wrapper(deseq_res$PL23_v_NP),
-      AM14MRLlpr = gseGO_wrapper(deseq_res$AM14MRLlpr))
-  
-    nrow(gseGO_results$AM14trans$PL23_2DG_v_Ctrl$gse_simplified)
-    nrow(gseGO_results$AM14trans$R848_2DG_v_Ctrl$gse_simplified)
-    nrow(gseGO_results$AM14trans$PL23_vs_R848$gse_simplified)
-    nrow(gseGO_results$B18trans$gse_simplified)
-    nrow(gseGO_results$PL23_v_NP$gse_simplified)
-    nrow(gseGO_results$AM14MRLlpr$gse_simplified)
+  gseGO_results <- list(
+    AM14trans = list(
+      PL23_2DG_v_Ctrl = gseGO_wrapper(deseq_res$AM14transfer$PL23_2DG_v_Ctrl),
+      R848_2DG_v_Ctrl = gseGO_wrapper(deseq_res$AM14transfer$R848_2DG_v_Ctrl),
+      PL23_vs_R848 = gseGO_wrapper(deseq_res$AM14transfer$PL23_vs_R848)),
+    B18trans = gseGO_wrapper(deseq_res$B18transfer),
+    PL23_v_NP = gseGO_wrapper(deseq_res$PL23_v_NP),
+    AM14MRLlpr = gseGO_wrapper(deseq_res$AM14MRLlpr))
+
+  gseGO_res_summary <- join_all(list(gseGO_summary(gseGO_results$AM14trans$PL23_2DG_v_Ctrl, "PL2-3+2DG vs PL2-3", "AM14 Adoptive Transfer"),
+                                     gseGO_summary(gseGO_results$AM14trans$R848_2DG_v_Ctrl, "R848+2DG vs R848", "AM14 Adoptive Transfer"),
+                                     gseGO_summary(gseGO_results$AM14trans$PL23_vs_R848, "PL2-3 vs R848", "AM14 Adoptive Transfer"),
+                                     gseGO_summary(gseGO_results$B18trans, "NP+2DG vs NP", "B1-8 Adoptive Transfer"),
+                                     gseGO_summary(gseGO_results$PL23_v_NP, "PL2-3 vs NP", "AM14 and B1-8 Adoptive Transfers"),
+                                     gseGO_summary(gseGO_results$AM14MRLlpr, "2DG vs Control", "AM14 MRL/lpr")), 
+                                type = "full")
+  gseGO_res_summary 
+
+  # Save results to an Excel file ----------------------------------------------
+    wb <- createWorkbook("Output/Functional_analyses/gsea_GOBP_results.xlsx")
     
-    min(gseGO_results$AM14trans$PL23_2DG_v_Ctrl$gse_simplified$NES)
-    min(gseGO_results$AM14trans$R848_2DG_v_Ctrl$gse_simplified$NES)
-    min(gseGO_results$AM14trans$PL23_vs_R848$gse_simplified$NES)
-    min(gseGO_results$B18trans$gse_simplified$NES)
-    min(gseGO_results$PL23_v_NP$gse_simplified$NES)
-    min(gseGO_results$AM14MRLlpr$gse_simplified$NES)
+    addWorksheet(wb, "GSE GO Summaries")
+    addWorksheet(wb, "AM14 PL23_2DG_vs_Ctrl - Full")
+    # addWorksheet(wb, "AM14 - R848_2DG_vs_Ctrl - Full")
+    # addWorksheet(wb, "AM14 - PL23_vs_R848 - Full")
+    # addWorksheet(wb, "B1-8 - 2DG_vs_Ctrl - Full")
+    addWorksheet(wb, "PL2-3 vs NP - Full")
+    addWorksheet(wb, "AM14 MRLlpr - Full")
+    
+    addWorksheet(wb, "AM14 PL23_2DG_vs_Ctrl - Simp")
+    # addWorksheet(wb, "AM14 - R848_2DG_vs_Ctrl - Simp")
+    # addWorksheet(wb, "AM14 - PL23_vs_R848 - Simp")
+    # addWorksheet(wb, "B1-8 - 2DG_vs_Ctrl - Simp")
+    addWorksheet(wb, "PL2-3 vs NP - Simp")
+    addWorksheet(wb, "AM14 MRLlpr - Simp")
+    
+    writeData(wb, "GSE GO Summaries", gseGO_res_summary)
+    writeData(wb, "AM14 PL23_2DG_vs_Ctrl - Full", gseGO_results$AM14trans$PL23_2DG_v_Ctrl$gse)
+    # writeData(wb, "AM14 - R848_2DG_vs_Ctrl - Full", gseGO_results$AM14trans$R848_2DG_v_Ctrl$gse)
+    # writeData(wb, "AM14 - PL23_vs_R848 - Full", gseGO_results$AM14trans$PL23_vs_R848$gse)
+    # writeData(wb, "B1-8 - 2DG_vs_Ctrl - Full", gseGO_results$B18trans$gse)
+    writeData(wb, "PL2-3 vs NP - Full", gseGO_results$PL23_v_NP$gse)
+    writeData(wb, "AM14 MRLlpr - Full", gseGO_results$AM14MRLlpr$gse)
+    
+    writeData(wb, "AM14 PL23_2DG_vs_Ctrl - Simp", gseGO_results$AM14trans$PL23_2DG_v_Ctrl$gse_simplified)
+    # writeData(wb, "AM14 - R848_2DG_vs_Ctrl - Simp", gseGO_results$AM14trans$R848_2DG_v_Ctrl$gse_simplified)
+    # writeData(wb, "AM14 - PL23_vs_R848 - Simp", gseGO_results$AM14trans$PL23_vs_R848$gse_simplified)
+    # writeData(wb, "B1-8 - 2DG_vs_Ctrl - Simp", gseGO_results$B18trans$gse_simplified)
+    writeData(wb, "PL2-3 vs NP - Simp", gseGO_results$PL23_v_NP$gse_simplified)
+    writeData(wb, "AM14 MRLlpr - Simp", gseGO_results$AM14MRLlpr$gse_simplified)
+    
+    saveWorkbook(wb, "Output/Functional_analyses/gsea_GOBP_results.xlsx", overwrite = TRUE)
+    rm(wb)
     
 
-  # visualize results ------------------------------------------------------------
+  # visualize results ----------------------------------------------------------
     # gseaplot(, geneSetID = 1, 
     #          title = gseGO_results$AM14trans$PL23_2DG_v_Ctrl$gse$Description[1])
     # gseaplot2(gseGO_results$AM14trans$PL23_2DG_v_Ctrl$gse, geneSetID = 1, 
@@ -167,21 +239,6 @@ gsePathway_wrapper <- function(dds_res){
             "AM14 MRL/lpr: 2DG vs Control\n(GO Biological Process)", 
             "gseGO_plots/AM14 MRLlpr 2DG vs Control", h = 1500)
     dev.off()
-    
-    # ggplot(gseGO_results$AM14trans$PL23_2DG_v_Ctrl$gse_simplified, showCategory = showCat,
-    #        aes(p.adjust, Description)) +
-    #   geom_segment(aes(xend=0, yend = Description)) +
-    #   geom_point(aes(color=NES, size = setSize)) +
-    #   scale_size_continuous(range=c(2, 10)) +
-    #   theme_dose(12) +
-    #   xlab("FDR") +
-    #   ylab(NULL) +
-    #   scale_y_discrete(labels = lapply(strwrap(gseGO_results$AM14trans$PL23_2DG_v_Ctrl$gse_simplified$Description, width = 70, simplify = FALSE), paste, collapse="\n")) +
-    #   ggtitle("plot_title") +
-    #   scale_color_brewer(palette = pnw_palette("Bay"))
-    # #guide=guide_colorbar(reverse=FALSE, order=1))
-    
-    
     
 
 # Reactome pathways ------------------------------------------------------------
@@ -242,4 +299,13 @@ gsePathway_wrapper <- function(dds_res){
 # viewPathway("Signaling by GPCR", readable = TRUE, foldChange = genes_sorted)
 
 
-
+# KEGG pathways ------------------------------------------------------------
+#   gseKEGG_results <- list(
+#     AM14trans = list(
+#       PL23_2DG_v_Ctrl = gseKEGG_wrapper(deseq_res$AM14transfer$PL23_2DG_v_Ctrl),
+#       R848_2DG_v_Ctrl = gseKEGG_wrapper(deseq_res$AM14transfer$R848_2DG_v_Ctrl),
+#       PL23_vs_R848 = gseKEGG_wrapper(deseq_res$AM14transfer$PL23_vs_R848)),
+#     B18trans = gseKEGG_wrapper(deseq_res$B18transfer),
+#     PL23_v_NP = gseKEGG_wrapper(deseq_res$PL23_v_NP),
+#     AM14MRLlpr = gseKEGG_wrapper(deseq_res$AM14MRLlpr)
+#   )

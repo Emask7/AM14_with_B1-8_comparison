@@ -203,9 +203,6 @@ summary_wrapper <- function(res, comparison, experiment, p_cutoff, lfc_cutoff){
   if(missing(p_cutoff)) p_cutoff <- 0.05
   if(missing(lfc_cutoff)) lfc_cutoff <- 1
 
-  up_string <- stri_join(c("Up (LFC >= ", lfc_cutoff, "p-adj <= ", p_cutoff, ")"), collapse = "")
-  down_string <- stri_join(c("Down (LFC <= -", lfc_cutoff, "p-adj <= ", p_cutoff,  ")"), collapse = "")
-  
   degs_up <- nrow(subset(res, res$padj <= p_cutoff & res$log2FoldChange >= lfc_cutoff))
   degs_down <- nrow(subset(res, res$padj <= p_cutoff & res$log2FoldChange <= (-1*lfc_cutoff)))
   
