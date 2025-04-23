@@ -119,35 +119,68 @@ oraPlot <- function(ora, yaxis, plot_title, file_name, showCat, w, h){
     rm(test)
     
 
-    oraPlot(enrichGO_all$AM14trans$PL23_2DG_v_Ctrl$eGO_simplified, 
+    oraPlot(enrichGO_all$AM14trans$PL23_2DG_v_Ctrl$eGO_simplified, "RichFactor",
             "AM14 Transfer: PL2-3+2DG vs PL2-3\n(GO Biological Process)",
-            "enrichGO_plots/AM14 Transfer - PL2-3 + 2DG vs PL2-3", w = 1400, h = 2100)
+            "enrichGO_plots/RichFactor - AM14 Transfer - PL2-3 + 2DG vs PL2-3", w = 1400, h = 2100)
     dev.off()  
     
-    oraPlot(enrichGO_all$AM14trans$R848_2DG_v_Ctrl$eGO_simplified, 
+    oraPlot(enrichGO_all$AM14trans$R848_2DG_v_Ctrl$eGO_simplified, "RichFactor",
             "AM14 Transfer: R848+2DG vs R848\n(GO Biological Process)",
-            "enrichGO_plots/AM14 Transfer - R848 + 2DG vs R848", w = 1500, h = 600)
+            "enrichGO_plots/RichFactor - AM14 Transfer - R848 + 2DG vs R848", w = 1500, h = 600)
     dev.off()
     
-    oraPlot(enrichGO_all$AM14trans$PL23_vs_R848$eGO_simplified, 
+    oraPlot(enrichGO_all$AM14trans$PL23_vs_R848$eGO_simplified, "RichFactor",
             "AM14 Transfer: PL2-3 vs R848\n(GO Biological Process)",
-            "enrichGO_plots/AM14 Transfer - PL2-3 vs R848", w = 1400, h = 2200)
+            "enrichGO_plots/RichFactor - AM14 Transfer - PL2-3 vs R848", w = 1400, h = 2200)
     dev.off()
     
-    oraPlot(enrichGO_all$PL23_v_NP$eGO_simplified,
+    oraPlot(enrichGO_all$PL23_v_NP$eGO_simplified, "RichFactor",
             "AM14 Transfer + PL2-3\nvs B1-8 Transfer + NP\n(GO Biological Process)",
-            "enrichGO_plots/AM14 Transfer PL2-3 vs B1-8 Transfer NP", w = 1500, h = 2000)
+            "enrichGO_plots/RichFactor - AM14 Transfer PL2-3 vs B1-8 Transfer NP", w = 1500, h = 2000)
     dev.off()
     
-    oraPlot(enrichGO_all$B18trans$eGO_simplified,
-            "B1-8 Transfer: NP + 2DG vs NP\n(GO Biological Process)",
-            "enrichGO_plots/B1-8 Transfer NP + 2DG vs NP", w = 1500, h = 800)
-    dev.off()
+    # oraPlot(enrichGO_all$B18trans$eGO_simplified, "RichFactor",
+    #         "B1-8 Transfer: NP + 2DG vs NP\n(GO Biological Process)",
+    #         "enrichGO_plots/RichFactor - B1-8 Transfer NP + 2DG vs NP", w = 1500, h = 800)
+    # dev.off()
     
-    oraPlot(enrichGO_all$AM14MRLlpr$eGO_simplified, 
+    oraPlot(enrichGO_all$AM14MRLlpr$eGO_simplified, "RichFactor",
             "AM14 MRL/lpr: 2DG vs Control\n(GO Biological Process)",
-            "enrichGO_plots/AM14 MRLlpr 2DG vs Control", w = 1500, h = 2000)
+            "enrichGO_plots/RichFactor - AM14 MRLlpr 2DG vs Control", w = 1500, h = 2000)
     dev.off()
+    
+    
+    
+    oraPlot(enrichGO_all$AM14trans$PL23_2DG_v_Ctrl$eGO_simplified, "FoldEnrichment",
+            "AM14 Transfer: PL2-3+2DG vs PL2-3\n(GO Biological Process)",
+            "enrichGO_plots/FoldEnrichment - AM14 Transfer - PL2-3 + 2DG vs PL2-3", w = 1400, h = 2100)
+    dev.off()  
+    
+    oraPlot(enrichGO_all$AM14trans$R848_2DG_v_Ctrl$eGO_simplified, "FoldEnrichment",
+            "AM14 Transfer: R848+2DG vs R848\n(GO Biological Process)",
+            "enrichGO_plots/FoldEnrichment - AM14 Transfer - R848 + 2DG vs R848", w = 1500, h = 600)
+    dev.off()
+    
+    oraPlot(enrichGO_all$AM14trans$PL23_vs_R848$eGO_simplified, "FoldEnrichment",
+            "AM14 Transfer: PL2-3 vs R848\n(GO Biological Process)",
+            "enrichGO_plots/FoldEnrichment - AM14 Transfer - PL2-3 vs R848", w = 1400, h = 2200)
+    dev.off()
+    
+    oraPlot(enrichGO_all$PL23_v_NP$eGO_simplified, "FoldEnrichment",
+            "AM14 Transfer + PL2-3\nvs B1-8 Transfer + NP\n(GO Biological Process)",
+            "enrichGO_plots/FoldEnrichment - AM14 Transfer PL2-3 vs B1-8 Transfer NP", w = 1500, h = 2000)
+    dev.off()
+    
+    # oraPlot(enrichGO_all$B18trans$eGO_simplified, "FoldEnrichment",
+    #         "B1-8 Transfer: NP + 2DG vs NP\n(GO Biological Process)",
+    #         "enrichGO_plots/FoldEnrichment - B1-8 Transfer NP + 2DG vs NP", w = 1500, h = 800)
+    # dev.off()
+    
+    oraPlot(enrichGO_all$AM14MRLlpr$eGO_simplified, "FoldEnrichment",
+            "AM14 MRL/lpr: 2DG vs Control\n(GO Biological Process)",
+            "enrichGO_plots/FoldEnrichment - AM14 MRLlpr 2DG vs Control", w = 1500, h = 2000)
+    dev.off()
+    
     
     # Save results to an Excel file ----------------------------------------------
       wb <- createWorkbook("Output/Functional_analyses/enrich_GOBP_results_allDEGs.xlsx")
@@ -205,10 +238,49 @@ oraPlot <- function(ora, yaxis, plot_title, file_name, showCat, w, h){
                                     type = "full")
     enrichGO_up_summary
   
-    # oraPlot(enrichGO_up$PL23_v_NP$eGO_simplified,
-    #         "AM14 Transfer + PL2-3 vs B1-8 Transfer + NP\n(Upregulated DEGs, GO Biological Process)",
-    #         "enrichGO_plots/AM14 Transfer PL2-3 vs B1-8 Transfer NP - UP")
-    # dev.off()
+    
+    oraPlot(enrichGO_up$AM14trans$R848_2DG_v_Ctrl$eGO_simplified, "RichFactor",
+            "AM14 Transfer: R848+2DG vs R848\n(Upregulated DEGs, GO Biological Process)",
+            "enrichGO_plots/RichFactor - AM14 Transfer - R848 + 2DG vs R848 - UP", h = 600)
+    dev.off()
+    
+    oraPlot(enrichGO_up$AM14trans$PL23_vs_R848$eGO_simplified, "RichFactor",
+            "AM14 Transfer: PL2-3 vs R848\n(Upregulated DEGs, GO Biological Process)",
+            "enrichGO_plots/RichFactor - AM14 Transfer - PL2-3 vs R848 - UP", h = 600)
+    dev.off()
+    
+    oraPlot(enrichGO_up$PL23_v_NP$eGO_simplified, "RichFactor",
+            "AM14 Transfer + PL2-3 vs B1-8 Transfer + NP\n(Upregulated DEGs, GO Biological Process)",
+            "enrichGO_plots/RichFactor - AM14 Transfer PL2-3 vs B1-8 Transfer NP - UP")
+    dev.off()
+    
+    oraPlot(enrichGO_up$AM14MRLlpr$eGO_simplified, "RichFactor",
+            "AM14 MRL/lpr: 2DG vs Control\n(Upregulated DEGs, GO Biological Process)",
+            "enrichGO_plots/RichFactor - AM14 MRLlpr 2DG vs Control - UP", , h = 1000)
+    dev.off()
+    
+    
+    oraPlot(enrichGO_up$AM14trans$R848_2DG_v_Ctrl$eGO_simplified, "FoldEnrichment",
+            "AM14 Transfer: R848+2DG vs R848\n(Upregulated DEGs, GO Biological Process)",
+            "enrichGO_plots/FoldEnrichment - AM14 Transfer - R848 + 2DG vs R848 - UP", h = 600)
+    dev.off()
+    
+    oraPlot(enrichGO_up$AM14trans$PL23_vs_R848$eGO_simplified, "FoldEnrichment",
+            "AM14 Transfer: PL2-3 vs R848\n(Upregulated DEGs, GO Biological Process)",
+            "enrichGO_plots/FoldEnrichment - AM14 Transfer - PL2-3 vs R848 - UP", h = 600)
+    dev.off()
+    
+    oraPlot(enrichGO_up$PL23_v_NP$eGO_simplified, "FoldEnrichment",
+            "AM14 Transfer + PL2-3 vs B1-8 Transfer + NP\n(Upregulated DEGs, GO Biological Process)",
+            "enrichGO_plots/FoldEnrichment - AM14 Transfer PL2-3 vs B1-8 Transfer NP - UP")
+    dev.off()
+    
+    oraPlot(enrichGO_up$AM14MRLlpr$eGO_simplified, "FoldEnrichment",
+            "AM14 MRL/lpr: 2DG vs Control\n(Upregulated DEGs, GO Biological Process)",
+            "enrichGO_plots/FoldEnrichment - AM14 MRLlpr 2DG vs Control - UP", , h = 1000)
+    dev.off()
+    
+    
     
     # Save results to an Excel file ----------------------------------------------
       wb <- createWorkbook("Output/Functional_analyses/enrich_GOBP_results_upregDEGs.xlsx")
@@ -272,20 +344,47 @@ oraPlot <- function(ora, yaxis, plot_title, file_name, showCat, w, h){
     # enrichGO_down_PL23_3DG_v_Ctrl_lowerSimp$Description
     # rm(enrichGO_down_PL23_3DG_v_Ctrl_lowerSimp)
     
-    oraPlot(enrichGO_down$AM14trans$PL23_2DG_v_Ctrl$eGO_simplified, 
+    oraPlot(enrichGO_down$AM14trans$PL23_2DG_v_Ctrl$eGO_simplified,  "RichFactor",
             "AM14 Transfer: PL2-3+2DG vs PL2-3\n(Downregulated DEGs, GO Biological Process)",
-            "enrichGO_plots/AM14 Transfer - PL2-3 + 2DG vs PL2-3 - DOWN", w = 1600, h = 1800)
+            "enrichGO_plots/RichFactor - AM14 Transfer - PL2-3 + 2DG vs PL2-3 - DOWN", w = 1600, h = 1800)
     dev.off()
     
-    oraPlot(enrichGO_down$AM14trans$PL23_vs_R848$eGO_simplified, 
+    oraPlot(enrichGO_down$AM14trans$PL23_vs_R848$eGO_simplified,  "RichFactor",
             "AM14 Transfer: PL2-3 vs R848\n(Downregulated DEGs,\nGO Biological Process)",
-            "enrichGO_plots/AM14 Transfer - PL2-3 vs R848 - DOWN", h = 1200)
+            "enrichGO_plots/RichFactor - AM14 Transfer - PL2-3 vs R848 - DOWN", h = 1500)
     dev.off()
     
-    oraPlot(enrichGO_down$AM14MRLlpr$eGO_simplified, 
-            "AM14 MRL/lpr: 2DG vs Control\n(Downregulated DEGs,\nGO Biological Process)",
-            "enrichGO_plots/AM14 MRLlpr 2DG vs Control - DOWN")
+    oraPlot(enrichGO_down$PL23_v_NP$eGO_simplified,  "RichFactor",
+            "AM14 Transfer + PL2-3 vs B1-8 Transfer + NP\n(Downregulated DEGs,\nGO Biological Process)",
+            "enrichGO_plots/RichFactor - AM14 Transfer PL2-3 vs B1-8 Transfer NP - DOWN", h = 800)
     dev.off()
+    
+    oraPlot(enrichGO_down$AM14MRLlpr$eGO_simplified,  "RichFactor",
+            "AM14 MRL/lpr: 2DG vs Control\n(Downregulated DEGs,\nGO Biological Process)",
+            "enrichGO_plots/RichFactor - AM14 MRLlpr 2DG vs Control - DOWN")
+    dev.off()
+    
+    
+    oraPlot(enrichGO_down$AM14trans$PL23_2DG_v_Ctrl$eGO_simplified,  "FoldEnrichment",
+            "AM14 Transfer: PL2-3+2DG vs PL2-3\n(Downregulated DEGs, GO Biological Process)",
+            "enrichGO_plots/FoldEnrichment - AM14 Transfer - PL2-3 + 2DG vs PL2-3 - DOWN", w = 1600, h = 1800)
+    dev.off()
+    
+    oraPlot(enrichGO_down$AM14trans$PL23_vs_R848$eGO_simplified,  "FoldEnrichment",
+            "AM14 Transfer: PL2-3 vs R848\n(Downregulated DEGs,\nGO Biological Process)",
+            "enrichGO_plots/FoldEnrichment - AM14 Transfer - PL2-3 vs R848 - DOWN", h = 1500)
+    dev.off()
+    
+    oraPlot(enrichGO_down$PL23_v_NP$eGO_simplified,  "FoldEnrichment",
+            "AM14 Transfer + PL2-3 vs B1-8 Transfer + NP\n(Downregulated DEGs,\nGO Biological Process)",
+            "enrichGO_plots/FoldEnrichment - AM14 Transfer PL2-3 vs B1-8 Transfer NP - DOWN", h = 800)
+    dev.off()
+    
+    oraPlot(enrichGO_down$AM14MRLlpr$eGO_simplified,  "FoldEnrichment",
+            "AM14 MRL/lpr: 2DG vs Control\n(Downregulated DEGs,\nGO Biological Process)",
+            "enrichGO_plots/FoldEnrichment - AM14 MRLlpr 2DG vs Control - DOWN")
+    dev.off()
+    
 
     # Save results to an Excel file --------------------------------------------
       wb <- createWorkbook("Output/Functional_analyses/enrich_GOBP_results_downregDEGs.xlsx")
