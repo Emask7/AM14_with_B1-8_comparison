@@ -13,16 +13,16 @@ enrichGO_wrapper <- function(dds_res, lfc_direction, lfc_cutoff){
     sig <- dplyr::filter(dds_res, padj < 0.05 & log2FoldChange < lfc_cutoff)
   } else return(print("lfc_direction must be either up, down, or NULL"))
   
-  if(length(sig) < 1) {
-    return(NULL)
+  if(nrow(sig) < 1) {
     print("0 significant DEGs")
+    return(NULL)
   }
   
   sig <- as.character(sig$ensembl_gene_id)
-    
+
   eGO <- enrichGO(gene = sig, universe = background, keyType = "ENSEMBL",
                   OrgDb = org.Mm.eg.db, ont = "BP", pAdjustMethod = "BH", readable = TRUE)
-  
+
   if(nrow(eGO) < 1) {
     print("ranked gene list length is > 0 but no significant GO terms were detected")
     return(NULL)
@@ -93,31 +93,32 @@ oraPlot <- function(ora, yaxis, plot_title, file_name, showCat, w, h){
   # Up- and down-regulated DEGs ------------------------------------------------
     enrichGO_all <- list(
       AM14trans = list(
-        PL23_2DG_v_Ctrl = enrichGO_wrapper(deseq_res$AM14transfer$PL23_2DG_v_Ctrl, NULL, 1.0),
-        R848_2DG_v_Ctrl = enrichGO_wrapper(deseq_res$AM14transfer$R848_2DG_v_Ctrl, NULL, 1.0),
-        PL23_vs_R848 = enrichGO_wrapper(deseq_res$AM14transfer$PL23_vs_R848, NULL, 1.0)),
-      PL23_v_NP = enrichGO_wrapper(deseq_res$PL23_v_NP, NULL, 1.0),
-      B18trans = enrichGO_wrapper(deseq_res$B18transfer, NULL, 1.0),
-      AM14MRLlpr = enrichGO_wrapper(deseq_res$AM14MRLlpr, NULL, 1.0))
+        PL23_2DG_v_Ctrl = enrichGO_wrapper(deseq_res$AM14transfer$PL23_2DG_v_Ctrl, NULL, 0.5),
+        R848_2DG_v_Ctrl = enrichGO_wrapper(deseq_res$AM14transfer$R848_2DG_v_Ctrl, NULL, 0.5),
+        PL23_vs_R848 = enrichGO_wrapper(deseq_res$AM14transfer$PL23_vs_R848, NULL, 0.5)),
+      PL23_v_NP = enrichGO_wrapper(deseq_res$PL23_v_NP, NULL, 0.5),
+      B18trans = enrichGO_wrapper(deseq_res$B18transfer, NULL, 0.5),
+      AM14MRLlpr = enrichGO_wrapper(deseq_res$AM14MRLlpr, NULL, 0.5))
   
     head(enrichGO_all$AM14trans$PL23_2DG_v_Ctrl$eGO_simplified)
     enrichGO_all$AM14trans$PL23_2DG_v_Ctrl$eGO_simplified$Description
   
-    enrichGO_all_summary <- join_all(list(enrichGO_summary(enrichGO_all$AM14trans$PL23_2DG_v_Ctrl, "PL2-3+2DG vs PL2-3", "AM14 Adoptive Transfer", "+/- 0.6"),
-                                          enrichGO_summary(enrichGO_all$AM14trans$R848_2DG_v_Ctrl, "R848+2DG vs R848", "AM14 Adoptive Transfer", "+/- 0.6"),
-                                          enrichGO_summary(enrichGO_all$AM14trans$PL23_vs_R848, "PL2-3 vs R848", "AM14 Adoptive Transfer", "+/- 0.6"),
-                                          enrichGO_summary(enrichGO_all$B18trans, "NP+2DG vs NP", "B1-8 Adoptive Transfer", "+/- 0.6"),
-                                          enrichGO_summary(enrichGO_all$PL23_v_NP, "PL2-3 vs NP", "AM14 and B1-8 Adoptive Transfers", "+/- 0.6"),
-                                          enrichGO_summary(enrichGO_all$AM14MRLlpr, "2DG vs Control", "AM14 MRL/lpr", "+/- 0.6")), 
+    enrichGO_all_summary <- join_all(list(enrichGO_summary(enrichGO_all$AM14trans$PL23_2DG_v_Ctrl, "PL2-3+2DG vs PL2-3", "AM14 Adoptive Transfer", "+/- 0.5"),
+                                          enrichGO_summary(enrichGO_all$AM14trans$R848_2DG_v_Ctrl, "R848+2DG vs R848", "AM14 Adoptive Transfer", "+/- 0.5"),
+                                          enrichGO_summary(enrichGO_all$AM14trans$PL23_vs_R848, "PL2-3 vs R848", "AM14 Adoptive Transfer", "+/- 0.5"),
+                                          enrichGO_summary(enrichGO_all$B18trans, "NP+2DG vs NP", "B1-8 Adoptive Transfer", "+/- 0.5"),
+                                          enrichGO_summary(enrichGO_all$PL23_v_NP, "PL2-3 vs NP", "AM14 and B1-8 Adoptive Transfers", "+/- 0.5"),
+                                          enrichGO_summary(enrichGO_all$AM14MRLlpr, "2DG vs Control", "AM14 MRL/lpr", "+/- 0.5")), 
                                      type = "full")
     enrichGO_all_summary
     
     
-    test <- enrichGO_wrapper(deseq_res$AM14transfer$PL23_2DG_v_Ctrl, NULL, 0.5)
+    test <- enrichGO_wrapper(deseq_res$AM14transfer$PL23_2DG_v_Ctrl, "down", 0.5)
     enrichGO_summary(test, "PL2-3+2DG vs PL2-3", "AM14 Adoptive Transfer", " ")
     test$eGO_simplified$Description
+    rm(test)
     
-                                    
+
     oraPlot(enrichGO_all$AM14trans$PL23_2DG_v_Ctrl$eGO_simplified, 
             "AM14 Transfer: PL2-3+2DG vs PL2-3\n(GO Biological Process)",
             "enrichGO_plots/AM14 Transfer - PL2-3 + 2DG vs PL2-3", w = 1400, h = 2100)
@@ -157,28 +158,28 @@ oraPlot <- function(ora, yaxis, plot_title, file_name, showCat, w, h){
       addWorksheet(wb, "AM14 PL23_2DG_vs_Ctrl - Simp")
       addWorksheet(wb, "AM14 - R848_2DG_vs_Ctrl - Simp")
       addWorksheet(wb, "AM14 - PL23_vs_R848 - Simp")
-      addWorksheet(wb, "B1-8 - 2DG_vs_Ctrl - Simp")
+      # addWorksheet(wb, "B1-8 - 2DG_vs_Ctrl - Simp")
       addWorksheet(wb, "PL2-3 vs NP - Simp")
       addWorksheet(wb, "AM14 MRLlpr - Simp")
       
       writeData(wb, "AM14 PL23_2DG_vs_Ctrl - Simp", enrichGO_all$AM14trans$PL23_2DG_v_Ctrl$eGO_simplified)
       writeData(wb, "AM14 - R848_2DG_vs_Ctrl - Simp", enrichGO_all$AM14trans$R848_2DG_v_Ctrl$eGO_simplified)
       writeData(wb, "AM14 - PL23_vs_R848 - Simp", enrichGO_all$AM14trans$PL23_vs_R848$eGO_simplified)
-      writeData(wb, "B1-8 - 2DG_vs_Ctrl - Simp", enrichGO_all$B18trans$eGO_simplified)
+      # writeData(wb, "B1-8 - 2DG_vs_Ctrl - Simp", enrichGO_all$B18trans$eGO_simplified)
       writeData(wb, "PL2-3 vs NP - Simp", enrichGO_all$PL23_v_NP$eGO_simplified)
       writeData(wb, "AM14 MRLlpr - Simp", enrichGO_all$AM14MRLlpr$eGO_simplified)
       
       addWorksheet(wb, "AM14 PL23_2DG_vs_Ctrl - Full")
       addWorksheet(wb, "AM14 - R848_2DG_vs_Ctrl - Full")
       addWorksheet(wb, "AM14 - PL23_vs_R848 - Full")
-      addWorksheet(wb, "B1-8 - 2DG_vs_Ctrl - Full")
+      # addWorksheet(wb, "B1-8 - 2DG_vs_Ctrl - Full")
       addWorksheet(wb, "PL2-3 vs NP - Full")
       addWorksheet(wb, "AM14 MRLlpr - Full")
       
       writeData(wb, "AM14 PL23_2DG_vs_Ctrl - Full", enrichGO_all$AM14trans$PL23_2DG_v_Ctrl$eGO)
       writeData(wb, "AM14 - R848_2DG_vs_Ctrl - Full", enrichGO_all$AM14trans$R848_2DG_v_Ctrl$eGO)
       writeData(wb, "AM14 - PL23_vs_R848 - Full", enrichGO_all$AM14trans$PL23_vs_R848$eGO)
-      writeData(wb, "B1-8 - 2DG_vs_Ctrl - Full", enrichGO_all$B18trans$eGO)
+      # writeData(wb, "B1-8 - 2DG_vs_Ctrl - Full", enrichGO_all$B18trans$eGO)
       writeData(wb, "PL2-3 vs NP - Full", enrichGO_all$PL23_v_NP$eGO)
       writeData(wb, "AM14 MRLlpr - Full", enrichGO_all$AM14MRLlpr$eGO)
       
@@ -188,19 +189,19 @@ oraPlot <- function(ora, yaxis, plot_title, file_name, showCat, w, h){
   # Upregulated DEGs -----------------------------------------------------------
     enrichGO_up <- list(
       AM14trans = list(
-        PL23_2DG_v_Ctrl = enrichGO_wrapper(deseq_res$AM14transfer$PL23_2DG_v_Ctrl, "up", 0.6),
-        R848_2DG_v_Ctrl = enrichGO_wrapper(deseq_res$AM14transfer$R848_2DG_v_Ctrl, "up", 0.6),
-        PL23_vs_R848 = enrichGO_wrapper(deseq_res$AM14transfer$PL23_vs_R848, "up", 0.6)),
-      PL23_v_NP = enrichGO_wrapper(deseq_res$PL23_v_NP, "up", 0.6),
-      B18trans = enrichGO_wrapper(deseq_res$B18transfer, "up", 0.6),
-      AM14MRLlpr = enrichGO_wrapper(deseq_res$AM14MRLlpr, "up", 0.6))
+        PL23_2DG_v_Ctrl = enrichGO_wrapper(deseq_res$AM14transfer$PL23_2DG_v_Ctrl, "up", 0.5),
+        R848_2DG_v_Ctrl = enrichGO_wrapper(deseq_res$AM14transfer$R848_2DG_v_Ctrl, "up", 0.5),
+        PL23_vs_R848 = enrichGO_wrapper(deseq_res$AM14transfer$PL23_vs_R848, "up", 0.5)),
+      PL23_v_NP = enrichGO_wrapper(deseq_res$PL23_v_NP, "up", 0.5),
+      B18trans = enrichGO_wrapper(deseq_res$B18transfer, "up", 0.5),
+      AM14MRLlpr = enrichGO_wrapper(deseq_res$AM14MRLlpr, "up", 0.5))
     
-    enrichGO_up_summary <- join_all(list(enrichGO_summary(enrichGO_up$AM14trans$PL23_2DG_v_Ctrl, "PL2-3+2DG vs PL2-3", "AM14 Adoptive Transfer", " +0.6"),
-                                         enrichGO_summary(enrichGO_up$AM14trans$R848_2DG_v_Ctrl, "R848+2DG vs R848", "AM14 Adoptive Transfer", " +0.6"),
-                                         enrichGO_summary(enrichGO_up$AM14trans$PL23_vs_R848, "PL2-3 vs R848", "AM14 Adoptive Transfer", " +0.6"),
-                                         enrichGO_summary(enrichGO_up$B18trans, "NP+2DG vs NP", "B1-8 Adoptive Transfer", " +0.6"),
-                                         enrichGO_summary(enrichGO_up$PL23_v_NP, "PL2-3 vs NP", "AM14 and B1-8 Adoptive Transfers", " +0.6"),
-                                         enrichGO_summary(enrichGO_up$AM14MRLlpr, "2DG vs Control", "AM14 MRL/lpr", " +0.6")), 
+    enrichGO_up_summary <- join_all(list(enrichGO_summary(enrichGO_up$AM14trans$PL23_2DG_v_Ctrl, "PL2-3+2DG vs PL2-3", "AM14 Adoptive Transfer", " +0.5"),
+                                         enrichGO_summary(enrichGO_up$AM14trans$R848_2DG_v_Ctrl, "R848+2DG vs R848", "AM14 Adoptive Transfer", " +0.5"),
+                                         enrichGO_summary(enrichGO_up$AM14trans$PL23_vs_R848, "PL2-3 vs R848", "AM14 Adoptive Transfer", " +0.5"),
+                                         enrichGO_summary(enrichGO_up$B18trans, "NP+2DG vs NP", "B1-8 Adoptive Transfer", " +0.5"),
+                                         enrichGO_summary(enrichGO_up$PL23_v_NP, "PL2-3 vs NP", "AM14 and B1-8 Adoptive Transfers", " +0.5"),
+                                         enrichGO_summary(enrichGO_up$AM14MRLlpr, "2DG vs Control", "AM14 MRL/lpr", " +0.5")), 
                                     type = "full")
     enrichGO_up_summary
   
@@ -249,23 +250,28 @@ oraPlot <- function(ora, yaxis, plot_title, file_name, showCat, w, h){
   # Downregulated DEGs ---------------------------------------------------------
     enrichGO_down <- list(
       AM14trans = list(
-        PL23_2DG_v_Ctrl = enrichGO_wrapper(deseq_res$AM14transfer$PL23_2DG_v_Ctrl, "down", 0.6),
-        R848_2DG_v_Ctrl = enrichGO_wrapper(deseq_res$AM14transfer$R848_2DG_v_Ctrl, "down", 0.6),
-        PL23_vs_R848 = enrichGO_wrapper(deseq_res$AM14transfer$PL23_vs_R848, "down", 0.6)),
-      PL23_v_NP = enrichGO_wrapper(deseq_res$PL23_v_NP, "down", 0.6),
-      B18trans = enrichGO_wrapper(deseq_res$B18transfer, "down", 0.6),
-      AM14MRLlpr = enrichGO_wrapper(deseq_res$AM14MRLlpr, "down", 0.6))
-    
-    enrichGO_down_summary <- join_all(list(enrichGO_summary(enrichGO_down$AM14trans$PL23_2DG_v_Ctrl, "PL2-3+2DG vs PL2-3", "AM14 Adoptive Transfer", " -0.6"),
-                                           enrichGO_summary(enrichGO_down$AM14trans$R848_2DG_v_Ctrl, "R848+2DG vs R848", "AM14 Adoptive Transfer", " -0.6"),
-                                           enrichGO_summary(enrichGO_down$AM14trans$PL23_vs_R848, "PL2-3 vs R848", "AM14 Adoptive Transfer", " -0.6"),
-                                           enrichGO_summary(enrichGO_down$B18trans, "NP+2DG vs NP", "B1-8 Adoptive Transfer", " -0.6"),
-                                           enrichGO_summary(enrichGO_down$PL23_v_NP, "PL2-3 vs NP", "AM14 and B1-8 Adoptive Transfers", " -0.6"),
-                                           enrichGO_summary(enrichGO_down$AM14MRLlpr, "2DG vs Control", "AM14 MRL/lpr", " -0.6")), 
+        PL23_2DG_v_Ctrl = enrichGO_wrapper(deseq_res$AM14transfer$PL23_2DG_v_Ctrl, "down", 0.5),
+        R848_2DG_v_Ctrl = enrichGO_wrapper(deseq_res$AM14transfer$R848_2DG_v_Ctrl, "down", 0.5),
+      PL23_vs_R848 = enrichGO_wrapper(deseq_res$AM14transfer$PL23_vs_R848, "down", 0.5)),
+      PL23_v_NP = enrichGO_wrapper(deseq_res$PL23_v_NP, "down", 0.5),
+      B18trans = enrichGO_wrapper(deseq_res$B18transfer, "down", 0.5),
+      AM14MRLlpr = enrichGO_wrapper(deseq_res$AM14MRLlpr, "down", 0.5))
+      
+    enrichGO_down_summary <- join_all(list(enrichGO_summary(enrichGO_down$AM14trans$PL23_2DG_v_Ctrl, "PL2-3+2DG vs PL2-3", "AM14 Adoptive Transfer", " -0.5"),
+                                           enrichGO_summary(enrichGO_down$AM14trans$R848_2DG_v_Ctrl, "R848+2DG vs R848", "AM14 Adoptive Transfer", " -0.5"),
+                                           enrichGO_summary(enrichGO_down$AM14trans$PL23_vs_R848, "PL2-3 vs R848", "AM14 Adoptive Transfer", " -0.5"),
+                                           enrichGO_summary(enrichGO_down$B18trans, "NP+2DG vs NP", "B1-8 Adoptive Transfer", " -0.5"),
+                                           enrichGO_summary(enrichGO_down$PL23_v_NP, "PL2-3 vs NP", "AM14 and B1-8 Adoptive Transfers", " -0.5"),
+                                           enrichGO_summary(enrichGO_down$AM14MRLlpr, "2DG vs Control", "AM14 MRL/lpr", " -0.5")), 
                                       type = "full")
     enrichGO_down_summary
     
-  
+    
+    # enrichGO_down_PL23_3DG_v_Ctrl_lowerSimp <- simplify(enrichGO_down$AM14trans$PL23_2DG_v_Ctrl$eGO, cutoff = 0.6)
+    # nrow(enrichGO_down_PL23_3DG_v_Ctrl_lowerSimp)
+    # enrichGO_down_PL23_3DG_v_Ctrl_lowerSimp$Description
+    # rm(enrichGO_down_PL23_3DG_v_Ctrl_lowerSimp)
+    
     oraPlot(enrichGO_down$AM14trans$PL23_2DG_v_Ctrl$eGO_simplified, 
             "AM14 Transfer: PL2-3+2DG vs PL2-3\n(Downregulated DEGs, GO Biological Process)",
             "enrichGO_plots/AM14 Transfer - PL2-3 + 2DG vs PL2-3 - DOWN", w = 1600, h = 1800)
@@ -291,28 +297,28 @@ oraPlot <- function(ora, yaxis, plot_title, file_name, showCat, w, h){
       # addWorksheet(wb, "AM14 - R848_2DG_vs_Ctrl - Simp")
       addWorksheet(wb, "AM14 - PL23_vs_R848 - Simp")
       # addWorksheet(wb, "B1-8 - 2DG_vs_Ctrl - Simp")
-      # addWorksheet(wb, "PL2-3 vs NP - Simp")
+      addWorksheet(wb, "PL2-3 vs NP - Simp")
       addWorksheet(wb, "AM14 MRLlpr - Simp")
       
       writeData(wb, "AM14 PL23_2DG_vs_Ctrl - Simp", enrichGO_down$AM14trans$PL23_2DG_v_Ctrl$eGO_simplified)
       # writeData(wb, "AM14 - R848_2DG_vs_Ctrl - Simp", enrichGO_down$AM14trans$R848_2DG_v_Ctrl$eGO_simplified)
       writeData(wb, "AM14 - PL23_vs_R848 - Simp", enrichGO_down$AM14trans$PL23_vs_R848$eGO_simplified)
       # writeData(wb, "B1-8 - 2DG_vs_Ctrl - Simp", enrichGO_down$B18trans$eGO_simplified)
-      # writeData(wb, "PL2-3 vs NP - Simp", enrichGO_down$PL23_v_NP$eGO_simplified)
+      writeData(wb, "PL2-3 vs NP - Simp", enrichGO_down$PL23_v_NP$eGO_simplified)
       writeData(wb, "AM14 MRLlpr - Simp", enrichGO_down$AM14MRLlpr$eGO_simplified)
   
       addWorksheet(wb, "AM14 PL23_2DG_vs_Ctrl - Full")
       # addWorksheet(wb, "AM14 - R848_2DG_vs_Ctrl - Full")
       addWorksheet(wb, "AM14 - PL23_vs_R848 - Full")
       # addWorksheet(wb, "B1-8 - 2DG_vs_Ctrl - Full")
-      # addWorksheet(wb, "PL2-3 vs NP - Full")
+      addWorksheet(wb, "PL2-3 vs NP - Full")
       addWorksheet(wb, "AM14 MRLlpr - Full")
       
       writeData(wb, "AM14 PL23_2DG_vs_Ctrl - Full", enrichGO_down$AM14trans$PL23_2DG_v_Ctrl$eGO)
       # writeData(wb, "AM14 - R848_2DG_vs_Ctrl - Full", enrichGO_down$AM14trans$R848_2DG_v_Ctrl$eGO)
       writeData(wb, "AM14 - PL23_vs_R848 - Full", enrichGO_down$AM14trans$PL23_vs_R848$eGO)
       # writeData(wb, "B1-8 - 2DG_vs_Ctrl - Full", enrichGO_down$B18trans$eGO)
-      # writeData(wb, "PL2-3 vs NP - Full", enrichGO_down$PL23_v_NP$eGO)
+      writeData(wb, "PL2-3 vs NP - Full", enrichGO_down$PL23_v_NP$eGO)
       writeData(wb, "AM14 MRLlpr - Full", enrichGO_down$AM14MRLlpr$eGO)
       
       saveWorkbook(wb, "Output/Functional_analyses/enrich_GOBP_results_downregDEGs.xlsx", overwrite = TRUE)
