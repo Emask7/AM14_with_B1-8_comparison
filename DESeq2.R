@@ -192,7 +192,13 @@
              "AM14 MRL/lpr mice +/- 2DG\n(After Batch Correction)",
              batch_effect = TRUE)
   dev.off()
-
+  
+  
+  
+  QC_heatmaps_batch_corrected(dds_AM14trans, 500, "AM14 Transfer - top 500 genes", "AM14 Adoptive Transfer", remove_batch = TRUE, 2)
+  QC_heatmaps_batch_corrected(dds_B18trans, 500, "B1-8 Transfer - top 500 genes", "B1-8 Adoptive Transfer", remove_batch = FALSE, 1)
+  QC_heatmaps_batch_corrected(dds_AM14MRLlpr, 500, "AM14 MRLlpr - top 500 genes", "AM14 MRL/lpr", remove_batch = TRUE, 2)
+  
 # Differential Expression Analysis ---------------------------------------------
   resultsNames(dds_PL23vNP)
   resultsNames(dds_AM14trans)
@@ -215,15 +221,21 @@
   head(deseq_res$AM14MRLlpr)
 
 # Make a data.frame that summarizes the numbers of DEGs detected -------------
-  full_summary <- join_all(list(summary_wrapper(deseq_res$AM14transfer$PL23_2DG_v_Ctrl, "PL2-3+2DG vs PL2-3", "AM14 Adoptive Transfer"),
-                                summary_wrapper(deseq_res$AM14transfer$R848_2DG_v_Ctrl, "R848+2DG vs R848", "AM14 Adoptive Transfer"),
-                                summary_wrapper(deseq_res$AM14transfer$PL23_vs_R848, "PL2-3 vs R848", "AM14 Adoptive Transfer"),
-                                summary_wrapper(deseq_res$B18transfer, "NP+2DG vs NP", "B1-8 Adoptive Transfer"),
-                                summary_wrapper(deseq_res$PL23_v_NP, "PL2-3 vs NP", "AM14 and B1-8 Adoptive Transfers"),
-                                summary_wrapper(deseq_res$AM14MRLlpr, "2DG vs Control", "AM14 MRL/lpr")), 
+  full_summary <- join_all(list(summary_wrapper(deseq_res$AM14transfer$PL23_2DG_v_Ctrl, "PL2-3+2DG vs PL2-3", "AM14 Adoptive Transfer", 0.05, 1),
+                                summary_wrapper(deseq_res$AM14transfer$R848_2DG_v_Ctrl, "R848+2DG vs R848", "AM14 Adoptive Transfer", 0.05, 1),
+                                summary_wrapper(deseq_res$AM14transfer$PL23_vs_R848, "PL2-3 vs R848", "AM14 Adoptive Transfer", 0.05, 1),
+                                summary_wrapper(deseq_res$B18transfer, "NP+2DG vs NP", "B1-8 Adoptive Transfer", 0.05, 1),
+                                summary_wrapper(deseq_res$PL23_v_NP, "PL2-3 vs NP", "AM14 and B1-8 Adoptive Transfers", 0.05, 1),
+                                summary_wrapper(deseq_res$AM14MRLlpr, "2DG vs Control", "AM14 MRL/lpr", 0.05, 1),
+                                summary_wrapper(deseq_res$AM14transfer$PL23_2DG_v_Ctrl, "PL2-3+2DG vs PL2-3", "AM14 Adoptive Transfer", 0.05, 0.5),
+                                summary_wrapper(deseq_res$AM14transfer$R848_2DG_v_Ctrl, "R848+2DG vs R848", "AM14 Adoptive Transfer", 0.05, 0.5),
+                                summary_wrapper(deseq_res$AM14transfer$PL23_vs_R848, "PL2-3 vs R848", "AM14 Adoptive Transfer", 0.05, 0.5),
+                                summary_wrapper(deseq_res$B18transfer, "NP+2DG vs NP", "B1-8 Adoptive Transfer", 0.05, 0.5),
+                                summary_wrapper(deseq_res$PL23_v_NP, "PL2-3 vs NP", "AM14 and B1-8 Adoptive Transfers", 0.05, 0.5),
+                                summary_wrapper(deseq_res$AM14MRLlpr, "2DG vs Control", "AM14 MRL/lpr", 0.05, 0.5)),
                            type = "full")
-  full_summary 
-  
+  full_summary
+
 # Save results to an Excel file ----------------------------------------------
   wb <- createWorkbook("Output/DESeq2_results.xlsx")
   

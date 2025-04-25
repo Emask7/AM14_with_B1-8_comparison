@@ -24,8 +24,9 @@ rank_genes <- function(dds_res, ID_type){
   return(gene_list)
 }
 
-gseGO_wrapper <- function(dds_res, ID_type){
+gseGO_wrapper <- function(dds_res, ID_type, p_cutoff){
   if(missing(ID_type)) ID_type <- "symbol"
+  if(missing(p_cutoff)) p_cutoff <- 0.05
   
   ranked_list <- rank_genes(dds_res, ID_type)
   if(is.null(ranked_list)) {
@@ -33,11 +34,11 @@ gseGO_wrapper <- function(dds_res, ID_type){
     return(list(gse = NULL, gse_simplified = NULL, gseGO_summary = NULL))
   } else {
     if(ID_type == "ensembl"){
-      gse <- gseGO(ranked_list, ont = "BP", keyType = "ENSEMBL", OrgDb = "org.Mm.eg.db", eps = 1e-300)
+      gse <- gseGO(ranked_list, ont = "BP", keyType = "ENSEMBL", OrgDb = "org.Mm.eg.db", eps = 1e-300, pvalueCutoff = p_cutoff)
     } else if(ID_type == "entrez"){
-      gse <- gseGO(ranked_list, ont = "BP", keyType = "ENTREZID", OrgDb = "org.Mm.eg.db", eps = 1e-300)
+      gse <- gseGO(ranked_list, ont = "BP", keyType = "ENTREZID", OrgDb = "org.Mm.eg.db", eps = 1e-300, pvalueCutoff = p_cutoff)
     } else if(ID_type == "symbol"){
-      gse <- gseGO(ranked_list, ont = "BP", keyType = "SYMBOL", OrgDb = "org.Mm.eg.db", eps = 1e-300)
+      gse <- gseGO(ranked_list, ont = "BP", keyType = "SYMBOL", OrgDb = "org.Mm.eg.db", eps = 1e-300, pvalueCutoff = p_cutoff)
     } else return(print("ID_type must be ensembl, entrez, or symbol"))
     
     if(nrow(gse) < 1){
@@ -147,12 +148,12 @@ gsePlot <- function(gse, plot_title, file_name, showCat, w, h){
 # GO Gene set enrichment analysis ----------------------------------------------
   gseGO_results <- list(
     AM14trans = list(
-      PL23_2DG_v_Ctrl = gseGO_wrapper(deseq_res$AM14transfer$PL23_2DG_v_Ctrl),
-      R848_2DG_v_Ctrl = gseGO_wrapper(deseq_res$AM14transfer$R848_2DG_v_Ctrl),
-      PL23_vs_R848 = gseGO_wrapper(deseq_res$AM14transfer$PL23_vs_R848)),
-    B18trans = gseGO_wrapper(deseq_res$B18transfer),
-    PL23_v_NP = gseGO_wrapper(deseq_res$PL23_v_NP),
-    AM14MRLlpr = gseGO_wrapper(deseq_res$AM14MRLlpr))
+      PL23_2DG_v_Ctrl = gseGO_wrapper(deseq_res$AM14transfer$PL23_2DG_v_Ctrl, "symbol", 0.05),
+      R848_2DG_v_Ctrl = gseGO_wrapper(deseq_res$AM14transfer$R848_2DG_v_Ctrl, "symbol", 0.05),
+      PL23_vs_R848 = gseGO_wrapper(deseq_res$AM14transfer$PL23_vs_R848, "symbol", 0.05)),
+    B18trans = gseGO_wrapper(deseq_res$B18transfer, "symbol", 0.05),
+    PL23_v_NP = gseGO_wrapper(deseq_res$PL23_v_NP, "symbol", 0.05),
+    AM14MRLlpr = gseGO_wrapper(deseq_res$AM14MRLlpr, "symbol", 0.05))
 
   gseGO_res_summary <- join_all(list(gseGO_summary(gseGO_results$AM14trans$PL23_2DG_v_Ctrl, "PL2-3+2DG vs PL2-3", "AM14 Adoptive Transfer"),
                                      gseGO_summary(gseGO_results$AM14trans$R848_2DG_v_Ctrl, "R848+2DG vs R848", "AM14 Adoptive Transfer"),

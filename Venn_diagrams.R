@@ -14,6 +14,16 @@ DEG_lists <- list(
   MRLlpr = deg_list_for_venn(deseq_res$AM14MRLlpr, 1)
 )
 
+DEG_lists_0.5LFC <- list(
+  PL23_2DG_vs_Ctrl = deg_list_for_venn(deseq_res$AM14transfer$PL23_2DG_v_Ctrl, 0.5),
+  R848_2DG_vs_Ctrl = deg_list_for_venn(deseq_res$AM14transfer$R848_2DG_v_Ctrl, 0.5),
+  PL23_vs_R848 = deg_list_for_venn(deseq_res$AM14transfer$PL23_vs_R848, 0.5),
+  PL23_vs_NP = deg_list_for_venn(deseq_res$PL23_v_NP, 0.5),
+  B18 = deg_list_for_venn(deseq_res$B18transfer, 0.5),
+  MRLlpr = deg_list_for_venn(deseq_res$AM14MRLlpr, 0.5)
+)
+
+
 # Comparing all groups ---------------------------------------------------------
   all_v_all <- venndetail(list("AM14 Transfer: PL2-3 + 2DG vs PL2-3" = DEG_lists$PL23_2DG_vs_Ctrl$all,
                                "AM14 Transfer: R848 + 2DG vs R848" = DEG_lists$R848_2DG_vs_Ctrl$all,
@@ -79,6 +89,39 @@ DEG_lists <- list(
       width = 2000, height = 1400, res = 250)
   plot(all_v_all_down_2, type = "upset")
   dev.off()
+  
+  
+  
+  all_v_all_2 <- venndetail(list("AM14 Transfer: PL2-3 + 2DG vs PL2-3" = DEG_lists_0.5LFC$PL23_2DG_vs_Ctrl$all,
+                                 "AM14 Transfer: R848 + 2DG vs R848" = DEG_lists_0.5LFC$R848_2DG_vs_Ctrl$all,
+                                 "AM14 Transfer: PL2-3 vs R848" = DEG_lists_0.5LFC$PL23_vs_R848$all,
+                                 "B1-8 Transfer: NP + 2DG vs NP" = DEG_lists_0.5LFC$B18$all,
+                                 "AM14 MRL/lpr: 2DG vs Control" = DEG_lists_0.5LFC$MRLlpr$all))
+  png(filename = "Output/Venn_diagrams/LFC 0.5 - All_DEGs_across_all_groups_version2.png",
+      width = 2000, height = 1400, res = 250)
+  plot(all_v_all_2, type = "upset")
+  dev.off()
+  
+  all_v_all_up_2 <- venndetail(list("AM14 Transfer: PL2-3 + 2DG vs PL2-3" = DEG_lists_0.5LFC$PL23_2DG_vs_Ctrl$up,
+                                    "AM14 Transfer: R848 + 2DG vs R848" = DEG_lists_0.5LFC$R848_2DG_vs_Ctrl$up,
+                                    "AM14 Transfer: PL2-3 vs R848" = DEG_lists_0.5LFC$PL23_vs_R848$up,
+                                    "B1-8 Transfer: NP + 2DG vs NP" = DEG_lists_0.5LFC$B18$up,
+                                    "AM14 MRL/lpr: 2DG vs Control" = DEG_lists_0.5LFC$MRLlpr$up))
+  png(filename = "Output/Venn_diagrams/LFC 0.5 - Upregulated_DEGs_across_all_groups_version2.png",
+      width = 2000, height = 1400, res = 250)
+  plot(all_v_all_up_2, type = "upset")
+  dev.off()
+  
+  all_v_all_down_2 <- venndetail(list("AM14 Transfer: PL2-3 + 2DG vs PL2-3" = DEG_lists_0.5LFC$PL23_2DG_vs_Ctrl$down,
+                                      "AM14 Transfer: R848 + 2DG vs R848" = DEG_lists_0.5LFC$R848_2DG_vs_Ctrl$down,
+                                      "AM14 Transfer: PL2-3 vs R848" = DEG_lists_0.5LFC$PL23_vs_R848$down,
+                                      "B1-8 Transfer: NP + 2DG vs NP" = DEG_lists_0.5LFC$B18$down,
+                                      "AM14 MRL/lpr: 2DG vs Control" = DEG_lists_0.5LFC$MRLlpr$down))
+  png(filename = "Output/Venn_diagrams/LFC 0.5 - Downregulated_DEGs_across_all_groups_version2.png",
+      width = 2000, height = 1400, res = 250)
+  plot(all_v_all_down_2, type = "upset")
+  dev.off()
+  
   
 # Comparing effects of 2DG on different conditions -----------------------------
   up_2DGvCtrl_venn <- venndetail(list("AM14 Transfer:\nPL2-3 + 2DG\nvs PL2-3\n" = DEG_lists$PL23_2DG_vs_Ctrl$up,

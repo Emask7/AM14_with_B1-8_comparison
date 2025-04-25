@@ -3,11 +3,12 @@
 ## https://yulab-smu.top/biomedical-knowledge-mining-book/index.html
 
 ## Notes on ORA (over-representation analysis) results 
-# geneRatio = ratio of input genes that are annotated in a term
-# BgRatio = ratio of all genes that are annotated in this term
-# RichFactor = ratio of input DEGs annotated to a term to the total number of genes annotated to that term
-# FoldEnrichment = ratio of the frequency of input genes annotated to a term to the frequency of all genes annotated to that term 
-  # (calculated by dividing geneRatio by BgRatio)
+# geneRatio = input DEGs in a term / total # DEGs
+# BgRatio = background genes in that term / total # background genes
+# RichFactor = # DEGs annotated in a term / # background genes annotated to that term
+# FoldEnrichment = geneRatio / BgRatio
+  #              = (input DEGs in a term/total # DEGs) / (background genes in that term/total # background genes)
+  #              = (input DEGs in a term/background genes in a term) / (total # DEGS/total # background genes)
 
 ## Notes on enrichplot
 # enrichplot is built on ggplot2, so you can use ggplot2 syntax for enrichplot

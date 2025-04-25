@@ -96,32 +96,48 @@ QC_heatmaps <- function(dds, filename_start, plot_title){
     }
 }
 
-QC_heatmaps_batch_corrected <- function(dds, filename_start, plot_title){
+QC_heatmaps_batch_corrected <- function(dds, n, filename_start, plot_title, remove_batch, nsplit){
   # Transform data -------------------------------------------------------------
     vsd <- vst(dds)
     mat <- assay(vsd)
     mm <- model.matrix(~Treatment, colData(vsd))
-    mat <- removeBatchEffect(mat, batch=vsd$Cohort, design=mm)
-    assay(vsd) <- mat
+    
+    if(remove_batch == "TRUE") {
+      mat <- removeBatchEffect(mat, batch=vsd$Cohort, design=mm)
+      assay(vsd) <- mat
+    }
 
   # Heatmap of count matrix ----------------------------------------------------
-    select <- order(rowMeans(counts(dds,normalized=TRUE)), 
-                    decreasing=TRUE)[1:20]
-    df <- as.data.frame(colData(dds)[, c("Treatment", "Cohort")])
+    select <- order(rowMeans(counts(dds,normalized=TRUE)), decreasing=TRUE)[1:n]
+    # df <- as.data.frame(colData(dds)[, c("Treatment", "Cohort")])
+    df <- as.data.frame(colData(dds)[, c("Treatment")])
+    rownames(df) <- rownames(as.data.frame(colData(dds)))
+    colnames(df) <- c("Treatment")
     
     if(!is.null(filename_start)) {
-      png(filename = stri_join(c("QC_results/Heatmaps/", filename_start,
-                                 " - Batch corrected.png"),
+      png(filename = stri_join(c("QC_results/Heatmaps/", filename_start,".png"),
                                collapse = ""),
-          width = 1200, height = 1200, units = "px", pointsize = 10, res = 200,
+          width = 2000, height = 2000, units = "px", pointsize = 8, res = 250,
           bg = "white", family = "", symbolfamily="default")
-      pheatmap(assay(vsd)[select,], cluster_rows=FALSE, show_rownames=FALSE,
-               cluster_cols=TRUE, annotation_col=df, labels_col = colData(dds)$Label_Name,
+      pheatmap(assay(vsd)[select,],
+               # pheatmap(counts(dds,normalized=TRUE)[select,],
+               cluster_rows=TRUE, show_rownames=FALSE, 
+               # color = pnw_palette("Moth", 20, type = "continuous"),
+               color = wes_palette("Zissou1", n = 100, type = "continuous"),
+               # annotation_colors = list(Treatment=c(PL23="#1d457f", PL23_2DG="#d8aedd", R848="#cc5c76", R848_2DG = "#ffc3a3")),
+               cutree_cols=nsplit, cluster_cols=TRUE, annotation_col=df, show_colnames = FALSE,
+               # labels_col = colData(dds)$Label_Name,
                main = stri_join(c(plot_title, "(Variance Stabilizing Transformation)"), collapse = "\n"))
       dev.off()
     } else {
-      pheatmap(assay(vsd)[select,], cluster_rows=FALSE, show_rownames=FALSE,
-               cluster_cols=TRUE, annotation_col=df, labels_col = colData(dds)$Label_Name,
+      pheatmap(assay(vsd)[select,],
+      # pheatmap(counts(dds,normalized=TRUE)[select,],
+               cluster_rows=TRUE, show_rownames=FALSE, 
+               # color = pnw_palette("Moth", 20, type = "continuous"),
+               color = wes_palette("Zissou1", n = 100, type = "continuous"),
+               # annotation_colors = list(Treatment=c(PL23="#1d457f", PL23_2DG="#d8aedd", R848="#cc5c76", R848_2DG = "#ffc3a3")),
+               cutree_cols=nsplit, cluster_cols=TRUE, annotation_col=df, show_colnames = FALSE,
+               # labels_col = colData(dds)$Label_Name,
                main = stri_join(c(plot_title, "(Variance Stabilizing Transformation)"), collapse = "\n"))
     }
 }
@@ -153,7 +169,7 @@ QC_PCAplot <- function(dds, filename_start, plot_title, batch_effect){
     if(!is.null(filename_start)){
       png(filename = stri_join(c("QC_results/PCA_plots/", filename_start, ".png"),
                                collapse = ""),
-          width = 1500, height = 1500, units = "px", pointsize = 10, res = 200,
+          width = 1500, height = 1500, units = "px", pointsize = 10, res = 300,
           bg = "white", family = "", symbolfamily="default")
     }
     ggplot(pcaData, aes(PC1, PC2, color=Treatment, shape=Cohort)) +
