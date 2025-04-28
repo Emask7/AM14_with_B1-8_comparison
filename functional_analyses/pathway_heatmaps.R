@@ -12,12 +12,22 @@ get_pathway_genes <- function(pw_file, dds, ID_conversion){
   
   res <- left_join(pw_df, norm_cts, by = "external_gene_name")
   rownames(res) <- res$external_gene_name
-  # res <- res[, 2:ncol(res)]
   res
-  # norm_cts
 }
 
 
+annotation_df <- read.csv("raw_data/sample_info.csv")
+sample_list <- annotation_df$Sample
+annotation_df <- data.frame(annotation_df$Drug, annotation_df$heatmap_col1)
+colnames(annotation_df) <- c("Treatment", "Experiment")
+rownames(annotation_df) <- sample_list
+annotation_df  
+
+ann_colors4 <- list(Experiment = c("AM14 Transfer + PL2-3 Stimulation" = "#00496f", 
+                                   "AM14 Transfer + R848 Stimulation" = "#0f85a0", 
+                                   "B1-8 Transfer + NP Stimulation" = "#edd746", 
+                                   "AM14 MRL/lpr" = "#dd4124"),
+                    Treatment = c("2DG" = "darkgray", "Control" = "beige"))
 
 GO_TLR9 <- join_all(list(
   get_pathway_genes("pathway_gene_lists/GOBP_TOLL_LIKE_RECEPTOR_9_SIGNALING_PATHWAY.txt", dds_AM14trans, gene_IDs$AM14trans[, 1:2]),
@@ -28,27 +38,18 @@ GO_TLR9 <- join_all(list(
 rownames(GO_TLR9) <- GO_TLR9$external_gene_name
 GO_TLR9 <- GO_TLR9[, c(2:ncol(GO_TLR9))]
 GO_TLR9 <- as.matrix(GO_TLR9)
-head(GO_TLR9)
-ncol(GO_TLR9)
 GO_TLR9 <- na.omit(GO_TLR9)
-nrow(GO_TLR9)
 
-annotation_df <- data.frame(coldata$Treatment)
-rownames(annotation_df) <- coldata$Sample
-colnames(annotation_df) <- c("Treatment")
-annotation_df
-# png(filename = stri_join(c("QC_results/Heatmaps/", filename_start,
-#                            " - Regularized Log Transformation.png"),
-#                          collapse = ""),
-#     width = 1200, height = 1200, units = "px", pointsize = 10, res = 200,
-#     bg = "white", family = "", symbolfamily="default")
-# pheatmap(GO_TLR9, scale = "column", color=colorRampPalette(c("navy", "white", "red"))(50),
-         # cluster_rows=FALSE, show_rownames=FALSE,
-         # cluster_cols=TRUE, labels_col = colnames(GO),
-         # annotation_col=annotation_df)
-         
-# dev.off()
+png(filename = "Output/Functional_analyses/enrichGO_plots/TLR9 Signaling Pathway.png",
+    width = 1200, height = 750, units = "px", pointsize = 10, res = 150,
+    bg = "white", family = "", symbolfamily="default")
+ComplexHeatmap::pheatmap(GO_TLR9, 
+                         annotation_col = annotation_df, scale = "row", 
+                         cluster_cols = FALSE, show_colnames = FALSE,
+                         annotation_colors = ann_colors4,
+                         main = "TLR9 Signaling Pathway",
+                         heatmap_legend_param = list(title = "Z-score"))
+dev.off()
 
 
 
-pheatmap(GO_TLR9, annotation_col = annotation_df)

@@ -3,6 +3,7 @@
 ## https://yulab-smu.top/biomedical-knowledge-mining-book/index.html
 
 ## Notes on ORA (over-representation analysis) results 
+# count = # DEGs annotated to a term
 # geneRatio = input DEGs in a term / total # DEGs
 # BgRatio = background genes in that term / total # background genes
 # RichFactor = # DEGs annotated in a term / # background genes annotated to that term

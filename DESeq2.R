@@ -195,9 +195,21 @@
   
   
   
-  QC_heatmaps_batch_corrected(dds_AM14trans, 500, "AM14 Transfer - top 500 genes", "AM14 Adoptive Transfer", remove_batch = TRUE, 2)
-  QC_heatmaps_batch_corrected(dds_B18trans, 500, "B1-8 Transfer - top 500 genes", "B1-8 Adoptive Transfer", remove_batch = FALSE, 1)
-  QC_heatmaps_batch_corrected(dds_AM14MRLlpr, 500, "AM14 MRLlpr - top 500 genes", "AM14 MRL/lpr", remove_batch = TRUE, 2)
+  # QC_heatmaps_batch_corrected(dds_AM14trans, 500, "AM14 Transfer - top 500 genes", "AM14 Adoptive Transfer", remove_batch = TRUE, 2)
+  # QC_heatmaps_batch_corrected(dds_B18trans, 500, "B1-8 Transfer - top 500 genes", "B1-8 Adoptive Transfer", remove_batch = FALSE, 1)
+  # QC_heatmaps_batch_corrected(dds_AM14MRLlpr, 500, "AM14 MRLlpr - top 500 genes", "AM14 MRL/lpr", remove_batch = TRUE, 2)
+  
+  ann_colors1 <- list(Treatment = c(PL23 = "#00496f", PL23_2DG = "#0f85a0", R848 = "#edd746", R848_2DG = "#dd4124"))
+  ann_colors2 <- list(Treatment = c(NP = "#0f85a0", NP_2DG = "#dd4124"))
+  ann_colors3 <- list(Treatment = c("2DG" = "#0f85a0", Control = "#dd4124"))
+  
+  QC_heatmaps_batch_corrected(dds_AM14trans, 500, ann_colors1, "AM14 Transfer - top 500 genes - zscore", "AM14 Adoptive Transfer", remove_batch = TRUE, 1)
+  dev.off()
+  QC_heatmaps_batch_corrected(dds_B18trans, 500, ann_colors2, "B1-8 Transfer - top 500 genes - zscore", "B1-8 Adoptive Transfer", remove_batch = FALSE, 1)
+  dev.off()
+  QC_heatmaps_batch_corrected(dds_AM14MRLlpr, 500, ann_colors3, "AM14 MRLlpr - top 500 genes - zscore", "AM14 MRL/lpr", remove_batch = TRUE, 1)
+  dev.off()
+  
   
 # Differential Expression Analysis ---------------------------------------------
   resultsNames(dds_PL23vNP)

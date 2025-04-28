@@ -96,7 +96,7 @@ QC_heatmaps <- function(dds, filename_start, plot_title){
     }
 }
 
-QC_heatmaps_batch_corrected <- function(dds, n, filename_start, plot_title, remove_batch, nsplit){
+QC_heatmaps_batch_corrected <- function(dds, n_genes, color_list, filename_start, plot_title, remove_batch, nsplit){
   # Transform data -------------------------------------------------------------
     vsd <- vst(dds)
     mat <- assay(vsd)
@@ -108,7 +108,7 @@ QC_heatmaps_batch_corrected <- function(dds, n, filename_start, plot_title, remo
     }
 
   # Heatmap of count matrix ----------------------------------------------------
-    select <- order(rowMeans(counts(dds,normalized=TRUE)), decreasing=TRUE)[1:n]
+    select <- order(rowMeans(counts(dds,normalized=TRUE)), decreasing=TRUE)[1:n_genes]
     # df <- as.data.frame(colData(dds)[, c("Treatment", "Cohort")])
     df <- as.data.frame(colData(dds)[, c("Treatment")])
     rownames(df) <- rownames(as.data.frame(colData(dds)))
@@ -119,26 +119,29 @@ QC_heatmaps_batch_corrected <- function(dds, n, filename_start, plot_title, remo
                                collapse = ""),
           width = 2000, height = 2000, units = "px", pointsize = 8, res = 250,
           bg = "white", family = "", symbolfamily="default")
-      pheatmap(assay(vsd)[select,],
-               # pheatmap(counts(dds,normalized=TRUE)[select,],
-               cluster_rows=TRUE, show_rownames=FALSE, 
-               # color = pnw_palette("Moth", 20, type = "continuous"),
-               color = wes_palette("Zissou1", n = 100, type = "continuous"),
-               # annotation_colors = list(Treatment=c(PL23="#1d457f", PL23_2DG="#d8aedd", R848="#cc5c76", R848_2DG = "#ffc3a3")),
-               cutree_cols=nsplit, cluster_cols=TRUE, annotation_col=df, show_colnames = FALSE,
-               # labels_col = colData(dds)$Label_Name,
-               main = stri_join(c(plot_title, "(Variance Stabilizing Transformation)"), collapse = "\n"))
-      dev.off()
+    }
+    
+    # ComplexHeatmap::pheatmap(counts(dds,normalized=TRUE)[select,],
+    if(nsplit > 1) {
+      ComplexHeatmap::pheatmap(assay(vsd)[select,], 
+                               cluster_rows=TRUE, show_rownames=FALSE, 
+                               cluster_cols=TRUE, show_colnames = FALSE, # labels_col = colData(dds)$Label_Name,
+                               annotation_col=df, scale = "row",
+                               cutree_cols=nsplit,
+                               annotation_colors = color_list,
+                               color = wes_palette("Zissou1", n = 100, type = "continuous"),
+                               heatmap_legend_param = list(title = "Z-score"),
+                               main = plot_title)
     } else {
-      pheatmap(assay(vsd)[select,],
-      # pheatmap(counts(dds,normalized=TRUE)[select,],
-               cluster_rows=TRUE, show_rownames=FALSE, 
-               # color = pnw_palette("Moth", 20, type = "continuous"),
-               color = wes_palette("Zissou1", n = 100, type = "continuous"),
-               # annotation_colors = list(Treatment=c(PL23="#1d457f", PL23_2DG="#d8aedd", R848="#cc5c76", R848_2DG = "#ffc3a3")),
-               cutree_cols=nsplit, cluster_cols=TRUE, annotation_col=df, show_colnames = FALSE,
-               # labels_col = colData(dds)$Label_Name,
-               main = stri_join(c(plot_title, "(Variance Stabilizing Transformation)"), collapse = "\n"))
+      ComplexHeatmap::pheatmap(assay(vsd)[select,], 
+                               cluster_rows=TRUE, show_rownames=FALSE, 
+                               cluster_cols=TRUE, show_colnames = FALSE, # labels_col = colData(dds)$Label_Name,
+                               annotation_col=df, scale = "row",
+                               annotation_colors = color_list,
+                               color = wes_palette("Zissou1", n = 100, type = "continuous"),
+                               heatmap_legend_param = list(title = "Z-score"),
+                               main = plot_title)
+      
     }
 }
 
