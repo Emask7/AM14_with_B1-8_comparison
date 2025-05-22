@@ -192,24 +192,21 @@
              "AM14 MRL/lpr mice +/- 2DG\n(After Batch Correction)",
              batch_effect = TRUE)
   dev.off()
-  
-  
-  
+
   # QC_heatmaps_batch_corrected(dds_AM14trans, 500, "AM14 Transfer - top 500 genes", "AM14 Adoptive Transfer", remove_batch = TRUE, 2)
   # QC_heatmaps_batch_corrected(dds_B18trans, 500, "B1-8 Transfer - top 500 genes", "B1-8 Adoptive Transfer", remove_batch = FALSE, 1)
   # QC_heatmaps_batch_corrected(dds_AM14MRLlpr, 500, "AM14 MRLlpr - top 500 genes", "AM14 MRL/lpr", remove_batch = TRUE, 2)
-  
-  ann_colors1 <- list(Treatment = c(PL23 = "#00496f", PL23_2DG = "#0f85a0", R848 = "#edd746", R848_2DG = "#dd4124"))
-  ann_colors2 <- list(Treatment = c(NP = "#0f85a0", NP_2DG = "#dd4124"))
-  ann_colors3 <- list(Treatment = c("2DG" = "#0f85a0", Control = "#dd4124"))
-  
-  QC_heatmaps_batch_corrected(dds_AM14trans, 500, ann_colors1, "AM14 Transfer - top 500 genes - zscore", "AM14 Adoptive Transfer", remove_batch = TRUE, 1)
-  dev.off()
-  QC_heatmaps_batch_corrected(dds_B18trans, 500, ann_colors2, "B1-8 Transfer - top 500 genes - zscore", "B1-8 Adoptive Transfer", remove_batch = FALSE, 1)
-  dev.off()
-  QC_heatmaps_batch_corrected(dds_AM14MRLlpr, 500, ann_colors3, "AM14 MRLlpr - top 500 genes - zscore", "AM14 MRL/lpr", remove_batch = TRUE, 1)
-  dev.off()
-  
+  # 
+  # ann_colors1 <- list(Treatment = c(PL23 = "#00496f", PL23_2DG = "#0f85a0", R848 = "#edd746", R848_2DG = "#dd4124"))
+  # ann_colors2 <- list(Treatment = c(NP = "#0f85a0", NP_2DG = "#dd4124"))
+  # ann_colors3 <- list(Treatment = c("2DG" = "#0f85a0", Control = "#dd4124"))
+  # 
+  # QC_heatmaps_batch_corrected(dds_AM14trans, 500, ann_colors1, "AM14 Transfer - top 500 genes - zscore", "AM14 Adoptive Transfer", remove_batch = TRUE, 1)
+  # dev.off()
+  # QC_heatmaps_batch_corrected(dds_B18trans, 500, ann_colors2, "B1-8 Transfer - top 500 genes - zscore", "B1-8 Adoptive Transfer", remove_batch = FALSE, 1)
+  # dev.off()
+  # QC_heatmaps_batch_corrected(dds_AM14MRLlpr, 500, ann_colors3, "AM14 MRLlpr - top 500 genes - zscore", "AM14 MRL/lpr", remove_batch = TRUE, 1)
+  # dev.off()
   
 # Differential Expression Analysis ---------------------------------------------
   resultsNames(dds_PL23vNP)
@@ -228,9 +225,30 @@
     AM14MRLlpr = results_wrapper(dds_AM14MRLlpr, c("Treatment", "2DG", "Control"), gene_IDs$AM14MRLlpr)
   )
   
-  head(deseq_res$AM14transfer$PL23_2DG_v_Ctrl)
-  head(deseq_res$B18transfer)
-  head(deseq_res$AM14MRLlpr)
+  # head(deseq_res$AM14transfer$PL23_2DG_v_Ctrl)
+  # head(deseq_res$B18transfer)
+  # head(deseq_res$AM14MRLlpr)
+  
+  # DEG Heatmaps ---------------------------------------------------------------
+    AM14_DEGs <- DEG_list(list(deseq_res$AM14transfer$PL23_vs_R848,
+                               deseq_res$AM14transfer$R848_2DG_v_Ctrl,
+                               deseq_res$AM14transfer$PL23_vs_R848))
+
+    DEG_heatmap(dds_AM14trans, AM14_DEGs, 
+                list(Treatment = c(PL23 = "#00496f", PL23_2DG = "#0f85a0", 
+                                   R848 = "#edd746", R848_2DG = "#dd4124")), 
+                "AM14 Adoptive Transfer\n(Significant DEGs)",
+                "AM14 adoptive transfer DEG heatmap", h = 1500, w = 1250)
+    
+    DEG_heatmap(dds_B18trans, DEG_list(list(deseq_res$B18transfer)), 
+                list(Treatment = c(NP = "#0f85a0", NP_2DG = "#dd4124")), 
+                "B1-8 Adoptive Transfer\n(Significant DEGs)",
+                "B1-8 adoptive transfer DEG heatmap", h = 1000, w = 1000)
+
+    DEG_heatmap(dds_AM14MRLlpr, DEG_list(list(deseq_res$AM14MRLlpr)), 
+                list(Treatment = c(Control = "#0f85a0", "2DG" = "#dd4124")), 
+                "AM14 MRL/lpr Mice\n(Significant DEGs)",
+                "AM14 MRLlpr DEG heatmap", h = 1500, w = 1250)
 
 # Make a data.frame that summarizes the numbers of DEGs detected -------------
   full_summary <- join_all(list(summary_wrapper(deseq_res$AM14transfer$PL23_2DG_v_Ctrl, "PL2-3+2DG vs PL2-3", "AM14 Adoptive Transfer", 0.05, 1),
@@ -270,35 +288,35 @@
   saveWorkbook(wb, "Output/DESeq2_results.xlsx", overwrite = TRUE)
   rm(wb)
   
-  # wb <- createWorkbook("Output/DESeq2_gene_counts.xlsx")
-  # 
-  # addWorksheet(wb, "Raw_Counts - AM14 transfer")
-  # addWorksheet(wb, "Norm_Counts - AM14 transfer")
-  # addWorksheet(wb, "Raw_Counts - B1-8 transfer")
-  # addWorksheet(wb, "Norm_Counts - B1-8 transfer")
-  # addWorksheet(wb, "Raw_Counts - AM14 MRLlpr")
-  # addWorksheet(wb, "Norm_Counts - AM14 MRLlpr")
-  # 
-  # writeData(wb, "Raw_Counts - AM14 transfer", counts(dds_AM14trans, normalized = FALSE), rowNames = TRUE)
-  # writeData(wb, "Norm_Counts - AM14 transfer", counts(dds_AM14trans, normalized = TRUE), rowNames = TRUE)
-  # writeData(wb, "Raw_Counts - B1-8 transfer", counts(dds_B18trans, normalized = FALSE), rowNames = TRUE)
-  # writeData(wb, "Norm_Counts - B1-8 transfer", counts(dds_B18trans, normalized = TRUE), rowNames = TRUE)
-  # writeData(wb, "Raw_Counts - AM14 MRLlpr", counts(dds_AM14MRLlpr, normalized = FALSE), rowNames = TRUE)
-  # writeData(wb, "Norm_Counts - AM14 MRLlpr", counts(dds_AM14MRLlpr, normalized = TRUE), rowNames = TRUE)
-  # 
-  # saveWorkbook(wb, "Output/DESeq2_gene_counts.xlsx", overwrite = TRUE)
-  # rm(wb)
+  wb <- createWorkbook("Output/DESeq2_gene_counts.xlsx")
+
+  addWorksheet(wb, "Raw_Counts - AM14 transfer")
+  addWorksheet(wb, "Norm_Counts - AM14 transfer")
+  addWorksheet(wb, "Raw_Counts - B1-8 transfer")
+  addWorksheet(wb, "Norm_Counts - B1-8 transfer")
+  addWorksheet(wb, "Raw_Counts - AM14 MRLlpr")
+  addWorksheet(wb, "Norm_Counts - AM14 MRLlpr")
+
+  writeData(wb, "Raw_Counts - AM14 transfer", counts(dds_AM14trans, normalized = FALSE), rowNames = TRUE)
+  writeData(wb, "Norm_Counts - AM14 transfer", counts(dds_AM14trans, normalized = TRUE), rowNames = TRUE)
+  writeData(wb, "Raw_Counts - B1-8 transfer", counts(dds_B18trans, normalized = FALSE), rowNames = TRUE)
+  writeData(wb, "Norm_Counts - B1-8 transfer", counts(dds_B18trans, normalized = TRUE), rowNames = TRUE)
+  writeData(wb, "Raw_Counts - AM14 MRLlpr", counts(dds_AM14MRLlpr, normalized = FALSE), rowNames = TRUE)
+  writeData(wb, "Norm_Counts - AM14 MRLlpr", counts(dds_AM14MRLlpr, normalized = TRUE), rowNames = TRUE)
+
+  saveWorkbook(wb, "Output/DESeq2_gene_counts.xlsx", overwrite = TRUE)
+  rm(wb)
 
 # Make DEG lists and export to files -------------------------------------------
-  sig_DEGs <- list(
-    AM14transfer = list(
-      PL23_2DG_v_Ctrl = sig_DEG_table(deseq_res$AM14transfer$PL23_2DG_v_Ctrl, "all", 1, 0.05, "AM14 - PL23_2DG_vs_Ctrl"),
-      R848_2DG_v_Ctrl = sig_DEG_table(deseq_res$AM14transfer$R848_2DG_v_Ctrl, "all", 1, 0.05, "AM14 - R848_2DG_vs_Ctrl"),
-      PL23_vs_R848 = sig_DEG_table(deseq_res$AM14transfer$PL23_vs_R848, "all", 1, 0.05, "AM14 - PL23_vs_R848")),
-    B18transfer = sig_DEG_table(deseq_res$B18transfer, "all", 1, 0.05, "B1-8 - 2DG_vs_Ctrl"),
-    PL23_v_NP = sig_DEG_table(deseq_res$PL23_v_NP, "all", 1, 0.05, "AM14 PL2-3 vs B1-8 NP"),
-    AM14MRLlpr = sig_DEG_table(deseq_res$AM14MRLlpr, "all", 1, 0.05, "AM14 MRLlpr - 2DG_vs_Ctrl")
-  )
+  # sig_DEGs <- list(
+  #   AM14transfer = list(
+  #     PL23_2DG_v_Ctrl = sig_DEG_table(deseq_res$AM14transfer$PL23_2DG_v_Ctrl, "all", 1, 0.05, "AM14 - PL23_2DG_vs_Ctrl"),
+  #     R848_2DG_v_Ctrl = sig_DEG_table(deseq_res$AM14transfer$R848_2DG_v_Ctrl, "all", 1, 0.05, "AM14 - R848_2DG_vs_Ctrl"),
+  #     PL23_vs_R848 = sig_DEG_table(deseq_res$AM14transfer$PL23_vs_R848, "all", 1, 0.05, "AM14 - PL23_vs_R848")),
+  #   B18transfer = sig_DEG_table(deseq_res$B18transfer, "all", 1, 0.05, "B1-8 - 2DG_vs_Ctrl"),
+  #   PL23_v_NP = sig_DEG_table(deseq_res$PL23_v_NP, "all", 1, 0.05, "AM14 PL2-3 vs B1-8 NP"),
+  #   AM14MRLlpr = sig_DEG_table(deseq_res$AM14MRLlpr, "all", 1, 0.05, "AM14 MRLlpr - 2DG_vs_Ctrl")
+  # )
   
   
 

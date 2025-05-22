@@ -1,8 +1,15 @@
 import_Rosalind_data <- function(res_file){
   temp_cts <- read.delim(res_file)
   temp_cts <- temp_cts %>%
-    filter(!grepl("Igh", external_gene_name)) %>%
-    filter(!grepl("Igk", external_gene_name)) # %>%
+    filter(!grepl("Ighd\\d", external_gene_name)) %>%
+    filter(!grepl("Ighj\\d", external_gene_name)) %>%
+    filter(!grepl("Ighv\\d", external_gene_name)) %>%
+    filter(!grepl("Igkj\\d", external_gene_name)) %>%
+    filter(!grepl("Igkv\\d", external_gene_name)) %>%
+    filter(!grepl("Iglj\\d", external_gene_name)) %>%
+    filter(!grepl("Iglv\\d", external_gene_name))
+    # filter(!grepl("Igh", external_gene_name)) %>%
+    # filter(!grepl("Igk", external_gene_name)) # %>%
     # filter(!grepl("7SK", external_gene_name)) %>%
     # filter(!grepl("5_8S_rRNA", external_gene_name)) %>%
     # filter(!grepl("5S_rRNA", external_gene_name))
@@ -96,55 +103,54 @@ QC_heatmaps <- function(dds, filename_start, plot_title){
     }
 }
 
-QC_heatmaps_batch_corrected <- function(dds, n_genes, color_list, filename_start, plot_title, remove_batch, nsplit){
-  # Transform data -------------------------------------------------------------
-    vsd <- vst(dds)
-    mat <- assay(vsd)
-    mm <- model.matrix(~Treatment, colData(vsd))
-    
-    if(remove_batch == "TRUE") {
-      mat <- removeBatchEffect(mat, batch=vsd$Cohort, design=mm)
-      assay(vsd) <- mat
-    }
-
-  # Heatmap of count matrix ----------------------------------------------------
-    select <- order(rowMeans(counts(dds,normalized=TRUE)), decreasing=TRUE)[1:n_genes]
-    # df <- as.data.frame(colData(dds)[, c("Treatment", "Cohort")])
-    df <- as.data.frame(colData(dds)[, c("Treatment")])
-    rownames(df) <- rownames(as.data.frame(colData(dds)))
-    colnames(df) <- c("Treatment")
-    
-    if(!is.null(filename_start)) {
-      png(filename = stri_join(c("QC_results/Heatmaps/", filename_start,".png"),
-                               collapse = ""),
-          width = 2000, height = 2000, units = "px", pointsize = 8, res = 250,
-          bg = "white", family = "", symbolfamily="default")
-    }
-    
-    # ComplexHeatmap::pheatmap(counts(dds,normalized=TRUE)[select,],
-    if(nsplit > 1) {
-      ComplexHeatmap::pheatmap(assay(vsd)[select,], 
-                               cluster_rows=TRUE, show_rownames=FALSE, 
-                               cluster_cols=TRUE, show_colnames = FALSE, # labels_col = colData(dds)$Label_Name,
-                               annotation_col=df, scale = "row",
-                               cutree_cols=nsplit,
-                               annotation_colors = color_list,
-                               color = wes_palette("Zissou1", n = 100, type = "continuous"),
-                               heatmap_legend_param = list(title = "Z-score"),
-                               main = plot_title)
-    } else {
-      ComplexHeatmap::pheatmap(assay(vsd)[select,], 
-                               cluster_rows=TRUE, show_rownames=FALSE, 
-                               cluster_cols=TRUE, show_colnames = FALSE, # labels_col = colData(dds)$Label_Name,
-                               annotation_col=df, scale = "row",
-                               annotation_colors = color_list,
-                               color = wes_palette("Zissou1", n = 100, type = "continuous"),
-                               heatmap_legend_param = list(title = "Z-score"),
-                               main = plot_title)
-      
-    }
-}
-
+# QC_heatmaps_batch_corrected <- function(dds, n_genes, color_list, filename_start, plot_title, remove_batch, nsplit){
+#   # Transform data -------------------------------------------------------------
+#     vsd <- vst(dds)
+#     mat <- assay(vsd)
+#     mm <- model.matrix(~Treatment, colData(vsd))
+#     
+#     if(remove_batch == "TRUE") {
+#       mat <- removeBatchEffect(mat, batch=vsd$Cohort, design=mm)
+#       assay(vsd) <- mat
+#     }
+# 
+#   # Heatmap of count matrix ----------------------------------------------------
+#     select <- order(rowMeans(counts(dds,normalized=TRUE)), decreasing=TRUE)[1:n_genes]
+#     # df <- as.data.frame(colData(dds)[, c("Treatment", "Cohort")])
+#     df <- as.data.frame(colData(dds)[, c("Treatment")])
+#     rownames(df) <- rownames(as.data.frame(colData(dds)))
+#     colnames(df) <- c("Treatment")
+#     
+#     if(!is.null(filename_start)) {
+#       png(filename = stri_join(c("QC_results/Heatmaps/", filename_start,".png"),
+#                                collapse = ""),
+#           width = 2000, height = 2000, units = "px", pointsize = 8, res = 250,
+#           bg = "white", family = "", symbolfamily="default")
+#     }
+#     
+#     # ComplexHeatmap::pheatmap(counts(dds,normalized=TRUE)[select,],
+#     if(nsplit > 1) {
+#       ComplexHeatmap::pheatmap(assay(vsd)[select,], 
+#                                cluster_rows=TRUE, show_rownames=FALSE, 
+#                                cluster_cols=TRUE, show_colnames = FALSE, # labels_col = colData(dds)$Label_Name,
+#                                annotation_col=df, scale = "row",
+#                                cutree_cols=nsplit,
+#                                annotation_colors = color_list,
+#                                color = wes_palette("Zissou1", n = 100, type = "continuous"),
+#                                heatmap_legend_param = list(title = "Z-score"),
+#                                main = plot_title)
+#     } else {
+#       ComplexHeatmap::pheatmap(assay(vsd)[select,], 
+#                                cluster_rows=TRUE, show_rownames=FALSE, 
+#                                cluster_cols=TRUE, show_colnames = FALSE, # labels_col = colData(dds)$Label_Name,
+#                                annotation_col=df, scale = "row",
+#                                annotation_colors = color_list,
+#                                color = wes_palette("Zissou1", n = 100, type = "continuous"),
+#                                heatmap_legend_param = list(title = "Z-score"),
+#                                main = plot_title)
+#       
+#     }
+# }
 
 QC_PCAplot <- function(dds, filename_start, plot_title, batch_effect){
   vsd <- vst(dds)
@@ -217,6 +223,56 @@ results_wrapper <- function(dds, cons, IDs){
   colnames(res) <- c("ensembl_gene_id", tempcols)
   return(right_join(IDs, res))
 }
+
+DEG_list <- function(dds_res_list, lfc_cutoff, ID_type){
+  if(missing(ID_type)) ID_type <- "ensembl_gene_id"
+  if(missing(lfc_cutoff)) lfc_cutoff <- 0.5
+
+  res <- c()
+  for (df in dds_res_list) {
+    DEGs <- dplyr::filter(df, padj < 0.05 & abs(log2FoldChange) > abs(lfc_cutoff))
+    if(ID_type == "external_gene_name") DEGs <- DEGs$external_gene_name
+    else if(ID_type == "entrezgene") DEGs <- DEGs$entrezgene
+    else DEGs <- DEGs$ensembl_gene_id
+    res <- append(res, DEGs)
+  }
+
+  res <- res[!duplicated(res)]
+  return(res)
+}
+
+DEG_heatmap <- function(dds, DEGs, color_list, heatmap_title, heatmap_filename, h, w){
+  if(missing(heatmap_filename)) heatmap_filename <- NULL
+  if(missing(h)) h <- 2000
+  if(missing(w)) w <- 1500
+  
+
+  heatmap_data <- counts(dds,normalized=TRUE)
+  heatmap_data <- heatmap_data[rownames(heatmap_data) %in% DEGs, ]
+  heatmap_data <- order(rowMeans(heatmap_data), decreasing=TRUE)
+  head(heatmap_data)
+
+  df <- as.data.frame(colData(dds)[, c("Treatment")])
+  rownames(df) <- rownames(as.data.frame(colData(dds)))
+  colnames(df) <- c("Treatment")
+  head(df)
+
+  if(!is.null(heatmap_filename)) {
+    png(filename = stri_join(c("Output/", heatmap_filename,".png"), collapse = ""),
+        width = w, height = h, units = "px", pointsize = 8, res = 250,
+        bg = "white", family = "", symbolfamily="default")
+  }
+  htmp <- ComplexHeatmap::pheatmap(counts(dds, normalized = TRUE)[heatmap_data, ],
+                                   cluster_rows = TRUE, show_rownames = FALSE,
+                                   cluster_cols = FALSE, show_colnames = FALSE,
+                                   annotation_col = df, scale = "row",
+                                   annotation_colors = color_list,
+                                   heatmap_legend_param = list(title = "Z-score"),
+                                   main = heatmap_title)
+  draw(htmp, legend_grouping = "original", merge_legends = TRUE)
+  if(!is.null(heatmap_filename)) dev.off()
+}
+
 
 summary_wrapper <- function(res, comparison, experiment, p_cutoff, lfc_cutoff){
   if(missing(p_cutoff)) p_cutoff <- 0.05

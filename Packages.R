@@ -24,7 +24,7 @@ library(wesanderson)
 
 
 library(BiocManager)
-# BiocManager::install(c("clusterProfiler", "ComplexHeatmap", "DESeq2", "DOSE", "EnhancedVolcano", "enrichplot", "ExperimentHub", "forcats", "GSEABase", "limma", "msigdb", "org.Mm.eg.db", "pheatmap", "ReactomePA", "sva", "VennDetail"))
+# BiocManager::install(c("clusterProfiler", "ComplexHeatmap", "DESeq2", "DOSE", "EnhancedVolcano", "enrichplot", "ExperimentHub", "fgsea", "forcats", "GSEABase", "limma", "msigdb", "org.Mm.eg.db", "pheatmap", "ReactomePA", "sva", "VennDetail"))
 # BiocManager::install(c("apeglm", "GOSemSim", "pathview", "vsn"))
 
 library(clusterProfiler)
@@ -34,6 +34,7 @@ library(DOSE)
 library(EnhancedVolcano)
 library(enrichplot)
 library(ExperimentHub)
+library(fgsea)
 library(forcats)
 library(GSEABase)
 library(limma)

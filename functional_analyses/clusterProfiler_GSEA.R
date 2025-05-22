@@ -27,7 +27,7 @@ rank_genes <- function(dds_res, ID_type){
 gseGO_wrapper <- function(dds_res, ID_type, p_cutoff){
   if(missing(ID_type)) ID_type <- "symbol"
   if(missing(p_cutoff)) p_cutoff <- 0.05
-  
+
   ranked_list <- rank_genes(dds_res, ID_type)
   if(is.null(ranked_list)) {
     print("ranked gene list is NULL (either incorrect ID type or no significant DEGs)")
@@ -39,6 +39,7 @@ gseGO_wrapper <- function(dds_res, ID_type, p_cutoff){
       gse <- gseGO(ranked_list, ont = "BP", keyType = "ENTREZID", OrgDb = "org.Mm.eg.db", eps = 1e-300, pvalueCutoff = p_cutoff)
     } else if(ID_type == "symbol"){
       gse <- gseGO(ranked_list, ont = "BP", keyType = "SYMBOL", OrgDb = "org.Mm.eg.db", eps = 1e-300, pvalueCutoff = p_cutoff)
+      # gse <- gseGO(ranked_list, ont = "BP", keyType = "SYMBOL", OrgDb = "org.Mm.eg.db", eps = 1e-300, pvalueCutoff = p_cutoff)
     } else return(print("ID_type must be ensembl, entrez, or symbol"))
     
     if(nrow(gse) < 1){
@@ -148,12 +149,12 @@ gsePlot <- function(gse, plot_title, file_name, showCat, w, h){
 # GO Gene set enrichment analysis ----------------------------------------------
   gseGO_results <- list(
     AM14trans = list(
-      PL23_2DG_v_Ctrl = gseGO_wrapper(deseq_res$AM14transfer$PL23_2DG_v_Ctrl, "symbol", 0.05),
-      R848_2DG_v_Ctrl = gseGO_wrapper(deseq_res$AM14transfer$R848_2DG_v_Ctrl, "symbol", 0.05),
-      PL23_vs_R848 = gseGO_wrapper(deseq_res$AM14transfer$PL23_vs_R848, "symbol", 0.05)),
-    B18trans = gseGO_wrapper(deseq_res$B18transfer, "symbol", 0.05),
-    PL23_v_NP = gseGO_wrapper(deseq_res$PL23_v_NP, "symbol", 0.05),
-    AM14MRLlpr = gseGO_wrapper(deseq_res$AM14MRLlpr, "symbol", 0.05))
+      PL23_2DG_v_Ctrl = gseGO_wrapper(deseq_res$AM14transfer$PL23_2DG_v_Ctrl, "symbol", 0.2),
+      R848_2DG_v_Ctrl = gseGO_wrapper(deseq_res$AM14transfer$R848_2DG_v_Ctrl, "symbol", 0.2),
+      PL23_vs_R848 = gseGO_wrapper(deseq_res$AM14transfer$PL23_vs_R848, "symbol", 0.2)),
+    B18trans = gseGO_wrapper(deseq_res$B18transfer, "symbol", 0.2),
+    PL23_v_NP = gseGO_wrapper(deseq_res$PL23_v_NP, "symbol", 0.2),
+    AM14MRLlpr = gseGO_wrapper(deseq_res$AM14MRLlpr, "symbol", 0.2))
 
   gseGO_res_summary <- join_all(list(gseGO_summary(gseGO_results$AM14trans$PL23_2DG_v_Ctrl, "PL2-3+2DG vs PL2-3", "AM14 Adoptive Transfer"),
                                      gseGO_summary(gseGO_results$AM14trans$R848_2DG_v_Ctrl, "R848+2DG vs R848", "AM14 Adoptive Transfer"),
@@ -249,14 +250,14 @@ gsePlot <- function(gse, plot_title, file_name, showCat, w, h){
       R848_2DG_v_Ctrl = gsePathway_wrapper(deseq_res$AM14transfer$R848_2DG_v_Ctrl),
       PL23_vs_R848 = gsePathway_wrapper(deseq_res$AM14transfer$PL23_vs_R848)),
     B18trans = gsePathway_wrapper(deseq_res$B18transfer),
-    PL23_v_NP = gsePathway_wrapper(deseq_res$PL23_v_NP),
+    # PL23_v_NP = gsePathway_wrapper(deseq_res$PL23_v_NP),
     AM14MRLlpr = gsePathway_wrapper(deseq_res$AM14MRLlpr)
   )
   nrow(gsePathway_results$AM14trans$PL23_2DG_v_Ctrl)
   nrow(gsePathway_results$AM14trans$R848_2DG_v_Ctrl)
   nrow(gsePathway_results$AM14trans$PL23_vs_R848)
   nrow(gsePathway_results$B18trans)
-  nrow(gsePathway_results$PL23_v_NP)
+  # nrow(gsePathway_results$PL23_v_NP)
   nrow(gsePathway_results$AM14MRLlpr)
   
   head(gsePathway_results$AM14trans$PL23_2DG_v_Ctrl)
@@ -270,26 +271,26 @@ gsePlot <- function(gse, plot_title, file_name, showCat, w, h){
           "gsePathway_plots/AM14 Transfer - PL2-3 vs R848", w = 1200, h = 750)
   dev.off()
   
-  gsePlot(gsePathway_results$PL23_v_NP,
-             "AM14 Transfer + PL2-3 vs B1-8 Transfer + NP\n(Reactome)",
-             "gsePathway_plots/AM14 Transfer PL2-3 vs B1-8 Transfer NP", w = 1700, h = 2000)
-  dev.off()
-  
-  temp_PL23_NP_up <- dplyr::filter(gsePathway_results$PL23_v_NP, NES > 0)
-  nrow(temp_PL23_NP_up)
-  gsePlot(temp_PL23_NP_up,
-          "AM14 Transfer + PL2-3 vs B1-8 Transfer + NP\n(Upregulated Reactome Pathways)", 
-          "gsePathway_plots/AM14 Transfer PL2-3 vs B1-8 Transfer NP - UP")
-  dev.off()
-  rm(temp_PL23_NP_up)
-  
-  temp_PL23_NP_down <- dplyr::filter(gsePathway_results$PL23_v_NP, NES < 0)
-  nrow(temp_PL23_NP_down)
-  gsePlot(temp_PL23_NP_down,
-          "AM14 Transfer + PL2-3 vs B1-8 Transfer + NP\n(Downregulated Reactome Pathways)",
-          "gsePathway_plots/AM14 Transfer PL2-3 vs B1-8 Transfer NP - DOWN", w = 1700, h = 1600)
-  dev.off()
-  rm(temp_PL23_NP_down)
+  # gsePlot(gsePathway_results$PL23_v_NP,
+  #            "AM14 Transfer + PL2-3 vs B1-8 Transfer + NP\n(Reactome)",
+  #            "gsePathway_plots/AM14 Transfer PL2-3 vs B1-8 Transfer NP", w = 1700, h = 2000)
+  # dev.off()
+  # 
+  # temp_PL23_NP_up <- dplyr::filter(gsePathway_results$PL23_v_NP, NES > 0)
+  # nrow(temp_PL23_NP_up)
+  # gsePlot(temp_PL23_NP_up,
+  #         "AM14 Transfer + PL2-3 vs B1-8 Transfer + NP\n(Upregulated Reactome Pathways)", 
+  #         "gsePathway_plots/AM14 Transfer PL2-3 vs B1-8 Transfer NP - UP")
+  # dev.off()
+  # rm(temp_PL23_NP_up)
+  # 
+  # temp_PL23_NP_down <- dplyr::filter(gsePathway_results$PL23_v_NP, NES < 0)
+  # nrow(temp_PL23_NP_down)
+  # gsePlot(temp_PL23_NP_down,
+  #         "AM14 Transfer + PL2-3 vs B1-8 Transfer + NP\n(Downregulated Reactome Pathways)",
+  #         "gsePathway_plots/AM14 Transfer PL2-3 vs B1-8 Transfer NP - DOWN", w = 1700, h = 1600)
+  # dev.off()
+  # rm(temp_PL23_NP_down)
   
   gsePlot(gsePathway_results$AM14MRLlpr, 
              "AM14 MRL/lpr: 2DG vs Control\n(Reactome)",
