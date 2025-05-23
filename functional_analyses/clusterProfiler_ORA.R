@@ -28,7 +28,7 @@ enrichGO_wrapper <- function(dds_res, lfc_direction, lfc_cutoff, GO_padj_cutoff)
     print("ranked gene list length is > 0 but no significant GO terms were detected")
     return(NULL)
   } else {
-    simp <- simplify(eGO, cutoff = 0.7)
+    simp <- clusterProfiler::simplify(eGO)
     return(list(eGO = eGO, eGO_simplified = simp))
   }
 }
@@ -158,7 +158,7 @@ oraPlot <- function(ora, plot_title, wrap, file_name, showCat, w, h){
         PL23_2DG_v_Ctrl = enrichGO_wrapper(deseq_res$AM14transfer$PL23_2DG_v_Ctrl, NULL, 0.5),
         R848_2DG_v_Ctrl = enrichGO_wrapper(deseq_res$AM14transfer$R848_2DG_v_Ctrl, NULL, 0.5),
         PL23_vs_R848 = enrichGO_wrapper(deseq_res$AM14transfer$PL23_vs_R848, NULL, 0.5)),
-      PL23_v_NP = enrichGO_wrapper(deseq_res$PL23_v_NP, NULL, 0.5),
+      # PL23_v_NP = enrichGO_wrapper(deseq_res$PL23_v_NP, NULL, 0.5),
       B18trans = enrichGO_wrapper(deseq_res$B18transfer, NULL, 0.5),
       AM14MRLlpr = enrichGO_wrapper(deseq_res$AM14MRLlpr, NULL, 0.5))
 
@@ -174,67 +174,67 @@ oraPlot <- function(ora, plot_title, wrap, file_name, showCat, w, h){
                                      type = "full")
     enrichGO_all_summary
     
-    oraPlot(enrichGO_all$AM14trans$PL23_2DG_v_Ctrl$eGO_simplified,
-            "AM14 Transfer: PL2-3+2DG vs PL2-3\n(GO Biological Process)", 40,
-            "enrichGO_plots/AM14 Transfer - PL2-3 + 2DG vs PL2-3", w = 1250, h = 2200)
-    dev.off()
-
-    oraPlot(enrichGO_all$AM14trans$R848_2DG_v_Ctrl$eGO,
-            "AM14 Transfer: R848+2DG vs R848\n(GO Biological Process)", 40,
-            "enrichGO_plots/AM14 Transfer - R848 + 2DG vs R848", h = 600)
-    dev.off()
-
-    oraPlot(enrichGO_all$AM14trans$PL23_vs_R848$eGO_simplified,
-            "AM14 Transfer: PL2-3 vs R848\n(GO Biological Process)", 40,
-            "enrichGO_plots/AM14 Transfer - PL2-3 vs R848")
-    dev.off()
-
-    oraPlot(enrichGO_all$PL23_v_NP$eGO_simplified,
-            "AM14 Transfer + PL2-3\nvs B1-8 Transfer + NP\n(GO Biological Process)", 42,
-            "enrichGO_plots/AM14 Transfer PL2-3 vs B1-8 Transfer NP")
-    dev.off()
-
-    oraPlot(enrichGO_all$AM14MRLlpr$eGO_simplified,
-            "AM14 MRL/lpr: 2DG vs Control\n(GO Biological Process)", 40,
-            "enrichGO_plots/AM14 MRLlpr 2DG vs Control")
-    dev.off()
-
-    # Save results to an Excel file ----------------------------------------------
-      wb <- createWorkbook("Output/Functional_analyses/enrich_GOBP_results_allDEGs.xlsx")
-
-      addWorksheet(wb, "Enrich GO Summaries")
-      writeData(wb, "Enrich GO Summaries", enrichGO_all_summary)
-
-      addWorksheet(wb, "AM14 PL23_2DG_vs_Ctrl - Simp")
-      addWorksheet(wb, "AM14 - R848_2DG_vs_Ctrl - Simp")
-      addWorksheet(wb, "AM14 - PL23_vs_R848 - Simp")
-      # addWorksheet(wb, "B1-8 - 2DG_vs_Ctrl - Simp")
-      addWorksheet(wb, "PL2-3 vs NP - Simp")
-      addWorksheet(wb, "AM14 MRLlpr - Simp")
-
-      writeData(wb, "AM14 PL23_2DG_vs_Ctrl - Simp", enrichGO_all$AM14trans$PL23_2DG_v_Ctrl$eGO_simplified)
-      writeData(wb, "AM14 - R848_2DG_vs_Ctrl - Simp", enrichGO_all$AM14trans$R848_2DG_v_Ctrl$eGO_simplified)
-      writeData(wb, "AM14 - PL23_vs_R848 - Simp", enrichGO_all$AM14trans$PL23_vs_R848$eGO_simplified)
-      # writeData(wb, "B1-8 - 2DG_vs_Ctrl - Simp", enrichGO_all$B18trans$eGO_simplified)
-      writeData(wb, "PL2-3 vs NP - Simp", enrichGO_all$PL23_v_NP$eGO_simplified)
-      writeData(wb, "AM14 MRLlpr - Simp", enrichGO_all$AM14MRLlpr$eGO_simplified)
-
-      addWorksheet(wb, "AM14 PL23_2DG_vs_Ctrl - Full")
-      addWorksheet(wb, "AM14 - R848_2DG_vs_Ctrl - Full")
-      addWorksheet(wb, "AM14 - PL23_vs_R848 - Full")
-      # addWorksheet(wb, "B1-8 - 2DG_vs_Ctrl - Full")
-      addWorksheet(wb, "PL2-3 vs NP - Full")
-      addWorksheet(wb, "AM14 MRLlpr - Full")
-
-      writeData(wb, "AM14 PL23_2DG_vs_Ctrl - Full", enrichGO_all$AM14trans$PL23_2DG_v_Ctrl$eGO)
-      writeData(wb, "AM14 - R848_2DG_vs_Ctrl - Full", enrichGO_all$AM14trans$R848_2DG_v_Ctrl$eGO)
-      writeData(wb, "AM14 - PL23_vs_R848 - Full", enrichGO_all$AM14trans$PL23_vs_R848$eGO)
-      # writeData(wb, "B1-8 - 2DG_vs_Ctrl - Full", enrichGO_all$B18trans$eGO)
-      writeData(wb, "PL2-3 vs NP - Full", enrichGO_all$PL23_v_NP$eGO)
-      writeData(wb, "AM14 MRLlpr - Full", enrichGO_all$AM14MRLlpr$eGO)
-
-      saveWorkbook(wb, "Output/Functional_analyses/enrich_GOBP_results_allDEGs.xlsx", overwrite = TRUE)
-      rm(wb)
+    # oraPlot(enrichGO_all$AM14trans$PL23_2DG_v_Ctrl$eGO_simplified,
+    #         "AM14 Transfer: PL2-3+2DG vs PL2-3\n(GO Biological Process)", 40,
+    #         "enrichGO_plots/AM14 Transfer - PL2-3 + 2DG vs PL2-3", w = 1250, h = 2200)
+    # dev.off()
+    # 
+    # oraPlot(enrichGO_all$AM14trans$R848_2DG_v_Ctrl$eGO,
+    #         "AM14 Transfer: R848+2DG vs R848\n(GO Biological Process)", 40,
+    #         "enrichGO_plots/AM14 Transfer - R848 + 2DG vs R848", h = 600)
+    # dev.off()
+    # 
+    # oraPlot(enrichGO_all$AM14trans$PL23_vs_R848$eGO_simplified,
+    #         "AM14 Transfer: PL2-3 vs R848\n(GO Biological Process)", 40,
+    #         "enrichGO_plots/AM14 Transfer - PL2-3 vs R848")
+    # dev.off()
+    # 
+    # oraPlot(enrichGO_all$PL23_v_NP$eGO_simplified,
+    #         "AM14 Transfer + PL2-3\nvs B1-8 Transfer + NP\n(GO Biological Process)", 42,
+    #         "enrichGO_plots/AM14 Transfer PL2-3 vs B1-8 Transfer NP")
+    # dev.off()
+    # 
+    # oraPlot(enrichGO_all$AM14MRLlpr$eGO_simplified,
+    #         "AM14 MRL/lpr: 2DG vs Control\n(GO Biological Process)", 40,
+    #         "enrichGO_plots/AM14 MRLlpr 2DG vs Control")
+    # dev.off()
+    # 
+    # # Save results to an Excel file ----------------------------------------------
+    #   wb <- createWorkbook("Output/Functional_analyses/enrich_GOBP_results_allDEGs.xlsx")
+    # 
+    #   addWorksheet(wb, "Enrich GO Summaries")
+    #   writeData(wb, "Enrich GO Summaries", enrichGO_all_summary)
+    # 
+    #   addWorksheet(wb, "AM14 PL23_2DG_vs_Ctrl - Simp")
+    #   addWorksheet(wb, "AM14 - R848_2DG_vs_Ctrl - Simp")
+    #   addWorksheet(wb, "AM14 - PL23_vs_R848 - Simp")
+    #   # addWorksheet(wb, "B1-8 - 2DG_vs_Ctrl - Simp")
+    #   addWorksheet(wb, "PL2-3 vs NP - Simp")
+    #   addWorksheet(wb, "AM14 MRLlpr - Simp")
+    # 
+    #   writeData(wb, "AM14 PL23_2DG_vs_Ctrl - Simp", enrichGO_all$AM14trans$PL23_2DG_v_Ctrl$eGO_simplified)
+    #   writeData(wb, "AM14 - R848_2DG_vs_Ctrl - Simp", enrichGO_all$AM14trans$R848_2DG_v_Ctrl$eGO_simplified)
+    #   writeData(wb, "AM14 - PL23_vs_R848 - Simp", enrichGO_all$AM14trans$PL23_vs_R848$eGO_simplified)
+    #   # writeData(wb, "B1-8 - 2DG_vs_Ctrl - Simp", enrichGO_all$B18trans$eGO_simplified)
+    #   writeData(wb, "PL2-3 vs NP - Simp", enrichGO_all$PL23_v_NP$eGO_simplified)
+    #   writeData(wb, "AM14 MRLlpr - Simp", enrichGO_all$AM14MRLlpr$eGO_simplified)
+    # 
+    #   addWorksheet(wb, "AM14 PL23_2DG_vs_Ctrl - Full")
+    #   addWorksheet(wb, "AM14 - R848_2DG_vs_Ctrl - Full")
+    #   addWorksheet(wb, "AM14 - PL23_vs_R848 - Full")
+    #   # addWorksheet(wb, "B1-8 - 2DG_vs_Ctrl - Full")
+    #   addWorksheet(wb, "PL2-3 vs NP - Full")
+    #   addWorksheet(wb, "AM14 MRLlpr - Full")
+    # 
+    #   writeData(wb, "AM14 PL23_2DG_vs_Ctrl - Full", enrichGO_all$AM14trans$PL23_2DG_v_Ctrl$eGO)
+    #   writeData(wb, "AM14 - R848_2DG_vs_Ctrl - Full", enrichGO_all$AM14trans$R848_2DG_v_Ctrl$eGO)
+    #   writeData(wb, "AM14 - PL23_vs_R848 - Full", enrichGO_all$AM14trans$PL23_vs_R848$eGO)
+    #   # writeData(wb, "B1-8 - 2DG_vs_Ctrl - Full", enrichGO_all$B18trans$eGO)
+    #   writeData(wb, "PL2-3 vs NP - Full", enrichGO_all$PL23_v_NP$eGO)
+    #   writeData(wb, "AM14 MRLlpr - Full", enrichGO_all$AM14MRLlpr$eGO)
+    # 
+    #   saveWorkbook(wb, "Output/Functional_analyses/enrich_GOBP_results_allDEGs.xlsx", overwrite = TRUE)
+    #   rm(wb)
     
   # Upregulated DEGs -----------------------------------------------------------
     enrichGO_up <- list(
@@ -256,62 +256,62 @@ oraPlot <- function(ora, plot_title, wrap, file_name, showCat, w, h){
     enrichGO_up_summary
   
     
-    oraPlot(enrichGO_up$AM14trans$R848_2DG_v_Ctrl$eGO,
-            "AM14 Transfer: R848+2DG vs R848\n(Upregulated DEGs,\nGO Biological Process)", 30,
-            "enrichGO_plots/AM14 Transfer - R848 + 2DG vs R848 - UP", h = 600)
-    dev.off()
-
-    oraPlot(enrichGO_up$AM14trans$PL23_vs_R848$eGO,
-            "AM14 Transfer: PL2-3 vs R848\n(Upregulated DEGs,\nGO Biological Process)", 30,
-            "enrichGO_plots/AM14 Transfer - PL2-3 vs R848 - UP", h = 750)
-    dev.off()
-
-    oraPlot(enrichGO_up$PL23_v_NP$eGO_simplified,
-            "AM14 Transfer + PL2-3 vs\nB1-8 Transfer + NP\n(Upregulated DEGs,\nGO Biological Process)", 42,
-            "enrichGO_plots/AM14 Transfer PL2-3 vs B1-8 Transfer NP - UP")
-    dev.off()
-
-    oraPlot(enrichGO_up$AM14MRLlpr$eGO,
-            "AM14 MRL/lpr: 2DG vs Control\n(Upregulated DEGs,\nGO Biological Process)", 40,
-            "enrichGO_plots/AM14 MRLlpr 2DG vs Control - UP", , h = 800)
-    dev.off()
-
-    # Save results to an Excel file ----------------------------------------------
-      wb <- createWorkbook("Output/Functional_analyses/enrich_GOBP_results_upregDEGs.xlsx")
-
-      addWorksheet(wb, "Enrich GO Summaries")
-      writeData(wb, "Enrich GO Summaries", enrichGO_up_summary)
-
-      # addWorksheet(wb, "AM14 PL23_2DG_vs_Ctrl - Simp")
-      addWorksheet(wb, "AM14 - R848_2DG_vs_Ctrl - Simp")
-      addWorksheet(wb, "AM14 - PL23_vs_R848 - Simp")
-      # addWorksheet(wb, "B1-8 - 2DG_vs_Ctrl - Simp")
-      addWorksheet(wb, "PL2-3 vs NP - Simp")
-      addWorksheet(wb, "AM14 MRLlpr - Simp")
-
-      # writeData(wb, "AM14 PL23_2DG_vs_Ctrl - Simp", enrichGO_up$AM14trans$PL23_2DG_v_Ctrl$eGO_simplified)
-      writeData(wb, "AM14 - R848_2DG_vs_Ctrl - Simp", enrichGO_up$AM14trans$R848_2DG_v_Ctrl$eGO_simplified)
-      writeData(wb, "AM14 - PL23_vs_R848 - Simp", enrichGO_up$AM14trans$PL23_vs_R848$eGO_simplified)
-      # writeData(wb, "B1-8 - 2DG_vs_Ctrl - Simp", enrichGO_up$B18trans$eGO_simplified)
-      writeData(wb, "PL2-3 vs NP - Simp", enrichGO_up$PL23_v_NP$eGO_simplified)
-      writeData(wb, "AM14 MRLlpr - Simp", enrichGO_up$AM14MRLlpr$eGO_simplified)
-
-      # addWorksheet(wb, "AM14 PL23_2DG_vs_Ctrl - Full")
-      addWorksheet(wb, "AM14 - R848_2DG_vs_Ctrl - Full")
-      addWorksheet(wb, "AM14 - PL23_vs_R848 - Full")
-      # addWorksheet(wb, "B1-8 - 2DG_vs_Ctrl - Full")
-      addWorksheet(wb, "PL2-3 vs NP - Full")
-      addWorksheet(wb, "AM14 MRLlpr - Full")
-
-      # writeData(wb, "AM14 PL23_2DG_vs_Ctrl - Full", enrichGO_up$AM14trans$PL23_2DG_v_Ctrl$eGO)
-      writeData(wb, "AM14 - R848_2DG_vs_Ctrl - Full", enrichGO_up$AM14trans$R848_2DG_v_Ctrl$eGO)
-      writeData(wb, "AM14 - PL23_vs_R848 - Full", enrichGO_up$AM14trans$PL23_vs_R848$eGO)
-      # writeData(wb, "B1-8 - 2DG_vs_Ctrl - Full", enrichGO_up$B18trans$eGO)
-      writeData(wb, "PL2-3 vs NP - Full", enrichGO_up$PL23_v_NP$eGO)
-      writeData(wb, "AM14 MRLlpr - Full", enrichGO_up$AM14MRLlpr$eGO)
-
-      saveWorkbook(wb, "Output/Functional_analyses/enrich_GOBP_results_upregDEGs.xlsx", overwrite = TRUE)
-      rm(wb)
+    # oraPlot(enrichGO_up$AM14trans$R848_2DG_v_Ctrl$eGO,
+    #         "AM14 Transfer: R848+2DG vs R848\n(Upregulated DEGs,\nGO Biological Process)", 30,
+    #         "enrichGO_plots/AM14 Transfer - R848 + 2DG vs R848 - UP", h = 600)
+    # dev.off()
+    # 
+    # oraPlot(enrichGO_up$AM14trans$PL23_vs_R848$eGO,
+    #         "AM14 Transfer: PL2-3 vs R848\n(Upregulated DEGs,\nGO Biological Process)", 30,
+    #         "enrichGO_plots/AM14 Transfer - PL2-3 vs R848 - UP", h = 750)
+    # dev.off()
+    # 
+    # oraPlot(enrichGO_up$PL23_v_NP$eGO_simplified,
+    #         "AM14 Transfer + PL2-3 vs\nB1-8 Transfer + NP\n(Upregulated DEGs,\nGO Biological Process)", 42,
+    #         "enrichGO_plots/AM14 Transfer PL2-3 vs B1-8 Transfer NP - UP")
+    # dev.off()
+    # 
+    # oraPlot(enrichGO_up$AM14MRLlpr$eGO,
+    #         "AM14 MRL/lpr: 2DG vs Control\n(Upregulated DEGs,\nGO Biological Process)", 40,
+    #         "enrichGO_plots/AM14 MRLlpr 2DG vs Control - UP", , h = 800)
+    # dev.off()
+    # 
+    # # Save results to an Excel file ----------------------------------------------
+    #   wb <- createWorkbook("Output/Functional_analyses/enrich_GOBP_results_upregDEGs.xlsx")
+    # 
+    #   addWorksheet(wb, "Enrich GO Summaries")
+    #   writeData(wb, "Enrich GO Summaries", enrichGO_up_summary)
+    # 
+    #   # addWorksheet(wb, "AM14 PL23_2DG_vs_Ctrl - Simp")
+    #   addWorksheet(wb, "AM14 - R848_2DG_vs_Ctrl - Simp")
+    #   addWorksheet(wb, "AM14 - PL23_vs_R848 - Simp")
+    #   # addWorksheet(wb, "B1-8 - 2DG_vs_Ctrl - Simp")
+    #   addWorksheet(wb, "PL2-3 vs NP - Simp")
+    #   addWorksheet(wb, "AM14 MRLlpr - Simp")
+    # 
+    #   # writeData(wb, "AM14 PL23_2DG_vs_Ctrl - Simp", enrichGO_up$AM14trans$PL23_2DG_v_Ctrl$eGO_simplified)
+    #   writeData(wb, "AM14 - R848_2DG_vs_Ctrl - Simp", enrichGO_up$AM14trans$R848_2DG_v_Ctrl$eGO_simplified)
+    #   writeData(wb, "AM14 - PL23_vs_R848 - Simp", enrichGO_up$AM14trans$PL23_vs_R848$eGO_simplified)
+    #   # writeData(wb, "B1-8 - 2DG_vs_Ctrl - Simp", enrichGO_up$B18trans$eGO_simplified)
+    #   writeData(wb, "PL2-3 vs NP - Simp", enrichGO_up$PL23_v_NP$eGO_simplified)
+    #   writeData(wb, "AM14 MRLlpr - Simp", enrichGO_up$AM14MRLlpr$eGO_simplified)
+    # 
+    #   # addWorksheet(wb, "AM14 PL23_2DG_vs_Ctrl - Full")
+    #   addWorksheet(wb, "AM14 - R848_2DG_vs_Ctrl - Full")
+    #   addWorksheet(wb, "AM14 - PL23_vs_R848 - Full")
+    #   # addWorksheet(wb, "B1-8 - 2DG_vs_Ctrl - Full")
+    #   addWorksheet(wb, "PL2-3 vs NP - Full")
+    #   addWorksheet(wb, "AM14 MRLlpr - Full")
+    # 
+    #   # writeData(wb, "AM14 PL23_2DG_vs_Ctrl - Full", enrichGO_up$AM14trans$PL23_2DG_v_Ctrl$eGO)
+    #   writeData(wb, "AM14 - R848_2DG_vs_Ctrl - Full", enrichGO_up$AM14trans$R848_2DG_v_Ctrl$eGO)
+    #   writeData(wb, "AM14 - PL23_vs_R848 - Full", enrichGO_up$AM14trans$PL23_vs_R848$eGO)
+    #   # writeData(wb, "B1-8 - 2DG_vs_Ctrl - Full", enrichGO_up$B18trans$eGO)
+    #   writeData(wb, "PL2-3 vs NP - Full", enrichGO_up$PL23_v_NP$eGO)
+    #   writeData(wb, "AM14 MRLlpr - Full", enrichGO_up$AM14MRLlpr$eGO)
+    # 
+    #   saveWorkbook(wb, "Output/Functional_analyses/enrich_GOBP_results_upregDEGs.xlsx", overwrite = TRUE)
+    #   rm(wb)
 
   # Downregulated DEGs ---------------------------------------------------------
     enrichGO_down <- list(
@@ -338,62 +338,62 @@ oraPlot <- function(ora, plot_title, wrap, file_name, showCat, w, h){
     # enrichGO_down_PL23_3DG_v_Ctrl_lowerSimp$Description
     # rm(enrichGO_down_PL23_3DG_v_Ctrl_lowerSimp)
     
-    oraPlot(enrichGO_down$AM14trans$PL23_2DG_v_Ctrl$eGO_simplified,
-            "AM14 Transfer: PL2-3+2DG vs PL2-3\n(Downregulated DEGs,\nGO Biological Process)", 40,
-            "enrichGO_plots/AM14 Transfer - PL2-3 + 2DG vs PL2-3 - DOWN")
-    dev.off()
-
-    oraPlot(enrichGO_down$AM14trans$PL23_vs_R848$eGO_simplified,
-            "AM14 Transfer: PL2-3 vs R848\n(Downregulated DEGs,\nGO Biological Process)", 40,
-            "enrichGO_plots/AM14 Transfer - PL2-3 vs R848 - DOWN")
-    dev.off()
-
-    oraPlot(enrichGO_down$PL23_v_NP$eGO,
-            "AM14 Transfer + PL2-3 vs B1-8 Transfer + NP\n(Downregulated DEGs,\nGO Biological Process)", 40,
-            "enrichGO_plots/AM14 Transfer PL2-3 vs B1-8 Transfer NP - DOWN", h = 800)
-    dev.off()
-
-    oraPlot(enrichGO_down$AM14MRLlpr$eGO_simplified,
-            "AM14 MRL/lpr: 2DG vs Control\n(Downregulated DEGs,\nGO Biological Process)", 40,
-            "enrichGO_plots/AM14 MRLlpr 2DG vs Control - DOWN")
-    dev.off()
-
-    # Save results to an Excel file --------------------------------------------
-      wb <- createWorkbook("Output/Functional_analyses/enrich_GOBP_results_downregDEGs.xlsx")
-
-      addWorksheet(wb, "Enrich GO Summaries")
-      writeData(wb, "Enrich GO Summaries", enrichGO_down_summary)
-
-      addWorksheet(wb, "AM14 PL23_2DG_vs_Ctrl - Simp")
-      # addWorksheet(wb, "AM14 - R848_2DG_vs_Ctrl - Simp")
-      addWorksheet(wb, "AM14 - PL23_vs_R848 - Simp")
-      # addWorksheet(wb, "B1-8 - 2DG_vs_Ctrl - Simp")
-      addWorksheet(wb, "PL2-3 vs NP - Simp")
-      addWorksheet(wb, "AM14 MRLlpr - Simp")
-
-      writeData(wb, "AM14 PL23_2DG_vs_Ctrl - Simp", enrichGO_down$AM14trans$PL23_2DG_v_Ctrl$eGO_simplified)
-      # writeData(wb, "AM14 - R848_2DG_vs_Ctrl - Simp", enrichGO_down$AM14trans$R848_2DG_v_Ctrl$eGO_simplified)
-      writeData(wb, "AM14 - PL23_vs_R848 - Simp", enrichGO_down$AM14trans$PL23_vs_R848$eGO_simplified)
-      # writeData(wb, "B1-8 - 2DG_vs_Ctrl - Simp", enrichGO_down$B18trans$eGO_simplified)
-      writeData(wb, "PL2-3 vs NP - Simp", enrichGO_down$PL23_v_NP$eGO_simplified)
-      writeData(wb, "AM14 MRLlpr - Simp", enrichGO_down$AM14MRLlpr$eGO_simplified)
-
-      addWorksheet(wb, "AM14 PL23_2DG_vs_Ctrl - Full")
-      # addWorksheet(wb, "AM14 - R848_2DG_vs_Ctrl - Full")
-      addWorksheet(wb, "AM14 - PL23_vs_R848 - Full")
-      # addWorksheet(wb, "B1-8 - 2DG_vs_Ctrl - Full")
-      addWorksheet(wb, "PL2-3 vs NP - Full")
-      addWorksheet(wb, "AM14 MRLlpr - Full")
-
-      writeData(wb, "AM14 PL23_2DG_vs_Ctrl - Full", enrichGO_down$AM14trans$PL23_2DG_v_Ctrl$eGO)
-      # writeData(wb, "AM14 - R848_2DG_vs_Ctrl - Full", enrichGO_down$AM14trans$R848_2DG_v_Ctrl$eGO)
-      writeData(wb, "AM14 - PL23_vs_R848 - Full", enrichGO_down$AM14trans$PL23_vs_R848$eGO)
-      # writeData(wb, "B1-8 - 2DG_vs_Ctrl - Full", enrichGO_down$B18trans$eGO)
-      writeData(wb, "PL2-3 vs NP - Full", enrichGO_down$PL23_v_NP$eGO)
-      writeData(wb, "AM14 MRLlpr - Full", enrichGO_down$AM14MRLlpr$eGO)
-
-      saveWorkbook(wb, "Output/Functional_analyses/enrich_GOBP_results_downregDEGs.xlsx", overwrite = TRUE)
-      rm(wb)
+    # oraPlot(enrichGO_down$AM14trans$PL23_2DG_v_Ctrl$eGO_simplified,
+    #         "AM14 Transfer: PL2-3+2DG vs PL2-3\n(Downregulated DEGs,\nGO Biological Process)", 40,
+    #         "enrichGO_plots/AM14 Transfer - PL2-3 + 2DG vs PL2-3 - DOWN")
+    # dev.off()
+    # 
+    # oraPlot(enrichGO_down$AM14trans$PL23_vs_R848$eGO_simplified,
+    #         "AM14 Transfer: PL2-3 vs R848\n(Downregulated DEGs,\nGO Biological Process)", 40,
+    #         "enrichGO_plots/AM14 Transfer - PL2-3 vs R848 - DOWN")
+    # dev.off()
+    # 
+    # oraPlot(enrichGO_down$PL23_v_NP$eGO,
+    #         "AM14 Transfer + PL2-3 vs B1-8 Transfer + NP\n(Downregulated DEGs,\nGO Biological Process)", 40,
+    #         "enrichGO_plots/AM14 Transfer PL2-3 vs B1-8 Transfer NP - DOWN", h = 800)
+    # dev.off()
+    # 
+    # oraPlot(enrichGO_down$AM14MRLlpr$eGO_simplified,
+    #         "AM14 MRL/lpr: 2DG vs Control\n(Downregulated DEGs,\nGO Biological Process)", 40,
+    #         "enrichGO_plots/AM14 MRLlpr 2DG vs Control - DOWN")
+    # dev.off()
+    # 
+    # # Save results to an Excel file --------------------------------------------
+    #   wb <- createWorkbook("Output/Functional_analyses/enrich_GOBP_results_downregDEGs.xlsx")
+    # 
+    #   addWorksheet(wb, "Enrich GO Summaries")
+    #   writeData(wb, "Enrich GO Summaries", enrichGO_down_summary)
+    # 
+    #   addWorksheet(wb, "AM14 PL23_2DG_vs_Ctrl - Simp")
+    #   # addWorksheet(wb, "AM14 - R848_2DG_vs_Ctrl - Simp")
+    #   addWorksheet(wb, "AM14 - PL23_vs_R848 - Simp")
+    #   # addWorksheet(wb, "B1-8 - 2DG_vs_Ctrl - Simp")
+    #   addWorksheet(wb, "PL2-3 vs NP - Simp")
+    #   addWorksheet(wb, "AM14 MRLlpr - Simp")
+    # 
+    #   writeData(wb, "AM14 PL23_2DG_vs_Ctrl - Simp", enrichGO_down$AM14trans$PL23_2DG_v_Ctrl$eGO_simplified)
+    #   # writeData(wb, "AM14 - R848_2DG_vs_Ctrl - Simp", enrichGO_down$AM14trans$R848_2DG_v_Ctrl$eGO_simplified)
+    #   writeData(wb, "AM14 - PL23_vs_R848 - Simp", enrichGO_down$AM14trans$PL23_vs_R848$eGO_simplified)
+    #   # writeData(wb, "B1-8 - 2DG_vs_Ctrl - Simp", enrichGO_down$B18trans$eGO_simplified)
+    #   writeData(wb, "PL2-3 vs NP - Simp", enrichGO_down$PL23_v_NP$eGO_simplified)
+    #   writeData(wb, "AM14 MRLlpr - Simp", enrichGO_down$AM14MRLlpr$eGO_simplified)
+    # 
+    #   addWorksheet(wb, "AM14 PL23_2DG_vs_Ctrl - Full")
+    #   # addWorksheet(wb, "AM14 - R848_2DG_vs_Ctrl - Full")
+    #   addWorksheet(wb, "AM14 - PL23_vs_R848 - Full")
+    #   # addWorksheet(wb, "B1-8 - 2DG_vs_Ctrl - Full")
+    #   addWorksheet(wb, "PL2-3 vs NP - Full")
+    #   addWorksheet(wb, "AM14 MRLlpr - Full")
+    # 
+    #   writeData(wb, "AM14 PL23_2DG_vs_Ctrl - Full", enrichGO_down$AM14trans$PL23_2DG_v_Ctrl$eGO)
+    #   # writeData(wb, "AM14 - R848_2DG_vs_Ctrl - Full", enrichGO_down$AM14trans$R848_2DG_v_Ctrl$eGO)
+    #   writeData(wb, "AM14 - PL23_vs_R848 - Full", enrichGO_down$AM14trans$PL23_vs_R848$eGO)
+    #   # writeData(wb, "B1-8 - 2DG_vs_Ctrl - Full", enrichGO_down$B18trans$eGO)
+    #   writeData(wb, "PL2-3 vs NP - Full", enrichGO_down$PL23_v_NP$eGO)
+    #   writeData(wb, "AM14 MRLlpr - Full", enrichGO_down$AM14MRLlpr$eGO)
+    # 
+    #   saveWorkbook(wb, "Output/Functional_analyses/enrich_GOBP_results_downregDEGs.xlsx", overwrite = TRUE)
+    #   rm(wb)
       
 
 # Pathway enrichment analysis --------------------------------------------------

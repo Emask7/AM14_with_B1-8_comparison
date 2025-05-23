@@ -24,7 +24,7 @@
 
 # Set up experimental factors --------------------------------------------------
   coldata <- read.csv("raw_data/sample_info.csv")
-  coldata <- coldata[, c(1:3, 5:6)]
+  coldata <- coldata[, c(1:3, 5:6, 10)]
   coldata
   
   cd_PL23vNP <- coldata[c(1:5, 26:29), ]
@@ -164,24 +164,21 @@
   QC_heatmaps(dds_B18trans, "B18_Adoptive_Transfer", "B1-8 Adoptive Transfer")
   QC_heatmaps(dds_AM14MRLlpr, "AM14_MRLlpr", "AM14 MRL/lpr +/- 2DG")
 
-  # QC_heatmaps_batch_corrected(dds_AM14trans, NULL, "AM14 Adoptive Transfer")
-  # QC_heatmaps_batch_corrected(dds_AM14MRLlpr, NULL, "AM14 MRL/lpr +/- 2DG")
-
-  # QC_PCAplot(dds_PL23vNP, NULL, "PL2-3 vs NP", batch_effect = FALSE)
-  # QC_PCAplot(dds_PL23vNP, NULL, "PL2-3 vs NP", batch_effect = TRUE)
-  QC_PCAplot(dds_PL23vNP, "PL23_vs_NP", "PL2-3 vs NP", batch_effect = FALSE)
-  dev.off()
+  # QC_PCAplot(dds_PL23vNP, "PL23_vs_NP", "PL2-3 vs NP", batch_effect = NULL)
+  # dev.off()
+  
   QC_PCAplot(dds_AM14trans, "AM14_Adoptive_Transfer-Before_Batch_Correction",
              "AM14 Adoptive Transfer\n(Before Batch Correction)",
              batch_effect = FALSE)
   dev.off()
+  
   QC_PCAplot(dds_AM14trans, "AM14_Adoptive_Transfer-After_Batch_Correction",
              "AM14 Adoptive Transfer\n(After Batch Correction)",
              batch_effect = TRUE)
   dev.off()
 
   QC_PCAplot(dds_B18trans, "B1-8_Adoptive_Transfer","B1-8 Adoptive Transfer",
-             batch_effect = FALSE)
+             batch_effect = NULL)
   dev.off()
 
   QC_PCAplot(dds_AM14MRLlpr, "AM14_MRLlpr-Before_Batch_Correction",
@@ -193,21 +190,6 @@
              batch_effect = TRUE)
   dev.off()
 
-  # QC_heatmaps_batch_corrected(dds_AM14trans, 500, "AM14 Transfer - top 500 genes", "AM14 Adoptive Transfer", remove_batch = TRUE, 2)
-  # QC_heatmaps_batch_corrected(dds_B18trans, 500, "B1-8 Transfer - top 500 genes", "B1-8 Adoptive Transfer", remove_batch = FALSE, 1)
-  # QC_heatmaps_batch_corrected(dds_AM14MRLlpr, 500, "AM14 MRLlpr - top 500 genes", "AM14 MRL/lpr", remove_batch = TRUE, 2)
-  # 
-  # ann_colors1 <- list(Treatment = c(PL23 = "#00496f", PL23_2DG = "#0f85a0", R848 = "#edd746", R848_2DG = "#dd4124"))
-  # ann_colors2 <- list(Treatment = c(NP = "#0f85a0", NP_2DG = "#dd4124"))
-  # ann_colors3 <- list(Treatment = c("2DG" = "#0f85a0", Control = "#dd4124"))
-  # 
-  # QC_heatmaps_batch_corrected(dds_AM14trans, 500, ann_colors1, "AM14 Transfer - top 500 genes - zscore", "AM14 Adoptive Transfer", remove_batch = TRUE, 1)
-  # dev.off()
-  # QC_heatmaps_batch_corrected(dds_B18trans, 500, ann_colors2, "B1-8 Transfer - top 500 genes - zscore", "B1-8 Adoptive Transfer", remove_batch = FALSE, 1)
-  # dev.off()
-  # QC_heatmaps_batch_corrected(dds_AM14MRLlpr, 500, ann_colors3, "AM14 MRLlpr - top 500 genes - zscore", "AM14 MRL/lpr", remove_batch = TRUE, 1)
-  # dev.off()
-  
 # Differential Expression Analysis ---------------------------------------------
   resultsNames(dds_PL23vNP)
   resultsNames(dds_AM14trans)
@@ -230,25 +212,60 @@
   # head(deseq_res$AM14MRLlpr)
   
   # DEG Heatmaps ---------------------------------------------------------------
-    AM14_DEGs <- DEG_list(list(deseq_res$AM14transfer$PL23_vs_R848,
+    AM14_DEGs <- DEG_list(list(deseq_res$AM14transfer$PL23_2DG_v_Ctrl,
                                deseq_res$AM14transfer$R848_2DG_v_Ctrl,
                                deseq_res$AM14transfer$PL23_vs_R848))
-
-    DEG_heatmap(dds_AM14trans, AM14_DEGs, 
-                list(Treatment = c(PL23 = "#00496f", PL23_2DG = "#0f85a0", 
-                                   R848 = "#edd746", R848_2DG = "#dd4124")), 
+  
+    AM14_DEGs_PL23only <- DEG_list(list(deseq_res$AM14transfer$PL23_2DG_v_Ctrl))
+    head(AM14_DEGs_PL23only)
+    
+    colors_AM14 <- list(Treatment = c(PL23 = "#00496f", PL23_2DG = "#0f85a0", 
+                                      R848 = "#edd746", R848_2DG = "#dd4124"))
+    
+    DEG_heatmap(dds_AM14trans, AM14_DEGs_PL23only, colors_AM14,
+                "AM14 Adoptive Transfer\n(PL2-3 +/- 2DG Significant DEGs)",
+                "AM14 adoptive transfer DEG heatmap - PL2-3 only - supervised",
+                unsupervised = FALSE, h = 1500, w = 1250)
+    
+    DEG_heatmap(dds_AM14trans, AM14_DEGs_PL23only, colors_AM14,
+                "AM14 Adoptive Transfer\n(PL2-3 +/- 2DG Significant DEGs)",
+                "AM14 adoptive transfer DEG heatmap - PL2-3 only - unsupervised",
+                unsupervised = TRUE, h = 1500, w = 1250)
+    
+    DEG_heatmap(dds_AM14trans, AM14_DEGs, colors_AM14,
                 "AM14 Adoptive Transfer\n(Significant DEGs)",
-                "AM14 adoptive transfer DEG heatmap", h = 1500, w = 1250)
+                "AM14 adoptive transfer DEG heatmap - supervised",
+                unsupervised = FALSE, h = 1500, w = 1250)
+    
+    DEG_heatmap(dds_AM14trans, AM14_DEGs, colors_AM14,
+                "AM14 Adoptive Transfer\n(Significant DEGs)",
+                "AM14 adoptive transfer DEG heatmap - unsupervised",
+                unsupervised = TRUE, h = 1500, w = 1250)
     
     DEG_heatmap(dds_B18trans, DEG_list(list(deseq_res$B18transfer)), 
                 list(Treatment = c(NP = "#0f85a0", NP_2DG = "#dd4124")), 
                 "B1-8 Adoptive Transfer\n(Significant DEGs)",
-                "B1-8 adoptive transfer DEG heatmap", h = 1000, w = 1000)
-
+                "B1-8 adoptive transfer DEG heatmap - supervised",
+                unsupervised = FALSE, h = 1000, w = 1000)
+    
+    DEG_heatmap(dds_B18trans, DEG_list(list(deseq_res$B18transfer)), 
+                list(Treatment = c(NP = "#0f85a0", NP_2DG = "#dd4124")), 
+                "B1-8 Adoptive Transfer\n(Significant DEGs)",
+                "B1-8 adoptive transfer DEG heatmap - unsupervised",
+                unsupervised = TRUE, h = 1000, w = 1000)
+    
     DEG_heatmap(dds_AM14MRLlpr, DEG_list(list(deseq_res$AM14MRLlpr)), 
                 list(Treatment = c(Control = "#0f85a0", "2DG" = "#dd4124")), 
                 "AM14 MRL/lpr Mice\n(Significant DEGs)",
-                "AM14 MRLlpr DEG heatmap", h = 1500, w = 1250)
+                "AM14 MRLlpr DEG heatmap - supervised", 
+                unsupervised = FALSE, h = 1500, w = 1250)
+    
+    DEG_heatmap(dds_AM14MRLlpr, DEG_list(list(deseq_res$AM14MRLlpr)), 
+                list(Treatment = c(Control = "#0f85a0", "2DG" = "#dd4124")), 
+                "AM14 MRL/lpr Mice\n(Significant DEGs)",
+                "AM14 MRLlpr DEG heatmap - unsupervised", 
+                unsupervised = TRUE, h = 1500, w = 1250)
+    
 
 # Make a data.frame that summarizes the numbers of DEGs detected -------------
   full_summary <- join_all(list(summary_wrapper(deseq_res$AM14transfer$PL23_2DG_v_Ctrl, "PL2-3+2DG vs PL2-3", "AM14 Adoptive Transfer", 0.05, 1),

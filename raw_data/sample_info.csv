@@ -1,47 +1,47 @@
-Sample,Label_Name,Mouse_Number,Experiment,Cohort,Treatment,Stimulation,Drug,heatmap_col1
-AM14_P1,PL2-3 (M1),1,AM14_Transfer,A1,PL23,PL23,Control,AM14 Transfer + PL2-3 Stimulation
-AM14_P2,PL2-3 (M2),2,AM14_Transfer,A1,PL23,PL23,Control,AM14 Transfer + PL2-3 Stimulation
-AM14_P3,PL2-3 (M3),3,AM14_Transfer,A1,PL23,PL23,Control,AM14 Transfer + PL2-3 Stimulation
-AM14_P4,PL2-3 (M4),4,AM14_Transfer,A2,PL23,PL23,Control,AM14 Transfer + PL2-3 Stimulation
-AM14_P5,PL2-3 (M5),5,AM14_Transfer,A2,PL23,PL23,Control,AM14 Transfer + PL2-3 Stimulation
-AM14_P2_1,PL2-3+2DG (M1),1,AM14_Transfer,A1,PL23_2DG,PL23,2DG,AM14 Transfer + PL2-3 Stimulation
-AM14_P2_2,PL2-3+2DG (M2),2,AM14_Transfer,A1,PL23_2DG,PL23,2DG,AM14 Transfer + PL2-3 Stimulation
-AM14_P2_3,PL2-3+2DG (M3),3,AM14_Transfer,A1,PL23_2DG,PL23,2DG,AM14 Transfer + PL2-3 Stimulation
-AM14_P2_4,PL2-3+2DG (M4),4,AM14_Transfer,A2,PL23_2DG,PL23,2DG,AM14 Transfer + PL2-3 Stimulation
-AM14_P2_5,PL2-3+2DG (M5),5,AM14_Transfer,A2,PL23_2DG,PL23,2DG,AM14 Transfer + PL2-3 Stimulation
-AM14_R_1,R848 (M1),1,AM14_Transfer,A1,R848,R848,Control,AM14 Transfer + R848 Stimulation
-AM14_R_2,R848 (M2),2,AM14_Transfer,A1,R848,R848,Control,AM14 Transfer + R848 Stimulation
-AM14_R_3,R848 (M3),3,AM14_Transfer,A2,R848,R848,Control,AM14 Transfer + R848 Stimulation
-AM14_R_4,R848 (M4),4,AM14_Transfer,A2,R848,R848,Control,AM14 Transfer + R848 Stimulation
-AM14_R_5,R848 (M5),5,AM14_Transfer,A2,R848,R848,Control,AM14 Transfer + R848 Stimulation
-AM14_R2_1,R848+2DG (M2),1,AM14_Transfer,A1,R848_2DG,R848,2DG,AM14 Transfer + R848 Stimulation
-AM14_R2_2,R848+2DG (M3),2,AM14_Transfer,A1,R848_2DG,R848,2DG,AM14 Transfer + R848 Stimulation
-AM14_R2_3,R848+2DG (M4),3,AM14_Transfer,A2,R848_2DG,R848,2DG,AM14 Transfer + R848 Stimulation
-AM14_R2_4,R848+2DG (M5),4,AM14_Transfer,A2,R848_2DG,R848,2DG,AM14 Transfer + R848 Stimulation
-AM14_R2_5,R848+2DG (M6),5,AM14_Transfer,A2,R848_2DG,R848,2DG,AM14 Transfer + R848 Stimulation
-B18_2DG_M1,NP+2DG (M1),1,B18_Transfer,B1,NP_2DG,NP,2DG,B1-8 Transfer + NP Stimulation
-B18_2DG_M2,NP+2DG (M2),2,B18_Transfer,B1,NP_2DG,NP,2DG,B1-8 Transfer + NP Stimulation
-B18_2DG_M3,NP+2DG (M3),3,B18_Transfer,B1,NP_2DG,NP,2DG,B1-8 Transfer + NP Stimulation
-B18_2DG_M4,NP+2DG (M4),4,B18_Transfer,B1,NP_2DG,NP,2DG,B1-8 Transfer + NP Stimulation
-B18_2DG_M5,NP+2DG (M5),5,B18_Transfer,B1,NP_2DG,NP,2DG,B1-8 Transfer + NP Stimulation
-B18_Ctrl_M6,NP (M6),6,B18_Transfer,B1,NP,NP,Control,B1-8 Transfer + NP Stimulation
-B18_Ctrl_M7,NP (M7),7,B18_Transfer,B1,NP,NP,Control,B1-8 Transfer + NP Stimulation
-B18_Ctrl_M8,NP (M8),8,B18_Transfer,B1,NP,NP,Control,B1-8 Transfer + NP Stimulation
-B18_Ctrl_M9,NP (M9),9,B18_Transfer,B1,NP,NP,Control,B1-8 Transfer + NP Stimulation
-MRL_C1,Control (M1),1,AM14_MRLlpr,M1,Control,N/A,Control,AM14 MRL/lpr
-MRL_C2,Control (M2),2,AM14_MRLlpr,M1,Control,N/A,Control,AM14 MRL/lpr
-MRL_C3,Control (M3),3,AM14_MRLlpr,M2,Control,N/A,Control,AM14 MRL/lpr
-MRL_C4,Control (M4),4,AM14_MRLlpr,M2,Control,N/A,Control,AM14 MRL/lpr
-MRL_C5,Control (M5),5,AM14_MRLlpr,M2,Control,N/A,Control,AM14 MRL/lpr
-MRL_C6,Control (M6),6,AM14_MRLlpr,M2,Control,N/A,Control,AM14 MRL/lpr
-MRL_C7,Control (M7),7,AM14_MRLlpr,M2,Control,N/A,Control,AM14 MRL/lpr
-MRL_C8,Control (M8),8,AM14_MRLlpr,M2,Control,N/A,Control,AM14 MRL/lpr
-MRL_2DG_1,2DG (M1),1,AM14_MRLlpr,M1,2DG,N/A,2DG,AM14 MRL/lpr
-MRL_2DG_2,2DG (M2),2,AM14_MRLlpr,M1,2DG,N/A,2DG,AM14 MRL/lpr
-MRL_2DG_3,2DG (M3),3,AM14_MRLlpr,M2,2DG,N/A,2DG,AM14 MRL/lpr
-MRL_2DG_4,2DG (M4),4,AM14_MRLlpr,M2,2DG,N/A,2DG,AM14 MRL/lpr
-MRL_2DG_5,2DG (M5),5,AM14_MRLlpr,M2,2DG,N/A,2DG,AM14 MRL/lpr
-MRL_2DG_6,2DG (M6),6,AM14_MRLlpr,M2,2DG,N/A,2DG,AM14 MRL/lpr
-MRL_2DG_7,2DG (M7),7,AM14_MRLlpr,M2,2DG,N/A,2DG,AM14 MRL/lpr
-MRL_2DG_8,2DG (M8),8,AM14_MRLlpr,M2,2DG,N/A,2DG,AM14 MRL/lpr
-MRL_2DG_9,2DG (M8),9,AM14_MRLlpr,M2,2DG,N/A,2DG,AM14 MRL/lpr
+Sample,Label_Name,Mouse_Number,Experiment,Cohort,Treatment,Stimulation,Drug,heatmap_col1,barplot_info
+AM14_P1,PL2-3_M1,1,AM14_Transfer,A1,PL23,PL23,Control,AM14 Transfer + PL2-3 Stimulation,PL2-3_Control_M1
+AM14_P2,PL2-3_M2,2,AM14_Transfer,A1,PL23,PL23,Control,AM14 Transfer + PL2-3 Stimulation,PL2-3_Control_M2
+AM14_P3,PL2-3_M3,3,AM14_Transfer,A1,PL23,PL23,Control,AM14 Transfer + PL2-3 Stimulation,PL2-3_Control_M3
+AM14_P4,PL2-3_M4,4,AM14_Transfer,A2,PL23,PL23,Control,AM14 Transfer + PL2-3 Stimulation,PL2-3_Control_M4
+AM14_P5,PL2-3_M5,5,AM14_Transfer,A2,PL23,PL23,Control,AM14 Transfer + PL2-3 Stimulation,PL2-3_Control_M5
+AM14_P2_1,PL2-3+2DG_M1,1,AM14_Transfer,A1,PL23_2DG,PL23,2DG,AM14 Transfer + PL2-3 Stimulation,PL2-3_2DG_M1
+AM14_P2_2,PL2-3+2DG_M2,2,AM14_Transfer,A1,PL23_2DG,PL23,2DG,AM14 Transfer + PL2-3 Stimulation,PL2-3_2DG_M2
+AM14_P2_3,PL2-3+2DG_M3,3,AM14_Transfer,A1,PL23_2DG,PL23,2DG,AM14 Transfer + PL2-3 Stimulation,PL2-3_2DG_M3
+AM14_P2_4,PL2-3+2DG_M4,4,AM14_Transfer,A2,PL23_2DG,PL23,2DG,AM14 Transfer + PL2-3 Stimulation,PL2-3_2DG_M4
+AM14_P2_5,PL2-3+2DG_M5,5,AM14_Transfer,A2,PL23_2DG,PL23,2DG,AM14 Transfer + PL2-3 Stimulation,PL2-3_2DG_M5
+AM14_R_1,R848_M1,1,AM14_Transfer,A1,R848,R848,Control,AM14 Transfer + R848 Stimulation,R848_Control_M1
+AM14_R_2,R848_M2,2,AM14_Transfer,A1,R848,R848,Control,AM14 Transfer + R848 Stimulation,R848_Control_M2
+AM14_R_3,R848_M3,3,AM14_Transfer,A2,R848,R848,Control,AM14 Transfer + R848 Stimulation,R848_Control_M3
+AM14_R_4,R848_M4,4,AM14_Transfer,A2,R848,R848,Control,AM14 Transfer + R848 Stimulation,R848_Control_M4
+AM14_R_5,R848_M5,5,AM14_Transfer,A2,R848,R848,Control,AM14 Transfer + R848 Stimulation,R848_Control_M5
+AM14_R2_1,R848+2DG_M2,1,AM14_Transfer,A1,R848_2DG,R848,2DG,AM14 Transfer + R848 Stimulation,R848_2DG_M2
+AM14_R2_2,R848+2DG_M3,2,AM14_Transfer,A1,R848_2DG,R848,2DG,AM14 Transfer + R848 Stimulation,R848_2DG_M3
+AM14_R2_3,R848+2DG_M4,3,AM14_Transfer,A2,R848_2DG,R848,2DG,AM14 Transfer + R848 Stimulation,R848_2DG_M4
+AM14_R2_4,R848+2DG_M5,4,AM14_Transfer,A2,R848_2DG,R848,2DG,AM14 Transfer + R848 Stimulation,R848_2DG_M5
+AM14_R2_5,R848+2DG_M6,5,AM14_Transfer,A2,R848_2DG,R848,2DG,AM14 Transfer + R848 Stimulation,R848_2DG_M6
+B18_2DG_M1,NP+2DG_M1,1,B18_Transfer,B1,NP_2DG,NP,2DG,B1-8 Transfer + NP Stimulation,NP_2DG_M1
+B18_2DG_M2,NP+2DG_M2,2,B18_Transfer,B1,NP_2DG,NP,2DG,B1-8 Transfer + NP Stimulation,NP_2DG_M2
+B18_2DG_M3,NP+2DG_M3,3,B18_Transfer,B1,NP_2DG,NP,2DG,B1-8 Transfer + NP Stimulation,NP_2DG_M3
+B18_2DG_M4,NP+2DG_M4,4,B18_Transfer,B1,NP_2DG,NP,2DG,B1-8 Transfer + NP Stimulation,NP_2DG_M4
+B18_2DG_M5,NP+2DG_M5,5,B18_Transfer,B1,NP_2DG,NP,2DG,B1-8 Transfer + NP Stimulation,NP_2DG_M5
+B18_Ctrl_M6,NP_M6,6,B18_Transfer,B1,NP,NP,Control,B1-8 Transfer + NP Stimulation,NP_Control_M6
+B18_Ctrl_M7,NP_M7,7,B18_Transfer,B1,NP,NP,Control,B1-8 Transfer + NP Stimulation,NP_Control_M7
+B18_Ctrl_M8,NP_M8,8,B18_Transfer,B1,NP,NP,Control,B1-8 Transfer + NP Stimulation,NP_Control_M8
+B18_Ctrl_M9,NP_M9,9,B18_Transfer,B1,NP,NP,Control,B1-8 Transfer + NP Stimulation,NP_Control_M9
+MRL_C1,Control_M1,1,AM14_MRLlpr,M1,Control,N/A,Control,AM14 MRL/lpr,AM14MRLlpr_Control_M1
+MRL_C2,Control_M2,2,AM14_MRLlpr,M1,Control,N/A,Control,AM14 MRL/lpr,AM14MRLlpr_Control_M2
+MRL_C3,Control_M3,3,AM14_MRLlpr,M2,Control,N/A,Control,AM14 MRL/lpr,AM14MRLlpr_Control_M3
+MRL_C4,Control_M4,4,AM14_MRLlpr,M2,Control,N/A,Control,AM14 MRL/lpr,AM14MRLlpr_Control_M4
+MRL_C5,Control_M5,5,AM14_MRLlpr,M2,Control,N/A,Control,AM14 MRL/lpr,AM14MRLlpr_Control_M5
+MRL_C6,Control_M6,6,AM14_MRLlpr,M2,Control,N/A,Control,AM14 MRL/lpr,AM14MRLlpr_Control_M6
+MRL_C7,Control_M7,7,AM14_MRLlpr,M2,Control,N/A,Control,AM14 MRL/lpr,AM14MRLlpr_Control_M7
+MRL_C8,Control_M8,8,AM14_MRLlpr,M2,Control,N/A,Control,AM14 MRL/lpr,AM14MRLlpr_Control_M8
+MRL_2DG_1,2DG_M1,1,AM14_MRLlpr,M1,2DG,N/A,2DG,AM14 MRL/lpr,AM14MRLlpr_2DG_M1
+MRL_2DG_2,2DG_M2,2,AM14_MRLlpr,M1,2DG,N/A,2DG,AM14 MRL/lpr,AM14MRLlpr_2DG_M2
+MRL_2DG_3,2DG_M3,3,AM14_MRLlpr,M2,2DG,N/A,2DG,AM14 MRL/lpr,AM14MRLlpr_2DG_M3
+MRL_2DG_4,2DG_M4,4,AM14_MRLlpr,M2,2DG,N/A,2DG,AM14 MRL/lpr,AM14MRLlpr_2DG_M4
+MRL_2DG_5,2DG_M5,5,AM14_MRLlpr,M2,2DG,N/A,2DG,AM14 MRL/lpr,AM14MRLlpr_2DG_M5
+MRL_2DG_6,2DG_M6,6,AM14_MRLlpr,M2,2DG,N/A,2DG,AM14 MRL/lpr,AM14MRLlpr_2DG_M6
+MRL_2DG_7,2DG_M7,7,AM14_MRLlpr,M2,2DG,N/A,2DG,AM14 MRL/lpr,AM14MRLlpr_2DG_M7
+MRL_2DG_8,2DG_M8,8,AM14_MRLlpr,M2,2DG,N/A,2DG,AM14 MRL/lpr,AM14MRLlpr_2DG_M8
+MRL_2DG_9,2DG_M9,9,AM14_MRLlpr,M2,2DG,N/A,2DG,AM14 MRL/lpr,AM14MRLlpr_2DG_M9
