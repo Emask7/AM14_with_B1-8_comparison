@@ -1,5 +1,4 @@
 # install.packages(c("arsenal", "BiocManager", "dplyr", "ggarchery", "ggplot2", "MetBrewer", "openxlsx", "plotrix", "plyr", "PNWColors", "RColorBrewer", "scales", "stringi", "tidyr", "tidyverse", "wesanderson")
-# install.packages(c("colorblindcheck", "ggrepel", "grid", "gridBase", "gridExtra", "igraph", "readr", "VennDiagram"))
 
 library(arsenal)
 library(dplyr)
@@ -16,19 +15,10 @@ library(stringi)
 library(tidyr)
 library(tidyverse)
 library(wesanderson)
-# library(colorblindcheck)
-# library(ggrepel)
-# library(grid)
-# library(gridBase)
-# library(gridExtra)
-# library(igraph)
-# library(readr)
-# library(VennDiagram)
 
 
 library(BiocManager)
 # BiocManager::install(c("clusterProfiler", "ComplexHeatmap", "DESeq2", "DOSE", "EnhancedVolcano", "enrichplot", "ExperimentHub", "fgsea", "forcats", "GSEABase", "limma", "msigdb", "org.Mm.eg.db", "pheatmap", "ReactomePA", "sva", "VennDetail"))
-# BiocManager::install(c("apeglm", "GOSemSim", "pathview", "vsn"))
 
 library(clusterProfiler)
 library(ComplexHeatmap)
@@ -47,6 +37,21 @@ library(pheatmap)
 library(ReactomePA)
 library(sva)
 library(VennDetail)
+
+
+
+# Packages I haven't used
+# install.packages(c("colorblindcheck", "ggrepel", "grid", "gridBase", "gridExtra", "igraph", "readr", "VennDiagram"))
+# library(colorblindcheck)
+# library(ggrepel)
+# library(grid)
+# library(gridBase)
+# library(gridExtra)
+# library(igraph)
+# library(readr)
+# library(VennDiagram)
+
+# BiocManager::install(c("apeglm", "GOSemSim", "pathview", "vsn"))
 # library(apeglm)
 # library(GOSemSim)
 # library(pathview)
