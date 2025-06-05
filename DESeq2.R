@@ -90,29 +90,28 @@
 
   QC_PCAplot(dds_AM14trans, "AM14_Adoptive_Transfer-Before_Batch_Correction",
              "AM14 Adoptive Transfer\n(Before Batch Correction)",
-             batch_effect = FALSE)
+             batch_effect = FALSE, draw_ellipse = TRUE)
   dev.off()
   
   QC_PCAplot(dds_AM14trans, "AM14_Adoptive_Transfer-After_Batch_Correction",
              "AM14 Adoptive Transfer\n(After Batch Correction)",
-             batch_effect = TRUE)
+             batch_effect = TRUE, draw_ellipse = TRUE)
   dev.off()
 
   QC_PCAplot(dds_B18trans, "B1-8_Adoptive_Transfer","B1-8 Adoptive Transfer",
-             batch_effect = NULL)
+             batch_effect = NULL, draw_ellipse = TRUE)
   dev.off()
 
   QC_PCAplot(dds_AM14MRLlpr, "AM14_MRLlpr-Before_Batch_Correction",
              "AM14 MRL/lpr mice +/- 2DG\n(Before Batch Correction)",
-             batch_effect = FALSE)
+             batch_effect = FALSE, draw_ellipse = TRUE)
   dev.off()
   QC_PCAplot(dds_AM14MRLlpr, "AM14_MRLlpr-After_Batch_Correction",
              "AM14 MRL/lpr mice +/- 2DG\n(After Batch Correction)",
-             batch_effect = TRUE)
+             batch_effect = TRUE, draw_ellipse = TRUE)
   dev.off()
 
 # Differential Expression Analysis ---------------------------------------------
-  resultsNames(dds_PL23vNP)
   resultsNames(dds_AM14trans)
   resultsNames(dds_B18trans)
   resultsNames(dds_AM14MRLlpr)
@@ -136,6 +135,7 @@
     AM14_DEGs <- DEG_list(list(deseq_res$AM14transfer$PL23_2DG_v_Ctrl,
                                deseq_res$AM14transfer$R848_2DG_v_Ctrl,
                                deseq_res$AM14transfer$PL23_vs_R848))
+    head(AM14_DEGs)
   
     AM14_DEGs_PL23only <- DEG_list(list(deseq_res$AM14transfer$PL23_2DG_v_Ctrl))
     head(AM14_DEGs_PL23only)
