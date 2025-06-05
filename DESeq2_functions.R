@@ -1,3 +1,9 @@
+# Import Rosalind data
+## This function reads in a .txt file containing raw count data exported from ROSALIND.
+## You have to use the "_rawCountsWithAnnotations.txt" file for the columns to be correct.
+## It then filters the count data to exclude Ig gene fragments (using RegEx format),
+## then removes duplicated lines, and sets the rownames to be the ensembl gene ID.
+## There are a few lines (that are currently commented out) that remove ribosomal RNA sequences.
 import_Rosalind_data <- function(res_file){
   temp_cts <- read.delim(res_file)
   temp_cts <- temp_cts %>%
@@ -8,8 +14,6 @@ import_Rosalind_data <- function(res_file){
     filter(!grepl("Igkv\\d", external_gene_name)) %>%
     filter(!grepl("Iglj\\d", external_gene_name)) %>%
     filter(!grepl("Iglv\\d", external_gene_name))
-    # filter(!grepl("Igh", external_gene_name)) %>%
-    # filter(!grepl("Igk", external_gene_name)) # %>%
     # filter(!grepl("7SK", external_gene_name)) %>%
     # filter(!grepl("5_8S_rRNA", external_gene_name)) %>%
     # filter(!grepl("5S_rRNA", external_gene_name))
@@ -20,6 +24,9 @@ import_Rosalind_data <- function(res_file){
   return(temp_cts)
 }
 
+
+# Generate heatmaps for quality control
+## Input is a 
 QC_heatmaps <- function(dds, filename_start, plot_title){
   # Transform data -------------------------------------------------------------
     vsd <- vst(dds)
