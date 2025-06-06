@@ -198,7 +198,7 @@
         PL23_vs_R848 = results_wrapper(dds_AM14trans_co2, c("Treatment", "PL23", "R848"), gene_IDs$AM14trans)
       )
   ),
-    B18transfer = results_wrapper(dds_B18trans, c("Treatment", "NP_2DG", "NP"), gene_IDs$B18trans),
+    # B18transfer = results_wrapper(dds_B18trans, c("Treatment", "NP_2DG", "NP"), gene_IDs$B18trans),
     AM14MRLlpr = list(
       co1 = results_wrapper(dds_AM14MRLlpr_co1, c("Treatment", "2DG", "Control"), gene_IDs$AM14MRLlpr),
       co2 = results_wrapper(dds_AM14MRLlpr_co2, c("Treatment", "2DG", "Control"), gene_IDs$AM14MRLlpr)
