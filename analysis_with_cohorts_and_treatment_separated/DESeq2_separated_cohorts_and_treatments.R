@@ -153,12 +153,12 @@
              batch_effect = NULL, draw_ellipse = TRUE)
   dev.off()
 
-# Differential Expression Analysis ---------------------------------------------
-  resultsNames(dds_AM14trans_co1)
-  resultsNames(dds_AM14trans_co2)
-  resultsNames(dds_B18trans)
-  resultsNames(dds_AM14MRLlpr_co1)
-  resultsNames(dds_AM14MRLlpr_co2)
+# # Differential Expression Analysis ---------------------------------------------
+#   resultsNames(dds_AM14trans_co1)
+#   resultsNames(dds_AM14trans_co2)
+#   resultsNames(dds_B18trans)
+#   resultsNames(dds_AM14MRLlpr_co1)
+#   resultsNames(dds_AM14MRLlpr_co2)
   
 # Get DESeq2 results -----------------------------------------------------------
   deseq_res <- list(
@@ -191,12 +191,24 @@
                 "AM14 adoptive transfer - PL2-3",
                 unsupervised = TRUE, h = 1500, w = 1250)
     
+    DEG_heatmap(dds_AM14trans_PL23, AM14_PL23_DEGs, 
+                list(Treatment = c(PL23 = "#0f85a0", PL23_2DG = "#dd4124")),
+                "AM14 Adoptive Transfer: PL2-3 + 2DG vs PL2-3\n(Supervised Clustering)",
+                "AM14 adoptive transfer - PL2-3 - supervised",
+                unsupervised = FALSE, h = 1500, w = 1250)
+    
     DEG_heatmap(dds_AM14trans_R848, AM14_R848_DEGs, 
                 list(Treatment = c(R848 = "#0f85a0", R848_2DG = "#dd4124")),
                 "AM14 Adoptive Transfer: R848 + 2DG vs R848\n(Unsupervised Clustering)",
                 "AM14 adoptive transfer - R848",
                 unsupervised = TRUE, h = 1500, w = 1250)
 
+    DEG_heatmap(dds_AM14trans_R848, AM14_R848_DEGs, 
+                list(Treatment = c(R848 = "#0f85a0", R848_2DG = "#dd4124")),
+                "AM14 Adoptive Transfer: R848 + 2DG vs R848\n(Supervised Clustering)",
+                "AM14 adoptive transfer - R848 - Supervised",
+                unsupervised = FALSE, h = 1500, w = 1250)
+    
     # DEG_heatmap(dds_B18trans, DEG_list(list(deseq_res$B18transfer)), 
     #             list(Treatment = c(NP = "#0f85a0", NP_2DG = "#dd4124")), 
     #             "B1-8 Adoptive Transfer\n(Significant DEGs)",
@@ -208,6 +220,13 @@
                 "AM14 MRL/lpr Mice: 2DG vs Control\n(Unsupervised Clustering)",
                 "AM14 MRLlpr DEG heatmap - Cohort 2", 
                 unsupervised = TRUE, h = 1500, w = 1250)
+    
+    DEG_heatmap(dds_AM14MRLlpr, DEG_list(list(deseq_res$AM14MRLlpr), lfc_cutoff = 1.0), 
+                list(Treatment = c(Control = "#0f85a0", "2DG" = "#dd4124")), 
+                "AM14 MRL/lpr Mice: 2DG vs Control\n(Supervised Clustering)",
+                "AM14 MRLlpr DEG heatmap - Cohort 2 - Supervised", 
+                unsupervised = FALSE, h = 1500, w = 1250)
+    
     
 
 # Make a data.frame that summarizes the numbers of DEGs detected -------------
