@@ -4,7 +4,9 @@
   ## It then filters the count data to exclude Ig gene fragments (using RegEx format),
   ## then removes duplicated lines, and sets the rownames to be the ensembl gene ID.
   ## There are a few lines (that are currently commented out) that remove ribosomal RNA sequences.
-  import_Rosalind_data <- function(res_file){
+  import_Rosalind_data <- function(res_file, ipa_format){
+    if(missing(ipa_format)) ipa_format <- FALSE
+    
     temp_cts <- read.delim(res_file)
     temp_cts <- temp_cts %>%
       filter(!grepl("Ighd\\d", external_gene_name)) %>%
@@ -17,7 +19,10 @@
       # filter(!grepl("7SK", external_gene_name)) %>%
       # filter(!grepl("5_8S_rRNA", external_gene_name)) %>%
       # filter(!grepl("5S_rRNA", external_gene_name))
-    temp_cts <- temp_cts[, c(1:4, 12:ncol(temp_cts))]
+    
+    if(ipa_format == TRUE) temp_cts <- temp_cts[, c(1:2, 4:5, 7, 9, 12:ncol(temp_cts))]
+    else temp_cts <- temp_cts[, c(1:4, 12:ncol(temp_cts))]
+
     temp_cts <- temp_cts[!duplicated(temp_cts), ]
     temp_cts <- temp_cts[!duplicated(temp_cts$ensembl_gene_id), ]
     rownames(temp_cts) <- temp_cts$ensembl_gene_id

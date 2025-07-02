@@ -1,23 +1,26 @@
+setwd("Z:/Emma Mask/R_projects/AM14_with_B1-8_comparison/")
+getwd()
+
 # Import raw counts from Rosalind output ---------------------------------------
-  cts_AM14trans <- import_Rosalind_data("raw_data/AM14_Adoptive_Transfer_rawCountsWithAnnotations.txt")
-  # cts_B18trans <- import_Rosalind_data("raw_data/B1-8_Adoptive_Transfer_rawCountsWithAnnotations.txt")
-  cts_AM14MRLlpr <- import_Rosalind_data("raw_data/AM14_MRLlpr_rawCountsWithAnnotations.txt")
+  cts_AM14trans <- import_Rosalind_data("raw_data/AM14_Adoptive_Transfer_rawCountsWithAnnotations.txt", ipa_format = TRUE)
+  cts_B18trans <- import_Rosalind_data("raw_data/B1-8_Adoptive_Transfer_rawCountsWithAnnotations.txt", ipa_format = TRUE)
+  cts_AM14MRLlpr <- import_Rosalind_data("raw_data/AM14_MRLlpr_rawCountsWithAnnotations.txt", ipa_format = TRUE)
 
   # Save a table of gene IDs in case they need to be converted later -----------
-    gene_IDs <- list(AM14trans = cts_AM14trans[, c(1:4)],
-                     # B18trans = cts_B18trans[, c(1:4)],
-                     AM14MRLlpr = cts_AM14MRLlpr[, c(1:4)])
+    gene_IDs <- list(AM14trans = cts_AM14trans[, c(1:6)],
+                     B18trans = cts_B18trans[, c(1:6)],
+                     AM14MRLlpr = cts_AM14MRLlpr[, c(1:6)])
         
   # Remove extra columns from cts ----------------------------------------------
-    cts_AM14trans <- cts_AM14trans[, c(5:24)]
+    cts_AM14trans <- cts_AM14trans[, c(7:26)]
     cts_AM14trans_PL23 <- cts_AM14trans[, c(1:3, 6:8)]
     cts_AM14trans_R848 <- cts_AM14trans[, c(13:15, 18:20)]
-  # cts_B18trans <- cts_B18trans[, c(5:13)]
-    cts_AM14MRLlpr <- cts_AM14MRLlpr[, c(7:12, 15:21)]
+    cts_B18trans <- cts_B18trans[, c(7:15)]
+    cts_AM14MRLlpr <- cts_AM14MRLlpr[, c(9:14, 17:23)]
   
     head(cts_AM14trans_PL23)
     head(cts_AM14trans_R848)
-    # head(cts_B18trans)
+    head(cts_B18trans)
     head(cts_AM14MRLlpr)
 
 # Set up experimental factors --------------------------------------------------
@@ -35,10 +38,10 @@
   cd_AM14trans_R848$Treatment <- factor(cd_AM14trans_R848$Treatment)
   cd_AM14trans_R848
   
-  # cd_B18trans <- coldata[21:29, ]
-  # cd_B18trans$Cohort <- factor(cd_B18trans$Cohort)
-  # cd_B18trans$Treatment <- factor(cd_B18trans$Treatment)
-  # cd_B18trans
+  cd_B18trans <- coldata[21:29, ]
+  cd_B18trans$Cohort <- factor(cd_B18trans$Cohort)
+  cd_B18trans$Treatment <- factor(cd_B18trans$Treatment)
+  cd_B18trans
   
   cd_AM14MRLlpr <- filter(coldata, Cohort == "M2")
   cd_AM14MRLlpr$Cohort <- factor(cd_AM14MRLlpr$Cohort)
@@ -54,10 +57,10 @@
       if(colnames(cts_AM14trans_R848)[x] == cd_AM14trans_R848$Sample[x]) print(c(x, "true"))
       else print(c(x, "false"))
     }
-    # for (x in 1:ncol(cts_B18trans)) {
-    #   if(colnames(cts_B18trans)[x] == cd_B18trans$Sample[x]) print(c(x, "true"))
-    #   else print(c(x, "false"))
-    # }
+    for (x in 1:ncol(cts_B18trans)) {
+      if(colnames(cts_B18trans)[x] == cd_B18trans$Sample[x]) print(c(x, "true"))
+      else print(c(x, "false"))
+    }
     for (x in 1:ncol(cts_AM14MRLlpr)) {
       if(colnames(cts_AM14MRLlpr)[x] == cd_AM14MRLlpr$Sample[x]) print(c(x, "true"))
       else print(c(x, "false"))
@@ -105,15 +108,15 @@
     resultsNames(dds_AM14trans_R848)
     rm(keep)
 
-    # dds_B18trans <- DESeqDataSetFromMatrix(countData = cts_B18trans, 
-    #                                        colData = cd_B18trans,
-    #                                        design = ~Treatment)
-    # dds_B18trans
-    # keep <- rowSums(counts(dds_B18trans) >= 10) >= 4
-    # dds_B18trans <- dds_B18trans[keep,]
-    # dds_B18trans <- DESeq(dds_B18trans)
-    # resultsNames(dds_B18trans)
-    # rm(keep)
+    dds_B18trans <- DESeqDataSetFromMatrix(countData = cts_B18trans,
+                                           colData = cd_B18trans,
+                                           design = ~Treatment)
+    dds_B18trans
+    keep <- rowSums(counts(dds_B18trans) >= 10) >= 4
+    dds_B18trans <- dds_B18trans[keep,]
+    dds_B18trans <- DESeq(dds_B18trans)
+    resultsNames(dds_B18trans)
+    rm(keep)
     
     dds_AM14MRLlpr <- DESeqDataSetFromMatrix(countData = cts_AM14MRLlpr,
                                                  colData = cd_AM14MRLlpr,
@@ -143,34 +146,28 @@
   dev.off()
   
   
-  # QC_heatmaps(dds_B18trans, "B18_Adoptive_Transfer", "B1-8 Adoptive Transfer", plot_cohorts = FALSE)
-  # QC_PCAplot(dds_B18trans, "B1-8_Adoptive_Transfer", "B1-8 Adoptive Transfer",
-  #            batch_effect = NULL, draw_ellipse = TRUE)
-  # dev.off()
+  QC_heatmaps(dds_B18trans, "B18_Adoptive_Transfer", "B1-8 Adoptive Transfer", plot_cohorts = FALSE)
+  QC_PCAplot(dds_B18trans, "B1-8_Adoptive_Transfer", "B1-8 Adoptive Transfer",
+             batch_effect = NULL, draw_ellipse = TRUE)
+  dev.off()
 
   QC_heatmaps(dds_AM14MRLlpr, "AM14_MRLlpr", "AM14 MRL/lpr +/- 2DG (Cohort 2)", plot_cohorts = FALSE)
   QC_PCAplot(dds_AM14MRLlpr, "AM14_MRLlpr", "AM14 MRL/lpr mice +/- 2DG (Cohort 2)",
              batch_effect = NULL, draw_ellipse = TRUE)
   dev.off()
 
-# # Differential Expression Analysis ---------------------------------------------
-#   resultsNames(dds_AM14trans_co1)
-#   resultsNames(dds_AM14trans_co2)
-#   resultsNames(dds_B18trans)
-#   resultsNames(dds_AM14MRLlpr_co1)
-#   resultsNames(dds_AM14MRLlpr_co2)
-  
 # Get DESeq2 results -----------------------------------------------------------
   deseq_res <- list(
     AM14transfer_PL23 = results_wrapper(dds_AM14trans_PL23, c("Treatment", "PL23_2DG", "PL23"), gene_IDs$AM14trans),
     AM14transfer_R848 = results_wrapper(dds_AM14trans_R848, c("Treatment", "R848_2DG", "R848"), gene_IDs$AM14trans),
-    # B18transfer = results_wrapper(dds_B18trans, c("Treatment", "NP_2DG", "NP"), gene_IDs$B18trans),
+    B18transfer = results_wrapper(dds_B18trans, c("Treatment", "NP_2DG", "NP"), gene_IDs$B18trans),
     AM14MRLlpr = results_wrapper(dds_AM14MRLlpr, c("Treatment", "2DG", "Control"), gene_IDs$AM14MRLlpr)
   )
   
   head(deseq_res$AM14transfer_PL23)
-  # head(deseq_res$B18transfer)
-  # head(deseq_res$AM14MRLlpr)
+  head(deseq_res$AM14transfer_R848)
+  head(deseq_res$B18transfer)
+  head(deseq_res$AM14MRLlpr)
   
   # DEG Heatmaps ---------------------------------------------------------------
     AM14_PL23_DEGs <- DEG_list(list(deseq_res$AM14transfer_PL23), lfc_cutoff = 1.0)
@@ -209,11 +206,17 @@
                 "AM14 adoptive transfer - R848 - Supervised",
                 unsupervised = FALSE, h = 1500, w = 1250)
     
-    # DEG_heatmap(dds_B18trans, DEG_list(list(deseq_res$B18transfer)), 
-    #             list(Treatment = c(NP = "#0f85a0", NP_2DG = "#dd4124")), 
-    #             "B1-8 Adoptive Transfer\n(Significant DEGs)",
-    #             "B1-8 adoptive transfer DEG heatmap",
-    #             unsupervised = TRUE, h = 1000, w = 1000)
+    DEG_heatmap(dds_B18trans, DEG_list(list(deseq_res$B18transfer)),
+                list(Treatment = c(NP = "#0f85a0", NP_2DG = "#dd4124")),
+                "B1-8 Adoptive Transfer\n(Significant DEGs)",
+                "B1-8 adoptive transfer DEG heatmap",
+                unsupervised = TRUE, h = 1000, w = 1000)
+    
+    DEG_heatmap(dds_B18trans, DEG_list(list(deseq_res$B18transfer)),
+                list(Treatment = c(NP = "#0f85a0", NP_2DG = "#dd4124")),
+                "B1-8 Adoptive Transfer\n(Significant DEGs)",
+                "B1-8 adoptive transfer DEG heatmap - Unsupervised",
+                unsupervised = FALSE, h = 1000, w = 1000)
     
     DEG_heatmap(dds_AM14MRLlpr, DEG_list(list(deseq_res$AM14MRLlpr), lfc_cutoff = 1.0), 
                 list(Treatment = c(Control = "#0f85a0", "2DG" = "#dd4124")), 
@@ -232,7 +235,7 @@
 # Make a data.frame that summarizes the numbers of DEGs detected -------------
   full_summary <- join_all(list(summary_wrapper(deseq_res$AM14transfer_PL23, "PL2-3+2DG vs PL2-3", "AM14 Adoptive Transfer: Cohort 1", 0.05, 1),
                                 summary_wrapper(deseq_res$AM14transfer_R848, "R848+2DG vs R848", "AM14 Adoptive Transfer: Cohort 2", 0.05, 1),
-                                # summary_wrapper(deseq_res$B18transfer, "NP+2DG vs NP", "B1-8 Adoptive Transfer", 0.05, 1),
+                                summary_wrapper(deseq_res$B18transfer, "NP+2DG vs NP", "B1-8 Adoptive Transfer", 0.05, 1),
                                 summary_wrapper(deseq_res$AM14MRLlpr, "2DG vs Control", "AM14 MRL/lpr: Cohort 2", 0.05, 1)),
                            type = "full")
   full_summary
@@ -244,15 +247,14 @@
   writeData(wb, "DEG Summaries", full_summary)
   
   addWorksheet(wb, "AM14 Co1 - PL23_2DG_vs_Ctrl")
-  # addWorksheet(wb, "B1-8 - 2DG_vs_Ctrl")
+  addWorksheet(wb, "B1-8 - 2DG_vs_Ctrl")
   addWorksheet(wb, "AM14 Co2 - R848_2DG_vs_Ctrl")
   addWorksheet(wb, "AM14 MRLlpr Co2 - 2DG_vs_Ctrl")
   
   writeData(wb, "AM14 Co1 - PL23_2DG_vs_Ctrl", deseq_res$AM14transfer_PL23)
-  # writeData(wb, "B1-8 - 2DG_vs_Ctrl", deseq_res$B18transfer)
+  writeData(wb, "B1-8 - 2DG_vs_Ctrl", deseq_res$B18transfer)
   writeData(wb, "AM14 Co2 - R848_2DG_vs_Ctrl", deseq_res$AM14transfer_R848)
   writeData(wb, "AM14 MRLlpr Co2 - 2DG_vs_Ctrl", deseq_res$AM14MRLlpr)
-  
   
   saveWorkbook(wb, "Output/DESeq2_results.xlsx", overwrite = TRUE)
   rm(wb)

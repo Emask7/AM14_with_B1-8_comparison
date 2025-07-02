@@ -1,3 +1,6 @@
+setwd("Z:/Emma Mask/R_projects/AM14_with_B1-8_comparison/analysis_with_cohorts_and_treatment_separated")
+getwd()
+
 vp_data = list(
   PL23_2DG_v_Ctrl = deseq_res$AM14transfer_PL23[, c(2, 6, 10)],
   R848_2DG_v_Ctrl = deseq_res$AM14transfer_R848[, c(2, 6, 10)],
