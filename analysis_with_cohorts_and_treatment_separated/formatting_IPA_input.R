@@ -32,14 +32,13 @@ create_ipa_input <- function(ID_cols, file_name){
   return(res)
 }
 
-mouse_ensembl <- create_ipa_input(c(1), "mouse_ensembl")
-mouse_symbol <- create_ipa_input(c(2), "mouse_symbol")
-mouse_entrez <- create_ipa_input(c(3), "mouse_entrez")
 mouse_all <- create_ipa_input(c(1:3), "mouse_all_IDs")
-
-human_ensembl <- create_ipa_input(c(4), "human_ensembl")
-human_symbol <- create_ipa_input(c(5), "human_symbol")
-human_entrez <- create_ipa_input(c(6), "human_entrez")
 human_all <- create_ipa_input(c(4:6), "human_all_IDs")
 
+# mouse_ensembl <- create_ipa_input(c(1), "mouse_ensembl")
+# mouse_symbol <- create_ipa_input(c(2), "mouse_symbol")
+# mouse_entrez <- create_ipa_input(c(3), "mouse_entrez")
 
+# human_ensembl <- create_ipa_input(c(4), "human_ensembl")
+# human_symbol <- create_ipa_input(c(5), "human_symbol")
+# human_entrez <- create_ipa_input(c(6), "human_entrez")
