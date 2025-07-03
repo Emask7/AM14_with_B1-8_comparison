@@ -1,17 +1,28 @@
+setwd("Z:/Emma Mask/R_projects/AM14_with_B1-8_comparison/")
+getwd()
+
 # Import raw counts from Rosalind output ---------------------------------------
-  cts_AM14trans <- import_Rosalind_data("raw_data/AM14_Adoptive_Transfer_rawCountsWithAnnotations.txt")
-  cts_B18trans <- import_Rosalind_data("raw_data/B1-8_Adoptive_Transfer_rawCountsWithAnnotations.txt")
-  cts_AM14MRLlpr <- import_Rosalind_data("raw_data/AM14_MRLlpr_rawCountsWithAnnotations.txt")
+  cts_AM14trans <- import_Rosalind_data("raw_data/AM14_Adoptive_Transfer_rawCountsWithAnnotations.txt", ipa_format = TRUE)
+  cts_B18trans <- import_Rosalind_data("raw_data/B1-8_Adoptive_Transfer_rawCountsWithAnnotations.txt", ipa_format = TRUE)
+  cts_AM14MRLlpr <- import_Rosalind_data("raw_data/AM14_MRLlpr_rawCountsWithAnnotations.txt", ipa_format = TRUE)
 
   # Save a table of gene IDs in case they need to be converted later -----------
-    gene_IDs <- list(AM14trans = cts_AM14trans[, c(1:4)],
-                     B18trans = cts_B18trans[, c(1:4)],
-                     AM14MRLlpr = cts_AM14MRLlpr[, c(1:4)])
+    # gene_IDs <- list(AM14trans = cts_AM14trans[, c(1:4)],
+    #                  B18trans = cts_B18trans[, c(1:4)],
+    #                  AM14MRLlpr = cts_AM14MRLlpr[, c(1:4)])
+    gene_IDs <- list(AM14trans = cts_AM14trans[, c(1:6)],
+                     B18trans = cts_B18trans[, c(1:6)],
+                     AM14MRLlpr = cts_AM14MRLlpr[, c(1:6)])
+  
         
   # Remove extra columns from cts ----------------------------------------------
-    cts_AM14trans <- cts_AM14trans[, c(5:24)]
-    cts_B18trans <- cts_B18trans[, c(5:13)]
-    cts_AM14MRLlpr <- cts_AM14MRLlpr[, c(5:21)]
+    # cts_AM14trans <- cts_AM14trans[, c(5:24)]
+    # cts_B18trans <- cts_B18trans[, c(5:13)]
+    # cts_AM14MRLlpr <- cts_AM14MRLlpr[, c(5:21)]
+    cts_AM14trans <- cts_AM14trans[, c(7:26)]
+    cts_B18trans <- cts_B18trans[, c(7:15)]
+    cts_AM14MRLlpr <- cts_AM14MRLlpr[, c(7:23)]
+  
   
     head(cts_AM14trans)
     head(cts_B18trans)

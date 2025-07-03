@@ -1,10 +1,12 @@
+setwd("Z:/Emma Mask/R_projects/AM14_with_B1-8_comparison/")
+getwd()
 
 create_ipa_input <- function(ID_cols, file_name){
   if(missing(file_name)) file_name <- NULL
-  shared_cols <- colnames(deseq_res$AM14transfer_PL23[, ID_cols])
+  shared_cols <- colnames(deseq_res$AM14transfer$PL23_2DG_v_Ctrl[, ID_cols])
 
-  PL23 <- deseq_res$AM14transfer_PL23[, c(ID_cols, 8, 11:12)]
-  R848 <- deseq_res$AM14transfer_R848[, c(ID_cols, 8, 11:12)]
+  PL23 <- deseq_res$AM14transfer$PL23_2DG_v_Ctrl[, c(ID_cols, 8, 11:12)]
+  R848 <- deseq_res$AM14transfer$R848_2DG_v_Ctrl[, c(ID_cols, 8, 11:12)]
   NP <- deseq_res$B18transfer[, c(ID_cols, 8, 11:12)]
   MRLlpr <- deseq_res$AM14MRLlpr[, c(ID_cols, 8, 11:12)]
 
@@ -30,18 +32,10 @@ create_ipa_input <- function(ID_cols, file_name){
   return(res)
 }
 
-# For analysis with cohorts separated ------------------------------------------
-  setwd("Z:/Emma Mask/R_projects/AM14_with_B1-8_comparison/analysis_with_cohorts_and_treatment_separated")
+# For analysis with cohorts combined ------------------------------------------
+  setwd("Z:/Emma Mask/R_projects/AM14_with_B1-8_comparison")
   getwd()
   
   mouse_all <- create_ipa_input(c(1:3), "mouse_all_IDs")
   human_all <- create_ipa_input(c(4:6), "human_all_IDs")
-  
-  # mouse_ensembl <- create_ipa_input(c(1), "mouse_ensembl")
-  # mouse_symbol <- create_ipa_input(c(2), "mouse_symbol")
-  # mouse_entrez <- create_ipa_input(c(3), "mouse_entrez")
-  
-  # human_ensembl <- create_ipa_input(c(4), "human_ensembl")
-  # human_symbol <- create_ipa_input(c(5), "human_symbol")
-  # human_entrez <- create_ipa_input(c(6), "human_entrez")
   
