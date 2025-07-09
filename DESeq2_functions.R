@@ -199,30 +199,7 @@ results_wrapper <- function(dds, cons, IDs){
   else return(right_join(IDs, res))
 }
 
-# # Make a list of DEGs from a list of DESeq2 results ----------------------------
-# ## Function inputs:
-# ### dds_res_list = a list of data.frame objects containing DESeq2 results
-# ### lfc_cutoff = Log2Fold-Change value at which a DEG is considered significant.
-# ### ID_type = a string indicating what type of gene ID to use for the output
-# #### (this can be "external_gene_name", "entrezgene", or anything else. 
-# #### If it is anything other than "external_gene_name" or "entrezgene", it will be the external_gene_name by default)
-# DEG_list <- function(dds_res_list, lfc_cutoff, ID_type){
-#   if(missing(lfc_cutoff)) lfc_cutoff <- 1
-#   if(missing(ID_type)) ID_type <- "ensembl_gene_id"
-#   
-#   res <- c()
-#   for (df in dds_res_list) {
-#     DEGs <- dplyr::filter(df, padj < 0.05 & abs(log2FoldChange) > abs(lfc_cutoff))
-#     if(ID_type == "external_gene_name") DEGs <- DEGs$external_gene_name
-#     else if(ID_type == "entrezgene") DEGs <- DEGs$entrezgene
-#     else DEGs <- DEGs$ensembl_gene_id
-#     res <- append(res, DEGs)
-#   }
-# 
-#   res <- res[!duplicated(res)]
-#   return(res)
-# }
-
+# Make a heatmap of DEGs -------------------------------------------------------
 DEG_heatmap <- function(dds, dds_results, lfc_cutoff, color_list, plot_title, filename, h, w){
   if(missing(filename)) filename <- NULL
   if(missing(h)) h <- 2000
