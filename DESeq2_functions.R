@@ -1,9 +1,9 @@
 # Import Rosalind data ---------------------------------------------------------
-  ## This function reads in a .txt file containing raw count data exported from ROSALIND.
-  ## You have to use the "_rawCountsWithAnnotations.txt" file for the columns to be correct.
-  ## It then filters the count data to exclude Ig gene fragments (using RegEx format),
-  ## then removes duplicated lines, and sets the rownames to be the ensembl gene ID.
-  ## There are a few lines (that are currently commented out) that remove ribosomal RNA sequences.
+## This function reads in a .txt file containing raw count data exported from ROSALIND.
+## You have to use the "_rawCountsWithAnnotations.txt" file for the columns to be correct.
+## It then filters the count data to exclude Ig gene fragments (using RegEx format),
+## then removes duplicated lines, and sets the rownames to be the ensembl gene ID.
+## There are a few lines (that are currently commented out) that remove ribosomal RNA sequences.
   import_Rosalind_data <- function(res_file, ipa_format){
     if(missing(ipa_format)) ipa_format <- FALSE
     
@@ -30,22 +30,22 @@
   }
 
 # Generate heatmaps for quality control ----------------------------------------
-  ## Function inputs:
-    ### dds = a DESeqDataSet object
-    ### filename_start = the beginning of whatever you want the resulting images to be saved as
-    ### plot_title = the title of the plots
-    ### plot_cohorts = a TRUE or FALSE value indicating whether to add cohorts to the column data. Default is TRUE
-  ## if you use NULL for filename_start, the image won't save but it'll appear in RStudio (this is good if you're running it for the first time and want to try things out)
-  QC_heatmaps <- function(dds, filename_start, plot_title, plot_cohorts){
+## Function inputs:
+### dds = a DESeqDataSet object
+### filename_start = the beginning of whatever you want the resulting images to be saved as
+### plot_title = the title of the plots
+### plot_cohorts = a TRUE or FALSE value indicating whether to add cohorts to the column data. Default is TRUE
+### max_genes = maximum number of genes to include in the heatmap (this corresponds to the number of rows)
+## if you use NULL for filename_start, the image won't save but it'll appear in RStudio (this is good if you're running it for the first time and want to try things out)
+  QC_heatmaps <- function(dds, filename_start, plot_title, plot_cohorts, max_genes){
     if(missing(plot_cohorts)) plot_cohorts <- TRUE
-
-    # Transform data -----------------------------------------------------------
-      vsd <- vst(dds)
-      rld <- rlog(dds)
-      ntd <- normTransform(dds)
+    if(missing(max_genes)) max_genes <- 20
     
+    # Transform data -----------------------------------------------------------
+      rld <- rlog(dds)
+
     # Heatmap of count matrix --------------------------------------------------
-      select <- order(rowMeans(counts(dds,normalized=TRUE)), decreasing=TRUE)[1:20]
+      select <- order(rowMeans(counts(dds,normalized=TRUE)), decreasing=TRUE)[1:max_genes]
       
       if(plot_cohorts == TRUE) df <- as.data.frame(colData(dds)[, c("Treatment", "Cohort")])
       else {
@@ -59,88 +59,70 @@
         
         if(!file.exists("QC_results/")) dir.create("QC_results/")
         if(!file.exists("QC_results/Heatmaps/")) dir.create("QC_results/Heatmaps/")
-        # if there is not already a QC_results/Heatmaps/" folder, create one
-        
-        png(filename = stri_join(c("QC_results/Heatmaps/", filename_start, " - Normalized Counts Transformation.png"),
-                                 collapse = ""),
-            width = 1200, height = 1200, units = "px", pointsize = 10, res = 200,
-            bg = "white", family = "", symbolfamily="default")
-        pheatmap(assay(ntd)[select,], cluster_rows=FALSE, show_rownames=FALSE, 
-                 cluster_cols=TRUE, annotation_col=df, labels_col = colData(dds)$Label_Name,
-                 main = stri_join(c(plot_title, "(Normalized Counts Transformation)"), collapse = "\n"))
-        dev.off()
-        
-        png(filename = stri_join(c("QC_results/Heatmaps/", filename_start,
-                                   " - Variance Stabilizing Transformation.png"),
-                                 collapse = ""),
-            width = 1200, height = 1200, units = "px", pointsize = 10, res = 200,
-            bg = "white", family = "", symbolfamily="default")
-        pheatmap(assay(vsd)[select,], cluster_rows=FALSE, show_rownames=FALSE,
-                 cluster_cols=TRUE, annotation_col=df, labels_col = colData(dds)$Label_Name,
-                 main = stri_join(c(plot_title, "(Variance Stabilizing Transformation)"), collapse = "\n"))
-        dev.off()
-        
-        png(filename = stri_join(c("QC_results/Heatmaps/", filename_start,
-                                   " - Regularized Log Transformation.png"),
-                                 collapse = ""),
+          # if there is not already a QC_results/Heatmaps/" folder, create one
+
+        png(filename = stri_join(c("QC_results/Heatmaps/", filename_start, ".png"), collapse = ""),
             width = 1200, height = 1200, units = "px", pointsize = 10, res = 200,
             bg = "white", family = "", symbolfamily="default")
         pheatmap(assay(rld)[select,], cluster_rows=FALSE, show_rownames=FALSE,
                  cluster_cols=TRUE, annotation_col=df, labels_col = colData(dds)$Label_Name,
-                 main = stri_join(c(plot_title, "(Regularized Log Transformation)"), collapse = "\n"))
+                 main = plot_title)
         dev.off()
       } else {
-        pheatmap(assay(ntd)[select,], cluster_rows=FALSE, show_rownames=FALSE,
-                 cluster_cols=TRUE, annotation_col=df, labels_col = colData(dds)$Label_Name,
-                 main = stri_join(c(plot_title, "(Normalized Counts Transformation)"), collapse = "\n"))
-
-        pheatmap(assay(vsd)[select,], cluster_rows=FALSE, show_rownames=FALSE,
-                 cluster_cols=TRUE, annotation_col=df, labels_col = colData(dds)$Label_Name,
-                 main = stri_join(c(plot_title, "(Variance Stabilizing Transformation)"), collapse = "\n"))
-
         pheatmap(assay(rld)[select,], cluster_rows=FALSE, show_rownames=FALSE,
                  cluster_cols=TRUE, annotation_col=df, labels_col = colData(dds)$Label_Name,
-                 main = stri_join(c(plot_title, "(Regularized Log Transformation)"), collapse = "\n"))
-      }
-      
-      
-    # Heatmap of sample-to-sample distances ------------------------------------
-      sampleDists <- dist(t(assay(vsd)))
-      sampleDistMatrix <- as.matrix(sampleDists)
-      rownames(sampleDistMatrix) <- paste(vsd$Label_Name)
-      colnames(sampleDistMatrix) <- NULL
-      
-      if(!is.null(filename_start)) {
-        png(filename = stri_join(c("QC_results/Heatmaps/", filename_start,
-                                   " - Sample-to-Sample Distances.png"),
-                                 collapse = ""),
-            width = 1200, height = 1200, units = "px", pointsize = 10, res = 200, 
-            bg = "white", family = "", symbolfamily="default")
-        pheatmap(sampleDistMatrix,
-                 clustering_distance_rows=sampleDists,
-                 clustering_distance_cols=sampleDists,
-                 col=colorRampPalette(rev(brewer.pal(9, "Blues")))(255),
-                 main = stri_join(c(plot_title, "(Sample-to-Sample Distances)"), collapse = "\n"))
-        dev.off()
-      } else {
-        pheatmap(sampleDistMatrix,
-                 clustering_distance_rows=sampleDists,
-                 clustering_distance_cols=sampleDists,
-                 col=colorRampPalette(rev(brewer.pal(9, "Blues")))(255),
-                 main = stri_join(c(plot_title, "(Sample-to-Sample Distances)"), collapse = "\n"))
+                 main = plot_title)
       }
   }
+  
+# Generate sample-to-sample distance plots -------------------------------------
+## Function inputs:
+### dds = a DESeqDataSet object
+### filename_start = the beginning of whatever you want the resulting images to be saved as
+### plot_title = the title of the plots
+## if you use NULL for filename_start, the image won't save but it'll appear in RStudio (this is good if you're running it for the first time and want to try things out)
+  sample_to_sample_plot <- function(dds, filename_start, plot_title){
+    vsd <- vst(dds)
+    sampleDists <- dist(t(assay(vsd)))
+    sampleDistMatrix <- as.matrix(sampleDists)
+    rownames(sampleDistMatrix) <- paste(vsd$Label_Name)
+    colnames(sampleDistMatrix) <- NULL
+    
+    if(!is.null(filename_start)) {
+      if(!file.exists("QC_results/")) dir.create("QC_results/")
+      if(!file.exists("QC_results/Sample-to-Sample_Distances/")) dir.create("QC_results/Sample-to-Sample_Distances/")
+        
+      png(filename = stri_join(c("QC_results/Sample-to-Sample_Distances/", filename_start,
+                                 " - Sample Distances.png"),
+                               collapse = ""),
+          width = 1200, height = 1200, units = "px", pointsize = 10, res = 200, 
+          bg = "white", family = "", symbolfamily="default")
+      pheatmap(sampleDistMatrix,
+               clustering_distance_rows=sampleDists,
+               clustering_distance_cols=sampleDists,
+               col=colorRampPalette(rev(brewer.pal(9, "Blues")))(255),
+               main = stri_join(c("Sample-to-Sample Distances:", plot_title), collapse = "\n"))
+      dev.off()
+    } else {
+      pheatmap(sampleDistMatrix,
+               clustering_distance_rows=sampleDists,
+               clustering_distance_cols=sampleDists,
+               col=colorRampPalette(rev(brewer.pal(9, "Blues")))(255),
+               main = stri_join(c("Sample-to-Sample Distances:", plot_title), collapse = "\n"))
+    }
+  }
+  
 
 # Generate PCA plots for quality control ---------------------------------------
-  ## Function inputs:
-    ### dds = a DESeqDataSet object
-    ### filename_start = the beginning of whatever you want the resulting images to be saved as
-    ### plot_title = the title of the plots
-    ### batch_effect = a TRUE, FALSE, or NULL value indicating whether to run batch effect correction
-    #### (use batch_effects = NULL if the experiment does not contain batches)
-    ### draw_ellipse = a TRUE or FALSE value indicating whether to draw ellipses around the groups
-    #### (if missing, this value will be set to FALSE)
-  ## if you use NULL for filename_start, the image won't save but it'll appear in RStudio (this is good if you're running it for the first time and want to try things out)
+## Function inputs:
+### dds = a DESeqDataSet object
+### filename_start = the beginning of whatever you want the resulting images to be saved as
+### plot_title = the title of the plots
+### batch_effect = a TRUE, FALSE, or NULL value indicating whether to run batch effect correction
+#### (use batch_effects = NULL if the experiment does not contain batches)
+### draw_ellipse = a TRUE or FALSE value indicating whether to draw ellipses around the groups
+#### (if missing, this value will be set to FALSE)
+## if you use NULL for filename_start, the image won't save but it'll appear in RStudio (this is good if you're running it for the first time and want to try things out)
   QC_PCAplot <- function(dds, filename_start, plot_title, batch_effect, draw_ellipse){
     if(missing(batch_effect)) batch_effect <- NULL
     if(missing(draw_ellipse)) draw_ellipse <- FALSE
@@ -152,7 +134,7 @@
       # if there is not already a QC_results/PCA_plots/" folder, create one
 
       png(filename = stri_join(c("./QC_results/PCA_plots/", filename_start, ".png"), collapse = ""),
-          width = 1500, height = 1500, units = "px", pointsize = 10, res = 200,
+          width = 1800, height = 1800, units = "px", pointsize = 10, res = 300,
           bg = "white", family = "", symbolfamily="default")
     }
     
@@ -194,11 +176,11 @@
   }
 
 # Wrapper for the DESeq2 results() function ------------------------------------
-  ## Function inputs:
-    ### dds = a DESeqDataSet object
-    ### cons = which contrasts you want to perform
-    ### IDs = a table containing additional data to add to the results, such as alternative gene IDs. Must contain a "ensembl_gene_id" column.
-      #### (if IDs is missing or NULL, this step will be skipped)
+## Function inputs:
+### dds = a DESeqDataSet object
+### cons = which contrasts you want to perform
+### IDs = a table containing additional data to add to the results, such as alternative gene IDs. Must contain a "ensembl_gene_id" column.
+#### (if IDs is missing or NULL, this step will be skipped)
 results_wrapper <- function(dds, cons, IDs){
   if(missing(IDs)) IDs <- NULL
   
@@ -217,39 +199,44 @@ results_wrapper <- function(dds, cons, IDs){
   else return(right_join(IDs, res))
 }
 
-# Make a list of DEGs from a list of DESeq2 results ----------------------------
-## Function inputs:
-### dds_res_list = a list of data.frame objects containing DESeq2 results
-### lfc_cutoff = Log2Fold-Change value at which a DEG is considered significant.
-### ID_type = a string indicating what type of gene ID to use for the output
-#### (this can be "external_gene_name", "entrezgene", or anything else. 
-#### If it is anything other than "external_gene_name" or "entrezgene", it will be the external_gene_name by default)
-DEG_list <- function(dds_res_list, lfc_cutoff, ID_type){
-  if(missing(ID_type)) ID_type <- "ensembl_gene_id"
-  if(missing(lfc_cutoff)) lfc_cutoff <- 0.5
-  
-  res <- c()
-  for (df in dds_res_list) {
-    DEGs <- dplyr::filter(df, padj < 0.05 & abs(log2FoldChange) > abs(lfc_cutoff))
-    if(ID_type == "external_gene_name") DEGs <- DEGs$external_gene_name
-    else if(ID_type == "entrezgene") DEGs <- DEGs$entrezgene
-    else DEGs <- DEGs$ensembl_gene_id
-    res <- append(res, DEGs)
-  }
+# # Make a list of DEGs from a list of DESeq2 results ----------------------------
+# ## Function inputs:
+# ### dds_res_list = a list of data.frame objects containing DESeq2 results
+# ### lfc_cutoff = Log2Fold-Change value at which a DEG is considered significant.
+# ### ID_type = a string indicating what type of gene ID to use for the output
+# #### (this can be "external_gene_name", "entrezgene", or anything else. 
+# #### If it is anything other than "external_gene_name" or "entrezgene", it will be the external_gene_name by default)
+# DEG_list <- function(dds_res_list, lfc_cutoff, ID_type){
+#   if(missing(lfc_cutoff)) lfc_cutoff <- 1
+#   if(missing(ID_type)) ID_type <- "ensembl_gene_id"
+#   
+#   res <- c()
+#   for (df in dds_res_list) {
+#     DEGs <- dplyr::filter(df, padj < 0.05 & abs(log2FoldChange) > abs(lfc_cutoff))
+#     if(ID_type == "external_gene_name") DEGs <- DEGs$external_gene_name
+#     else if(ID_type == "entrezgene") DEGs <- DEGs$entrezgene
+#     else DEGs <- DEGs$ensembl_gene_id
+#     res <- append(res, DEGs)
+#   }
+# 
+#   res <- res[!duplicated(res)]
+#   return(res)
+# }
 
-  res <- res[!duplicated(res)]
-  return(res)
-}
-
-DEG_heatmap <- function(dds, DEGs, color_list, plot_title, filename, unsupervised, h, w){
+DEG_heatmap <- function(dds, dds_results, lfc_cutoff, color_list, plot_title, filename, h, w){
   if(missing(filename)) filename <- NULL
   if(missing(h)) h <- 2000
   if(missing(w)) w <- 1500
-  if(missing(unsupervised)) unsupervised <- TRUE
   
-  if(unsupervised != TRUE & unsupervised != FALSE) unsupervised <- TRUE
+  DEGs <- c()
+  for (df in list(dds_results)) {
+    res <- dplyr::filter(df, padj < 0.05 & abs(log2FoldChange) > abs(lfc_cutoff))
+    res <- res$ensembl_gene_id
+    DEGs <- append(DEGs, res)
+  }
+  DEGs <- DEGs[!duplicated(DEGs)]
 
-  heatmap_data <- counts(dds,normalized=TRUE)
+  heatmap_data <- counts(dds, normalized=TRUE)
   heatmap_data <- heatmap_data[rownames(heatmap_data) %in% DEGs, ]
   heatmap_data <- order(rowMeans(heatmap_data), decreasing=TRUE)
 
@@ -263,13 +250,31 @@ DEG_heatmap <- function(dds, DEGs, color_list, plot_title, filename, unsupervise
     if(!file.exists("Output/DEG_heatmaps/")) dir.create("Output/DEG_heatmaps/")
     # if there is not already a QC_results/DEG_heatmaps/" folder, create one
     
-    png(filename = stri_join(c("Output/DEG_heatmaps/", filename,".png"), collapse = ""),
+    png(filename = stri_join(c("Output/DEG_heatmaps/Unsupervised - ", filename,".png"), collapse = ""),
         width = w, height = h, units = "px", pointsize = 8, res = 250,
         bg = "white", family = "", symbolfamily="default")
   }
+  
   htmp <- ComplexHeatmap::pheatmap(counts(dds, normalized = TRUE)[heatmap_data, ],
                                    cluster_rows = TRUE, show_rownames = FALSE,
-                                   show_colnames = FALSE, cluster_cols = unsupervised,
+                                   cluster_cols = TRUE, show_colnames = FALSE, 
+                                   annotation_col = df, scale = "row",
+                                   annotation_colors = color_list,
+                                   heatmap_legend_param = list(title = "Z-score"),
+                                   main = plot_title)
+  draw(htmp, legend_grouping = "original", merge_legends = TRUE)
+  
+  if(!is.null(filename)) {
+    dev.off()
+
+    png(filename = stri_join(c("Output/DEG_heatmaps/Supervised - ", filename,".png"), collapse = ""),
+        width = w, height = h, units = "px", pointsize = 8, res = 250,
+        bg = "white", family = "", symbolfamily="default")
+  }
+  
+  htmp <- ComplexHeatmap::pheatmap(counts(dds, normalized = TRUE)[heatmap_data, ],
+                                   cluster_rows = TRUE, show_rownames = FALSE,
+                                   cluster_cols = FALSE, show_colnames = FALSE, 
                                    annotation_col = df, scale = "row",
                                    annotation_colors = color_list,
                                    heatmap_legend_param = list(title = "Z-score"),
