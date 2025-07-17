@@ -2,9 +2,10 @@ setwd("Z:/Emma Mask/R_projects/AM14_with_B1-8_comparison/analysis_with_cohorts_a
 getwd()
 
 vp_data = list(
-  PL23_2DG_v_Ctrl = deseq_res$AM14transfer_PL23[, c(2, 6, 10)],
-  R848_2DG_v_Ctrl = deseq_res$AM14transfer_R848[, c(2, 6, 10)],
-  AM14MRLlpr = deseq_res$AM14MRLlpr[, c(2, 6, 10)])
+  PL23_2DG_v_Ctrl = deseq_res$AM14transfer_PL23[, c(2, 8, 12)],
+  R848_2DG_v_Ctrl = deseq_res$AM14transfer_R848[, c(2, 8, 12)],
+  AM14MRLlpr = deseq_res$AM14MRLlpr[, c(2, 8, 12)],
+  B18 = deseq_res$B18transfer[, c(2, 8, 12)])
 head(vp_data$AM14MRLlpr)
 
 volcano_wrapper <- function(dat, lfc_cutoff, plot_title, cap, file_name, x_limits, y_limits){
@@ -53,18 +54,22 @@ confirm_foldchange(dds_B18trans, "Dmrt2", gene_IDs$B18trans)
 confirm_foldchange(dds_PL23vNP, "Lars2", gene_IDs$AM14trans)
 
 
-volcano_wrapper(vp_data$PL23_2DG_v_Ctrl, 1, "AM14 Transfer: PL2-3 + 2DG vs PL2-3\n(Cohort 1 Only)",
+volcano_wrapper(vp_data$PL23_2DG_v_Ctrl, 1, "AM14 Transfer: PL2-3 + 2DG vs PL2-3",
                 "Upregulated in PL2-3                                     Upregulated in PL2-3 + 2DG",
                 # c(-11, 5), c(0, 8), 
                 "AM14_Transfer-PL2-3_2DG_vs_Control")
 
-volcano_wrapper(vp_data$R848_2DG_v_Ctrl, 1, "AM14 Transfer: R848 + 2DG vs R848\n(Cohort 2 Only)", 
+volcano_wrapper(vp_data$R848_2DG_v_Ctrl, 1, "AM14 Transfer: R848 + 2DG vs R848", 
                 "Upregulated in R848                                      Upregulated in R848 + 2DG",
                 # c(-7.5, 5), c(0, 5),
                 "AM14_Transfer-R848_2DG_vs_Control")
 
-volcano_wrapper(vp_data$AM14MRLlpr, 1, "AM14 MRL/lpr: 2DG vs Control\n(Cohort 2 Only)",
-                "Upregulated in Control                                                 Upregulated in 2DG",
+volcano_wrapper(vp_data$AM14MRLlpr, 1, "AM14 MRL/lpr: 2DG vs Control",
+                "Upregulated in Control                                          Upregulated in 2DG",
                 # c(-5, 2.5), c(0, 15),  
                 "AM14_MRLlpr")
 
+volcano_wrapper(vp_data$B18, 1, "B1-8 Transfer: NP + 2DG vs NP",
+                "Upregulated in NP                                       Upregulated in NP + 2DG",
+                # c(-5, 2.5), c(0, 15),  
+                "B18_Transfer")
