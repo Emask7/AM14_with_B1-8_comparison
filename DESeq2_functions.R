@@ -200,66 +200,113 @@ results_wrapper <- function(dds, cons, IDs){
 }
 
 # Make a heatmap of DEGs -------------------------------------------------------
-DEG_heatmap <- function(dds, dds_results, lfc_cutoff, color_list, plot_title, filename, h, w){
+DEG_heatmap <- function(dds, dds_results, factors, color_list, lfc_cutoff, padj_cutoff, count_type, dds_cols, plot_title, filename, h, w){
+  if(missing(color_list)) {
+    color_list <- list(Treatment = c(PL23 = "#0f85a0", PL23_2DG = "#dd4124",
+                                      R848 = "#0f85a0", R848_2DG = "#dd4124",
+                                     NP = "#0f85a0", NP_2DG = "#dd4124",
+                                     Control = "#0f85a0", "2DG" = "#dd4124"),
+                        Cohort = c(A1 = "#00496f", A2 = "#edd746", B1 = "#00496f",
+                                   M1 = "#00496f", M2 = "#edd746"))
+    
+    # color_list <- list(Treatment = c(PL23 = "#00496f", PL23_2DG = "#0f85a0", 
+    #                                  R848 = "#ed8b00", R848_2DG = "#dd4124",
+    #                                  NP = "#0f85a0", NP_2DG = "#dd4124",
+    #                                  Control = "#0f85a0", "2DG" = "#dd4124"),
+    #                    Cohort = c(A1 = "#00496f", A2 = "#edd746", B1 = "#00496f", 
+    #                               M1 = "#00496f", M2 = "#edd746"))
+  }
+  if(missing(lfc_cutoff)) lfc_cutoff <- 1
+  if(missing(padj_cutoff)) padj_cutoff <- 0.05
+  if(missing(count_type)) count_type <- "norm_counts"
+  if(missing(dds_cols)) dds_cols <- NULL
+  if(missing(plot_title)) plot_title <- "Plot Title"
   if(missing(filename)) filename <- NULL
   if(missing(h)) h <- 2000
   if(missing(w)) w <- 1500
+
+  # make a list of DEGs from the DEG results -----------------------------------
+    DEGs <- c()
+    for (df in list(dds_results)) {
+      res <- dplyr::filter(df, padj < padj_cutoff & abs(log2FoldChange) > abs(lfc_cutoff))
+      res <- res$ensembl_gene_id
+      DEGs <- append(DEGs, res)
+    }
+    DEGs <- DEGs[!duplicated(DEGs)]
   
-  DEGs <- c()
-  for (df in list(dds_results)) {
-    res <- dplyr::filter(df, padj < 0.05 & abs(log2FoldChange) > abs(lfc_cutoff))
-    res <- res$ensembl_gene_id
-    DEGs <- append(DEGs, res)
-  }
-  DEGs <- DEGs[!duplicated(DEGs)]
+  # Make a vector of count matrix row numbers in decreasing order of row means -
+    select <- counts(dds, normalized=TRUE)
+    if(!is.null(dds_cols)) select <- select[, dds_cols]
+    select <- select[rownames(select) %in% DEGs, ]
+    select <- order(rowMeans(select), decreasing=TRUE)
+    head(select)
+  
+  # Make a dataframe with sample info ------------------------------------------
+    # If dds_col is NULL, use all sample info from the dds object
+    # Else, only get sample info from rows corresponding to the count columns of interest
+    if(is.null(dds_cols)) {
+      df <- as.data.frame(colData(dds)[, factors])
+      rownames(df) <- rownames(as.data.frame(colData(dds)))
+    } else {
+      df <- as.data.frame(colData(dds)[dds_cols, factors])
+      rownames(df) <- rownames(as.data.frame(colData(dds)))[dds_cols]
+    }
+    colnames(df) <- factors
 
-  heatmap_data <- counts(dds, normalized=TRUE)
-  heatmap_data <- heatmap_data[rownames(heatmap_data) %in% DEGs, ]
-  heatmap_data <- order(rowMeans(heatmap_data), decreasing=TRUE)
-
-  df <- as.data.frame(colData(dds)[, c("Treatment")])
-  rownames(df) <- rownames(as.data.frame(colData(dds)))
-  colnames(df) <- c("Treatment")
-  head(df)
-
-  if(!is.null(filename)) {
-    if(!file.exists("Output/")) dir.create("Output/")
-    if(!file.exists("Output/DEG_heatmaps/")) dir.create("Output/DEG_heatmaps/")
-    # if there is not already a QC_results/DEG_heatmaps/" folder, create one
+  # Sort the normalized counts by decreasing mean counts -----------------------
+    if(count_type == "norm_counts") {
+      if(!is.null(dds_cols)) {
+        htmp_cts <- counts(dds, normalized = TRUE)[select, dds_cols]
+      } else htmp_cts <- counts(dds, normalized = TRUE)[select, ]
+    } else if(count_type == "rlog") {
+      rld <- rlog(dds)
+      if(!is.null(dds_cols)) {
+        htmp_cts <- assay(rld)[select, dds_cols]
+      } else htmp_cts <- assay(rld)[select, ]
+    } else {
+      print("Error: count_type must be either norm_counts or rlog")
+      return(NULL)
+    }
     
-    png(filename = stri_join(c("Output/DEG_heatmaps/Unsupervised - ", filename,".png"), collapse = ""),
-        width = w, height = h, units = "px", pointsize = 8, res = 250,
-        bg = "white", family = "", symbolfamily="default")
-  }
+  # Plot heatmap with unsupervised column clustering ---------------------------
+    if(!is.null(filename)) {
+      if(!file.exists("Output/")) dir.create("Output/")
+      if(!file.exists("Output/DEG_heatmaps/")) dir.create("Output/DEG_heatmaps/")
+      # if there is not already a QC_results/DEG_heatmaps/" folder, create one
+      
+      png(filename = stri_join(c("Output/DEG_heatmaps/Unsupervised - ", filename,".png"), collapse = ""),
+          width = w, height = h, units = "px", pointsize = 8, res = 250,
+          bg = "white", family = "", symbolfamily="default")
+    }
+    
+    htmp <- ComplexHeatmap::pheatmap(htmp_cts,
+                                     cluster_rows = TRUE, show_rownames = FALSE,
+                                     cluster_cols = TRUE, show_colnames = FALSE,
+                                     annotation_col = df, scale = "row",
+                                     annotation_colors = color_list,
+                                     heatmap_legend_param = list(title = "Z-score"),
+                                     main = plot_title)
+    draw(htmp, legend_grouping = "original", merge_legends = TRUE)
+    
+    if(!is.null(filename))  dev.off()
+    
+  # Plot heatmap with supervised column clustering -----------------------------
+    if(!is.null(filename)) {
+      png(filename = stri_join(c("Output/DEG_heatmaps/Supervised - ", filename,".png"), collapse = ""),
+          width = w, height = h, units = "px", pointsize = 8, res = 250,
+          bg = "white", family = "", symbolfamily="default")
+    }
   
-  htmp <- ComplexHeatmap::pheatmap(counts(dds, normalized = TRUE)[heatmap_data, ],
-                                   cluster_rows = TRUE, show_rownames = FALSE,
-                                   cluster_cols = TRUE, show_colnames = FALSE, 
-                                   annotation_col = df, scale = "row",
-                                   annotation_colors = color_list,
-                                   heatmap_legend_param = list(title = "Z-score"),
-                                   main = plot_title)
-  draw(htmp, legend_grouping = "original", merge_legends = TRUE)
-  
-  if(!is.null(filename)) {
-    dev.off()
-
-    png(filename = stri_join(c("Output/DEG_heatmaps/Supervised - ", filename,".png"), collapse = ""),
-        width = w, height = h, units = "px", pointsize = 8, res = 250,
-        bg = "white", family = "", symbolfamily="default")
-  }
-  
-  htmp <- ComplexHeatmap::pheatmap(counts(dds, normalized = TRUE)[heatmap_data, ],
-                                   cluster_rows = TRUE, show_rownames = FALSE,
-                                   cluster_cols = FALSE, show_colnames = FALSE, 
-                                   annotation_col = df, scale = "row",
-                                   annotation_colors = color_list,
-                                   heatmap_legend_param = list(title = "Z-score"),
-                                   main = plot_title)
-  draw(htmp, legend_grouping = "original", merge_legends = TRUE)
-  if(!is.null(filename)) dev.off()
+    htmp <- ComplexHeatmap::pheatmap(htmp_cts,
+                                     cluster_rows = TRUE, show_rownames = FALSE,
+                                     cluster_cols = FALSE, show_colnames = FALSE,
+                                     annotation_col = df, scale = "row",
+                                     annotation_colors = color_list,
+                                     heatmap_legend_param = list(title = "Z-score"),
+                                     main = plot_title)
+    draw(htmp, legend_grouping = "original", merge_legends = TRUE)
+    if(!is.null(filename)) dev.off()
 }
-
 
 summary_wrapper <- function(res, comparison, experiment, p_cutoff, lfc_cutoff){
   if(missing(p_cutoff)) p_cutoff <- 0.05
