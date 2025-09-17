@@ -1,17 +1,17 @@
 # Import raw counts from Rosalind output ---------------------------------------
-  cts_AM14trans <- import_Rosalind_data("raw_data/AM14_Adoptive_Transfer_rawCountsWithAnnotations.txt")
-  cts_B18trans <- import_Rosalind_data("raw_data/B1-8_Adoptive_Transfer_rawCountsWithAnnotations.txt")
-  cts_AM14MRLlpr <- import_Rosalind_data("raw_data/AM14_MRLlpr_rawCountsWithAnnotations.txt")
+  cts_AM14trans <- import_Rosalind_data("raw_data/AM14_Adoptive_Transfer_rawCountsWithAnnotations.txt", ipa_format = TRUE)
+  cts_B18trans <- import_Rosalind_data("raw_data/B1-8_Adoptive_Transfer_rawCountsWithAnnotations.txt", ipa_format = TRUE)
+  cts_AM14MRLlpr <- import_Rosalind_data("raw_data/AM14_MRLlpr_rawCountsWithAnnotations.txt", ipa_format = TRUE)
 
   # Save a table of gene IDs in case they need to be converted later -----------
-    gene_IDs <- list(AM14trans = cts_AM14trans[, c(1:4)],
-                     B18trans = cts_B18trans[, c(1:4)],
-                     AM14MRLlpr = cts_AM14MRLlpr[, c(1:4)])
-        
+    gene_IDs <- list(AM14trans = cts_AM14trans[, c(1:6)],
+                     B18trans = cts_B18trans[, c(1:6)],
+                     AM14MRLlpr = cts_AM14MRLlpr[, c(1:6)])
+  
   # Remove extra columns from cts ----------------------------------------------
-    cts_AM14trans <- cts_AM14trans[, c(5:24)]
-    cts_B18trans <- cts_B18trans[, c(5:13)]
-    cts_AM14MRLlpr <- cts_AM14MRLlpr[, c(5:21)]
+    cts_AM14trans <- cts_AM14trans[, c(7:26)]
+    cts_B18trans <- cts_B18trans[, c(7:15)]
+    cts_AM14MRLlpr <- cts_AM14MRLlpr[, c(7:23)]
   
     head(cts_AM14trans)
     head(cts_B18trans)
@@ -198,7 +198,7 @@
         PL23_vs_R848 = results_wrapper(dds_AM14trans_co2, c("Treatment", "PL23", "R848"), gene_IDs$AM14trans)
       )
   ),
-    # B18transfer = results_wrapper(dds_B18trans, c("Treatment", "NP_2DG", "NP"), gene_IDs$B18trans),
+    B18transfer = results_wrapper(dds_B18trans, c("Treatment", "NP_2DG", "NP"), gene_IDs$B18trans),
     AM14MRLlpr = list(
       co1 = results_wrapper(dds_AM14MRLlpr_co1, c("Treatment", "2DG", "Control"), gene_IDs$AM14MRLlpr),
       co2 = results_wrapper(dds_AM14MRLlpr_co2, c("Treatment", "2DG", "Control"), gene_IDs$AM14MRLlpr)
@@ -206,8 +206,8 @@
   )
   
   head(deseq_res$AM14transfer$co1$PL23_2DG_v_Ctrl)
-  # head(deseq_res$B18transfer)
-  # head(deseq_res$AM14MRLlpr)
+  head(deseq_res$B18transfer)
+  head(deseq_res$AM14MRLlpr$co1)
   
   # DEG Heatmaps ---------------------------------------------------------------
     AM14_DEGs_co1 <- DEG_list(list(deseq_res$AM14transfer$co1$PL23_2DG_v_Ctrl,
