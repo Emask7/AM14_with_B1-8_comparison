@@ -134,7 +134,7 @@
       # if there is not already a QC_results/PCA_plots/" folder, create one
 
       png(filename = stri_join(c("./QC_results/PCA_plots/", filename_start, ".png"), collapse = ""),
-          width = 1800, height = 1800, units = "px", pointsize = 10, res = 300,
+          width = 1800, height = 1800, units = "px", pointsize = 10, res = 350,
           bg = "white", family = "", symbolfamily="default")
     }
     

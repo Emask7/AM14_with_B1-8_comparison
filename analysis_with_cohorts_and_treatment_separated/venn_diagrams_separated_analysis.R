@@ -106,7 +106,7 @@ DEG_lists_lfc0.6 <- list(
                                 "AM14 Transfer: R848 + 2DG vs R848" = DEG_lists_lfc0.6$R848_2DG_vs_Ctrl$all,
                                 "B1-8 Transfer: NP + 2DG vs NP" = DEG_lists_lfc0.6$B18$all,
                                 "AM14 MRL/lpr: 2DG vs Control" = DEG_lists_lfc0.6$MRLlpr$all))
-    png(filename = "Output/Venn_diagrams/All_DEGs_LFC0.6.png", width = 2000, height = 1500, res = 250)
+    png(filename = "Output/Venn_diagrams/All_DEGs_LFC0.6.png", width = 2200, height = 1500, res = 300)
     plot(all_degs_0.6, type = "upset")
     dev.off()
     
@@ -149,4 +149,37 @@ DEG_lists_lfc0.6 <- list(
                                      "AM14 MRL/lpr:\n2DG vs Control" = DEG_lists_lfc0.6$MRLlpr$down))
     plot(down_degs_0.6, margin = 0.07, cat.cex = 1.1, cex = 1.2,
          filename = "Output/Venn_diagrams/Downregulated_DEGs_LFC0.6_venn.png")
+    
+    
+    
+  # DEGs with LFC > +/- 0.6 (no AM14 MRL/lpr) ----------------------------------
+    transfer_only_all_degs_0.6 <- venndetail(list("AM14 Transfer: PL2-3 + 2DG vs PL2-3" = DEG_lists_lfc0.6$PL23_2DG_vs_Ctrl$all,
+                                    "AM14 Transfer: R848 + 2DG vs R848" = DEG_lists_lfc0.6$R848_2DG_vs_Ctrl$all,
+                                    "B1-8 Transfer: NP + 2DG vs NP" = DEG_lists_lfc0.6$B18$all))
+    png(filename = "Output/Venn_diagrams/Adoptive_Transfers_All_DEGs_LFC0.6.png", width = 2000, height = 1500, res = 350)
+    plot(transfer_only_all_degs_0.6, type = "upset")
+    dev.off()
+    
+    transfer_only_up_degs_0.6 <- venndetail(list("AM14 Transfer: PL2-3 + 2DG vs PL2-3" = DEG_lists_lfc0.6$PL23_2DG_vs_Ctrl$up,
+                                   "AM14 Transfer: R848 + 2DG vs R848" = DEG_lists_lfc0.6$R848_2DG_vs_Ctrl$up,
+                                   "B1-8 Transfer: NP + 2DG vs NP" = DEG_lists_lfc0.6$B18$up))
+    png(filename = "Output/Venn_diagrams/Adoptive_Transfers_Upregulated_DEGs_LFC0.6.png", width = 2000, height = 1500, res = 350)
+    plot(transfer_only_up_degs_0.6, type = "upset")
+    dev.off()
+    
+    transfer_only_down_degs_0.6 <- venndetail(list("AM14 Transfer: PL2-3 + 2DG vs PL2-3" = DEG_lists_lfc0.6$PL23_2DG_vs_Ctrl$down,
+                                     "AM14 Transfer: R848 + 2DG vs R848" = DEG_lists_lfc0.6$R848_2DG_vs_Ctrl$down,
+                                     "B1-8 Transfer: NP + 2DG vs NP" = DEG_lists_lfc0.6$B18$down))
+    png(filename = "Output/Venn_diagrams/Adoptive_Transfers_Downregulated_DEGs_LFC0.6.png", width = 2000, height = 1500, res = 350)
+    plot(transfer_only_down_degs_0.6, type = "upset")
+    dev.off()
+    
+    
+  # AM14 only - DEGs with LFC > +/- 0.6 ----------------------------------------
+    AM14_only_all_degs_0.6 <- venndetail(list("AM14 Transfer: PL2-3 + 2DG vs PL2-3" = DEG_lists_lfc0.6$PL23_2DG_vs_Ctrl$all,
+                                    "AM14 MRL/lpr: 2DG vs Control" = DEG_lists_lfc0.6$MRLlpr$all))
+    png(filename = "Output/Venn_diagrams/AM14_only_All_DEGs_LFC0.6.png", width = 2000, height = 1500, res = 350)
+    plot(AM14_only_all_degs_0.6, type = "upset")
+    # plot(AM14_only_all_degs_0.6, margin = 0.15, cat.cex = 1.5, cex = 1.2)
+    dev.off()
     
