@@ -106,88 +106,71 @@ normcounts_plot <- function(gene_list, dds, ID_df, title) {
               sd = sd(normCounts)) %>%
     filter(external_gene_name %in% gene_list)
 
-  plot_data %>%
-    ggplot(aes(x = stim, y = mean, fill = treatment)) +
-    geom_bar(position = position_dodge(), stat = "identity") +
-    ggtitle(title) +
-    labs(x = "", y = "DESeq2 Normalized Counts") +
-    # scale_y_continuous(transform = 'log10') +
-    geom_errorbar(
-      aes(x = stim, ymin = mean - sem, ymax = mean + sem),
-      width = 0.2,
-      position = position_dodge(width = 0.9),
-      stat = "identity"
-    ) +
-    # geom_jitter(aes(y = reads), position = position_jitterdodge(jitter.width = 0.3)) +
-    geom_jitter(aes(y = reads), position = position_dodge(width = 0.9)) +
-    facet_wrap( ~ external_gene_name, scales = 'free')
+  if(nrow(plot_data) > 0){
+    plot_data %>%
+      ggplot(aes(x = stim, y = mean, fill = treatment)) +
+      geom_bar(position = position_dodge(), stat = "identity") +
+      ggtitle(title) +
+      labs(x = "", y = "DESeq2 Normalized Counts") +
+      # scale_y_continuous(transform = 'log10') +
+      geom_errorbar(
+        aes(x = stim, ymin = mean - sem, ymax = mean + sem),
+        width = 0.2,
+        position = position_dodge(width = 0.9),
+        stat = "identity"
+      ) +
+      # geom_jitter(aes(y = reads), position = position_jitterdodge(jitter.width = 0.3)) +
+      geom_jitter(aes(y = reads), position = position_dodge(width = 0.9)) +
+      facet_wrap( ~ external_gene_name, scales = 'free')
     # facet_grid(. ~ external_gene_name)
+  } else return(NULL)
 }
 
-normcounts_plot(c("Il2", "Il2rb", "Il12b", "Il12rb1"), dds_AM14trans_PL23, gene_IDs$AM14trans, 
-                "PL2-3 + 2DG vs PL2-3") +
-  normcounts_plot(c("Il2", "Il2rb", "Il12b", "Il12rb1"), dds_AM14MRLlpr, gene_IDs$AM14MRLlpr, 
-                  "AM14 MRL/lpr + 2DG vs Control") +
-  normcounts_plot(c("Il2", "Il2rb", "Il12b", "Il12rb1"), dds_AM14trans_R848, gene_IDs$AM14trans, 
-                  "R848 + 2DG vs R848") +
-  normcounts_plot(c("Il2", "Il2rb", "Il12b", "Il12rb1"), dds_B18trans, gene_IDs$B18trans, 
-                  "NP + 2DG vs NP") 
+normcounts_plot_multi <- function(gene_list){
+  normcounts_plot(gene_list, dds_AM14trans_PL23, gene_IDs$AM14trans, "PL2-3 + 2DG vs PL2-3") +
+    normcounts_plot(gene_list, dds_AM14MRLlpr, gene_IDs$AM14MRLlpr, "AM14 MRL/lpr + 2DG vs Control") +
+    normcounts_plot(gene_list, dds_AM14trans_R848, gene_IDs$AM14trans, "R848 + 2DG vs R848") +
+    normcounts_plot(gene_list, dds_B18trans, gene_IDs$B18trans, "NP + 2DG vs NP") 
+}
 
 
-normcounts_plot(c("Il1b"), dds_AM14trans_PL23, gene_IDs$AM14trans, 
-                "PL2-3 + 2DG vs PL2-3") +
-  normcounts_plot(c("Il1b"), dds_AM14MRLlpr, gene_IDs$AM14MRLlpr, 
-                  "AM14 MRL/lpr + 2DG vs Control") +
-  normcounts_plot(c("Il1b"), dds_AM14trans_R848, gene_IDs$AM14trans,
-                  "R848 + 2DG vs R848") 
-  normcounts_plot(c("Il1b"), dds_B18trans, gene_IDs$B18trans, 
-                  "NP + 2DG vs NP") 
+normcounts_plot_multi(c("Il2", "Il2rb", "Il12b", "Il12rb1"))
 
+normcounts_plot_multi(c("Il1b"))
+normcounts_plot_multi(c("Il2"))
+normcounts_plot_multi(c("Il12rb2"))
+normcounts_plot_multi(c("Ifngas1"))
 
-
-normcounts_plot(c("Il2"), dds_AM14trans_PL23, gene_IDs$AM14trans, 
-                "PL2-3 + 2DG vs PL2-3") +
-  normcounts_plot(c("Il2"), dds_AM14MRLlpr, gene_IDs$AM14MRLlpr, 
-                  "AM14 MRL/lpr + 2DG vs Control") +
-  # normcounts_plot(c("Il2"), dds_AM14trans_R848, gene_IDs$AM14trans, 
-  #                 "R848 + 2DG vs R848") +
-  normcounts_plot(c("Il2"), dds_B18trans, gene_IDs$B18trans, 
-                  "NP + 2DG vs NP") 
-
-
-normcounts_plot(c("Il12rb2"), dds_AM14trans_PL23, gene_IDs$AM14trans, 
-                "PL2-3 + 2DG vs PL2-3") +
-  normcounts_plot(c("Il12rb2"), dds_AM14MRLlpr, gene_IDs$AM14MRLlpr, 
-                  "AM14 MRL/lpr + 2DG vs Control") +
-  normcounts_plot(c("Il12rb2"), dds_AM14trans_R848, gene_IDs$AM14trans,
-                  "R848 + 2DG vs R848") 
-  # normcounts_plot(c("Il12rb2"), dds_B18trans, gene_IDs$B18trans, 
-  #                 "NP + 2DG vs NP") 
+normcounts_plot_multi(c("Unc93b1", "Tbx21", "Il2", "Il2rb", "Il12b", "Il12rb1", "Ptpn22", "Rab7b", "Vcam1"))
 
 
 
-normcounts_plot(c("Ifngas1"), dds_AM14trans_PL23, gene_IDs$AM14trans, 
-                "PL2-3 + 2DG vs PL2-3") +
-  normcounts_plot(c("Ifngas1"), dds_AM14MRLlpr, gene_IDs$AM14MRLlpr, 
-                  "AM14 MRL/lpr + 2DG vs Control") +
-  normcounts_plot(c("Ifngas1"), dds_AM14trans_R848, gene_IDs$AM14trans,
-                  "R848 + 2DG vs R848")
-  normcounts_plot(c("Ifngas1"), dds_B18trans, gene_IDs$B18trans, 
-                  "NP + 2DG vs NP") 
 
 
-  
-normcounts_plot(c("Unc93b1", "Tbx21", "Il2", "Il2rb", "Il12b", "Il12rb1", "Ptpn22", "Rab7b", "Vcam1"), dds_AM14trans_PL23, gene_IDs$AM14trans, 
-                "AM14 Adoptive Transfer: PL2-3 + 2DG vs PL2-3") +
+normcounts_plot_multi(c("Unc93b1")) 
+normcounts_plot_multi(c("Tbx21")) 
+normcounts_plot_multi(c("Il2"))
+normcounts_plot_multi(c("Il2rb")) 
+normcounts_plot_multi(c("Il12a")) 
+normcounts_plot_multi(c("Il12b")) 
+normcounts_plot_multi(c("Il12rb1")) 
+normcounts_plot_multi(c("Il12rb2")) 
+normcounts_plot_multi(c("Il21")) 
+normcounts_plot_multi(c("Il21r")) 
+normcounts_plot_multi(c("Irf7")) 
+normcounts_plot_multi(c("Tlr7")) 
+normcounts_plot_multi(c("Tlr9")) 
+normcounts_plot_multi(c("Stat1")) 
+normcounts_plot_multi(c("Stat3")) 
+normcounts_plot_multi(c("Ackr2")) 
+normcounts_plot_multi(c("Ifngas1")) 
+normcounts_plot_multi(c("Il1b")) 
+normcounts_plot_multi(c("Ptpn22")) 
+normcounts_plot_multi(c("Rab7b")) 
+normcounts_plot_multi(c("Ifng")) 
 
-normcounts_plot(c("Unc93b1", "Tbx21", "Il2", "Il2rb", "Il12b", "Il12rb1", "Ptpn22", "Rab7b", "Vcam1"), dds_AM14trans_R848, gene_IDs$AM14trans, 
-                "AM14 Adoptive Transfer: R848 + 2DG vs R848") 
 
-normcounts_plot(c("Unc93b1", "Tbx21", "Il2", "Il2rb", "Il12b", "Il12rb1", "Ptpn22", "Rab7b", "Vcam1"), dds_AM14MRLlpr, gene_IDs$AM14MRLlpr, 
-                "AM14 MRLlpr: 2DG vs Control") 
 
-normcounts_plot(c("Unc93b1", "Tbx21", "Il2", "Il2rb", "Il12b", "Il12rb1", "Ptpn22", "Rab7b", "Vcam1"), dds_B18trans, gene_IDs$B18trans, 
-                "B1-8 Adoptive Transfer: NP + 2DG vs NP") 
 
 
 normcounts_plot(c("Unc93b1"), dds_AM14MRLlpr, gene_IDs$AM14MRLlpr) 
@@ -197,118 +180,6 @@ normcounts_plot(c("Unc93b1", "C1qa", "C1qb", "C1qc"), dds_AM14trans_PL23, gene_I
 
 
 
-
-
-normcounts_plot2 <- function(gene_list) {
-  get_plot_data <- function(dds, IDs){
-    cts <- counts(dds, normalized = TRUE)
-    cts <- data.frame(rownames(cts), cts)
-    colnames(cts) <- c("ensembl_gene_id", dds$barplot_info)
-    cts <- right_join(IDs[, 1:2], cts, by = "ensembl_gene_id")
-    cts <- cts[, c(2:ncol(cts))]
-    
-    cts %>%
-      pivot_longer(
-        cols = -(1), # by using a `-`, we can exclude the first two columns
-        values_to = c("normCounts"),
-        names_to = c("stim", "treatment", "mouse"),
-        names_sep  = "_"
-      ) %>%
-      group_by(external_gene_name, stim, treatment) %>%
-      summarise(n = n(),
-                reads = normCounts,
-                mean = mean(normCounts),
-                sem = std.error(normCounts),
-                sd = sd(normCounts)) %>%
-      filter(external_gene_name %in% gene_list)
-  }
-  
-  pl23_plot_data <- get_plot_data(dds_AM14trans_PL23, gene_IDs$AM14trans)
-  mrllpr_plot_data <- get_plot_data(dds_AM14MRLlpr, gene_IDs$AM14MRLlpr)
-  r848_plot_data <- get_plot_data(dds_AM14trans_R848, gene_IDs$AM14trans)
-  np_plot_data <- get_plot_data(dds_B18trans, gene_IDs$B18trans)
-
-  pl23_plot_data %>%
-    ggplot(aes(x = stim, y = mean, fill = treatment)) +
-    geom_bar(position = position_dodge(width = 0.9), stat = "identity") +
-    ggtitle("PL2-3 + 2DG vs PL2-3") +
-    labs(x = "", y = "DESeq2 Normalized Counts") +
-    # scale_y_continuous(transform = 'log10') +
-    geom_errorbar(
-      aes(x = stim, ymin = mean - sem, ymax = mean + sem),
-      width = 0.2,
-      position = position_dodge(width = 0.9),
-      stat = "identity"
-    ) +
-    geom_jitter(aes(y = reads), position = position_dodge(width = 0.9)) +
-    facet_wrap( ~ external_gene_name, scales = 'free') +
-
-  mrllpr_plot_data %>%
-    ggplot(aes(x = stim, y = mean, fill = treatment)) +
-    geom_bar(position = position_dodge(width = 0.9), stat = "identity") +
-    ggtitle("AM14 MRL/lpr 2DG vs Control") +
-    labs(x = "", y = "DESeq2 Normalized Counts") +
-    # scale_y_continuous(transform = 'log10') +
-    geom_errorbar(
-      aes(x = stim, ymin = mean - sem, ymax = mean + sem),
-      width = 0.2,
-      position = position_dodge(width = 0.9),
-      stat = "identity"
-    ) +
-    geom_jitter(aes(y = reads), position = position_dodge(width = 0.9)) +
-    facet_wrap( ~ external_gene_name, scales = 'free') +
-    
-  r848_plot_data %>%
-    ggplot(aes(x = stim, y = mean, fill = treatment)) +
-    geom_bar(position = position_dodge(width = 0.9), stat = "identity") +
-    ggtitle("R848 + 2DG vs R848") +
-    labs(x = "", y = "DESeq2 Normalized Counts") +
-    # scale_y_continuous(transform = 'log10') +
-    geom_errorbar(
-      aes(x = stim, ymin = mean - sem, ymax = mean + sem),
-      width = 0.2,
-      position = position_dodge(width = 0.9),
-      stat = "identity"
-    ) +
-    geom_jitter(aes(y = reads), position = position_dodge(width = 0.9)) +
-    facet_wrap( ~ external_gene_name, scales = 'free') +
-    
-  np_plot_data %>%
-    ggplot(aes(x = stim, y = mean, fill = treatment)) +
-    geom_bar(position = position_dodge(width = 0.9), stat = "identity") +
-    ggtitle("NP + 2DG vs NP") +
-    labs(x = "", y = "DESeq2 Normalized Counts") +
-    # scale_y_continuous(transform = 'log10') +
-    geom_errorbar(
-      aes(x = stim, ymin = mean - sem, ymax = mean + sem),
-      width = 0.2,
-      position = position_dodge(width = 0.9),
-      stat = "identity"
-    ) +
-    geom_jitter(aes(y = reads), position = position_dodge(width = 0.9)) +
-    facet_wrap( ~ external_gene_name, scales = 'free') 
-}
-
-
-
-
-normcounts_plot2(c("Unc93b1")) 
-normcounts_plot2(c("Tbx21")) 
-# normcounts_plot2(c("Il2")) 
-normcounts_plot2(c("Il2rb")) 
-normcounts_plot2(c("Il12a")) 
-normcounts_plot2(c("Il12b")) 
-normcounts_plot2(c("Il12rb1")) 
-normcounts_plot2(c("Il12rb2")) 
-normcounts_plot2(c("Il21")) 
-normcounts_plot2(c("Irf7")) 
-normcounts_plot2(c("Tlr7")) 
-normcounts_plot2(c("Tlr9")) 
-normcounts_plot2(c("Stat1")) 
-normcounts_plot2(c("Stat3")) 
-normcounts_plot2(c("Ackr2")) 
-normcounts_plot2(c("Ifngas1")) 
-normcounts_plot2(c("Il1b")) 
 
 
 
