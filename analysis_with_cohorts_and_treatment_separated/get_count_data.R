@@ -146,6 +146,7 @@ normcounts_plot_multi(c("Unc93b1", "Tbx21", "Il2", "Il2rb", "Il12b", "Il12rb1", 
 
 
 
+normcounts_plot_multi(c("Ifngr1"))
 
 normcounts_plot_multi(c("Unc93b1")) 
 normcounts_plot_multi(c("Tbx21")) 
@@ -169,6 +170,12 @@ normcounts_plot_multi(c("Ptpn22"))
 normcounts_plot_multi(c("Rab7b")) 
 normcounts_plot_multi(c("Ifng")) 
 
+normcounts_plot_multi(c("Cr2")) 
+normcounts_plot_multi(c("Ly6c1")) 
+normcounts_plot_multi(c("Batf3")) 
+normcounts_plot_multi(c("Lck")) 
+normcounts_plot_multi(c("Ccl4")) 
+normcounts_plot_multi(c("Irf7")) 
 
 
 
@@ -213,27 +220,27 @@ p1 %>%
   facet_wrap( ~ external_gene_name, scales = 'free')
 
 
-bp <- tidy_reads("Unc93b1", "AM14trans")
-bp$summary
-bp$df
-head(bp$cts)
-head(bp$cts_with_symbols)
-
-test <- bp$cts_with_symbols %>%
-  pivot_longer(
-    cols = -(1:2), # by using a `-`, we can exclude the first two columns
-    values_to = c("normCounts"),
-    names_to = c("treatment", "mouse"),
-    names_sep  = "_"
-  )
-head(test)
-rm(test)
-
-test %>%
-  filter(external_gene_name == "Unc93b1") %>%
-  ggplot(aes(x = treatment)) +
-  geom_bar() +
-  ggtitle("geom_bar")
+# bp <- tidy_reads("Unc93b1", "AM14trans")
+# bp$summary
+# bp$df
+# head(bp$cts)
+# head(bp$cts_with_symbols)
+# 
+# test <- bp$cts_with_symbols %>%
+#   pivot_longer(
+#     cols = -(1:2), # by using a `-`, we can exclude the first two columns
+#     values_to = c("normCounts"),
+#     names_to = c("treatment", "mouse"),
+#     names_sep  = "_"
+#   )
+# head(test)
+# rm(test)
+# 
+# test %>%
+#   filter(external_gene_name == "Unc93b1") %>%
+#   ggplot(aes(x = treatment)) +
+#   geom_bar() +
+#   ggtitle("geom_bar")
 
 # temp_cts <- counts(dds_AM14trans, normalized = TRUE)
 # rm(temp_cts)

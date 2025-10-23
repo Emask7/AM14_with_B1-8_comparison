@@ -298,6 +298,9 @@ getwd()
   full_summary
 
 # Save results to an Excel file ----------------------------------------------
+  setwd("Z:/Emma Mask/R_projects/AM14_with_B1-8_comparison/analysis_with_cohorts_and_treatment_separated")
+  getwd()
+  
   wb <- createWorkbook("Output/DESeq2_results.xlsx")
   
   addWorksheet(wb, "DEG Summaries")
@@ -316,21 +319,17 @@ getwd()
   saveWorkbook(wb, "Output/DESeq2_results.xlsx", overwrite = TRUE)
   rm(wb)
   
-  # wb <- createWorkbook("Output/DESeq2_gene_counts.xlsx")
-  # 
-  # addWorksheet(wb, "Raw_Counts - AM14 transfer")
-  # addWorksheet(wb, "Norm_Counts - AM14 transfer")
-  # addWorksheet(wb, "Raw_Counts - B1-8 transfer")
-  # addWorksheet(wb, "Norm_Counts - B1-8 transfer")
-  # addWorksheet(wb, "Raw_Counts - AM14 MRLlpr")
-  # addWorksheet(wb, "Norm_Counts - AM14 MRLlpr")
-  # 
-  # writeData(wb, "Raw_Counts - AM14 transfer", counts(dds_AM14trans_co1, normalized = FALSE), rowNames = TRUE)
-  # writeData(wb, "Norm_Counts - AM14 transfer", counts(dds_AM14trans_co1, normalized = TRUE), rowNames = TRUE)
-  # writeData(wb, "Raw_Counts - B1-8 transfer", counts(dds_B18trans, normalized = FALSE), rowNames = TRUE)
-  # writeData(wb, "Norm_Counts - B1-8 transfer", counts(dds_B18trans, normalized = TRUE), rowNames = TRUE)
-  # writeData(wb, "Raw_Counts - AM14 MRLlpr", counts(dds_AM14MRLlpr, normalized = FALSE), rowNames = TRUE)
-  # writeData(wb, "Norm_Counts - AM14 MRLlpr", counts(dds_AM14MRLlpr, normalized = TRUE), rowNames = TRUE)
-  # 
-  # saveWorkbook(wb, "Output/DESeq2_gene_counts.xlsx", overwrite = TRUE)
-  # rm(wb)
+  wb <- createWorkbook("Output/DESeq2_normalized_gene_counts.xlsx")
+
+  addWorksheet(wb, "PL23")
+  addWorksheet(wb, "R848")
+  addWorksheet(wb, "MRLlpr")
+  addWorksheet(wb, "NP")
+
+  writeData(wb, "PL23", counts(dds_AM14trans_PL23, normalized = TRUE), rowNames = TRUE)
+  writeData(wb, "R848", counts(dds_AM14trans_R848, normalized = TRUE), rowNames = TRUE)
+  writeData(wb, "NP", counts(dds_B18trans, normalized = TRUE), rowNames = TRUE)
+  writeData(wb, "MRLlpr", counts(dds_AM14MRLlpr, normalized = TRUE), rowNames = TRUE)
+
+  saveWorkbook(wb, "Output/DESeq2_normalized_gene_counts.xlsx", overwrite = TRUE)
+  rm(wb)
