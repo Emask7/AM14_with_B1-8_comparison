@@ -28,12 +28,12 @@ head(DEGs)
 
 zscore_matrix <- function(dds){
   zscores <- counts(dds, normalized=TRUE)
-  zscores <- zscores[rownames(zscores) %in% DEGs, ]
   res_colnames <- colnames(zscores)
   zscores <- t(zscores)
   zscores <- scale(zscores)
   zscores <- t(zscores)
   zscores <- data.frame(rownames(zscores), zscores)
+  zscores <- zscores[rownames(zscores) %in% DEGs, ]
   colnames(zscores) <- c("ensembl_gene_id", res_colnames)
   rm(res_colnames)
   return(zscores)
