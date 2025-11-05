@@ -73,6 +73,11 @@ get_counts_B18trans <- function(gene_name){
   get_counts_AM14MRLlpr("Tbx21")
   get_counts_B18trans("Tbx21")
   
+  get_counts_AM14trans("Cr2")
+  get_counts_AM14MRLlpr("Cr2")
+  get_counts_B18trans("Cr2")
+  
+  
   get_counts_AM14trans("Il12a")
   get_counts_AM14MRLlpr("Il12a")
   get_counts_B18trans("Il12a")
@@ -134,7 +139,7 @@ normcounts_plot_multi <- function(gene_list){
 }
 
 
-normcounts_plot_multi(c("Il2", "Il2rb", "Il12b", "Il12rb1"))
+normcounts_plot_multi(c("Cr2", "Itgax", "Tbx21", "Cxcr3"))
 
 normcounts_plot_multi(c("Il1b"))
 normcounts_plot_multi(c("Il2"))
