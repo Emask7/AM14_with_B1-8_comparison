@@ -10,6 +10,9 @@ getwd()
     gene_IDs <- list(AM14trans = cts_AM14trans[, c(1:6)],
                      B18trans = cts_B18trans[, c(1:6)],
                      AM14MRLlpr = cts_AM14MRLlpr[, c(1:6)])
+    gene_IDs_full <- full_join(gene_IDs$AM14trans, gene_IDs$B18trans)
+    gene_IDs_full <- full_join(gene_IDs_full, gene_IDs$AM14MRLlpr)
+    head(gene_IDs_full)
         
   # Remove extra columns from cts ----------------------------------------------
     cts_AM14trans <- cts_AM14trans[, c(7:26)]
