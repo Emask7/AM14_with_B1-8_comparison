@@ -1,10 +1,11 @@
-# install.packages(c("arsenal", "BiocManager", "dplyr", "ggarchery", "ggplot2", "MetBrewer", "openxlsx", "plotrix", "plyr", "PNWColors", "RColorBrewer", "scales", "stringi", "tidyr", "tidyverse", "wesanderson")
+# install.packages(c("arsenal", "BiocManager", "dplyr", "ggarchery", "ggplot2", "ggpubr", "MetBrewer", "openxlsx", "plotrix", "plyr", "PNWColors", "RColorBrewer", "scales", "stringi", "tidyr", "tidyverse", "wesanderson")
 
 library(arsenal)
 library(cowplot)
 library(dplyr)
 library(ggarchery)
 library(ggplot2)
+library(ggpubr)
 library(MetBrewer)
 library(openxlsx)
 library(plotrix)

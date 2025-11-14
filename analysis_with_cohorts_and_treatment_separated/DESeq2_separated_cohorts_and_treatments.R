@@ -28,7 +28,7 @@ getwd()
 
 # Set up experimental factors --------------------------------------------------
   coldata <- read.csv("raw_data/sample_info.csv")
-  coldata <- coldata[, c(1:3, 5:6, 10)]
+  coldata <- coldata[, c(1:3, 5:10)]
   coldata
   
   cd_AM14trans_PL23 <- filter(coldata, Cohort == "A1" & grepl("PL23", Treatment))

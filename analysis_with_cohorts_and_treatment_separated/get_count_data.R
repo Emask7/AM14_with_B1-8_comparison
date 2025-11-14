@@ -1,3 +1,5 @@
+setwd("Z:/Emma Mask/R_projects/AM14_with_B1-8_comparison/analysis_with_cohorts_and_treatment_separated/ABC_marker_analysis")
+getwd()
 
 find_ensembl_ID <- function(search_name) {
   dat <- dplyr::filter(gene_IDs$AM14trans, external_gene_name == search_name)
@@ -43,30 +45,6 @@ get_counts_B18trans <- function(gene_name){
   df
 }
 
-
-
-# Complement genes
-  get_counts("C1qa")
-  get_counts("C1qb")
-  get_counts("C1qc")
-  get_counts("Fcna")
-  get_counts("C6")
-  get_counts("C4b")
-  get_counts("C3")
-  get_counts("Cfh")
-  get_counts("Ighg2c")
-  get_counts("Ighm")
-  get_counts("Ighg2b")
-  
-# TLR signaling
-  get_counts("Unc93b1")
-  get_counts("Tlr9")
-  get_counts("Ptpn22")
-  get_counts("Treml4")
-  get_counts("Rab7b")
-  get_counts("Colec12")
-  get_counts("Cxcr4")
-  get_counts("Gpr55")
   
 # Th1 pathway
   get_counts_AM14trans("Tbx21")
@@ -259,4 +237,5 @@ p1 %>%
 #             sd = sd(normCounts))
 # 
 #   summary1 %>% knitr::kable()
+
   
