@@ -1,3 +1,6 @@
+setwd("Z:/Emma Mask/R_projects/AM14_with_B1-8_comparison/analysis_with_cohorts_and_treatment_separated/")
+getwd()
+
 find_ensembl_ID <- function(search_name) {
   dat <- dplyr::filter(gene_IDs_full, external_gene_name == search_name)
   dat$ensembl_gene_id
@@ -9,13 +12,16 @@ normcount_table <- function(gene_name, dds){
   res <- counts(dds, normalized = TRUE)
   res <- res[rownames(res) %in% ID, ]
   res <- data.frame(Sample = names(res), counts = res)
-  res <- left_join(res, coldata, by = "Sample")
-  res <- res[ , c(1:2, 6, 8, 9)] %>%
-    group_by(Treatment, Drug, heatmap_col1)
   
-  colnames(res) <- c("Sample", "counts", "Treatment", "Drug", "Experiment")
-  
-  return(res)
+  if(nrow(res) > 0){
+    res <- left_join(res, coldata, by = "Sample")
+    res <- res[ , c(1:2, 4, 6, 8, 9)] %>%
+      group_by(Treatment, Drug, heatmap_col1)
+    
+    colnames(res) <- c("Sample", "counts", "Mouse_Number", "Treatment", "Drug", "Experiment")
+    
+    return(res)
+  } else return(NULL)
   
   # summary_df <- res %>%
   #   summarise(
@@ -38,51 +44,130 @@ normcount_table <- function(gene_name, dds){
 #   return(x < quantile(x, 0.25) - 1.5 * IQR(x) | x > quantile(x, 0.75) + 1.5 * IQR(x))
 # }
 
-count_boxplot <- function(gene_name, counts_table){
-  # normcounts_res <- normcount_table(gene_name, dds)
+count_boxplot <- function(gene_name, counts_table, alt_title){
+  if(missing(alt_title)) alt_title <- NULL
+  
+  if(is.null(alt_title)) alt_title <- gene_name
   
   ggboxplot(counts_table, x = "Drug", y = "counts", 
-            add = c("mean", "jitter"), # Add mean and individual points
-            ylab = "counts", xlab = "Treatment") +
-    # geom_boxplot() +
-    # geom_jitter(width = 0.2, alpha = 0.5) +
-    theme_bw() +
-    labs(title = gene_name) + 
-    geom_text(aes(label = Sample), nudge_y = 50, size = 3) +
-    # geom_text(aes(label = ifelse(is_outlier(counts), Sample, NA)), nudge_y = 50, size = 3) +
+            # outliers = FALSE,
+            add = c("jitter"), label = "Mouse_Number", repel = TRUE,
+            ggtheme = theme_bw(), ylab = "counts", xlab = "Treatment") +
+    # geom_point(aes(group = Treatment), position = position_jitter(width = 0.3), size = 1.5) +
+    # geom_text(aes(label = Mouse_Number), vjust = -0.5) +
+    labs(title = alt_title) + 
     facet_wrap( ~ Experiment, scales = 'fixed', ncol = 4)
 }
 
-multi_boxplot <- function(gene_name){
+multi_boxplot <- function(gene_name, alt_title){
+  if(missing(alt_title)) alt_title <- NULL
+  
   pl23_normcounts <- normcount_table(gene_name, dds_AM14trans_PL23)
   mrl_normcounts <- normcount_table(gene_name, dds_AM14MRLlpr)
   r848_normcounts <- normcount_table(gene_name, dds_AM14trans_R848)
   np_normcounts <- normcount_table(gene_name, dds_B18trans)
   
-  full_table <- full_join(pl23_normcounts, mrl_normcounts)
-  if(nrow(r848_normcounts) > 0) full_table <- full_join(full_table, r848_normcounts)
-  if(nrow(np_normcounts) > 0) full_table <- full_join(full_table, np_normcounts)
+  if(!is.null(pl23_normcounts)) {
+    full_table <- pl23_normcounts
+    if(!is.null(mrl_normcounts)) full_table <- full_join(full_table, mrl_normcounts)
+    if(!is.null(r848_normcounts)) full_table <- full_join(full_table, r848_normcounts)
+    if(!is.null(np_normcounts)) full_table <- full_join(full_table, np_normcounts)
+  } else if(!is.null(mrl_normcounts)){
+    full_table <- mrl_normcounts
+    if(!is.null(r848_normcounts)) full_table <- full_join(full_table, r848_normcounts)
+    if(!is.null(np_normcounts)) full_table <- full_join(full_table, np_normcounts)
+  } else if(!is.null(r848_normcounts)){
+    full_table <- r848_normcounts
+    if(!is.null(np_normcounts)) full_table <- full_join(full_table, np_normcounts)
+  } else if(!is.null(np_normcounts)) {
+    full_table <- np_normcounts
+  } else {
+    print("gene not found")
+    return(NULL)
+  }
   
-  count_boxplot(gene_name, full_table)
-  
-  # count_boxplot(gene_name, pl23_normcounts) +
-  #   count_boxplot(gene_name, mrl_normcounts) +
-  #   count_boxplot(gene_name, r848_normcounts) +
-  #   count_boxplot(gene_name, np_normcounts)
-  
-  # return(mrl_normcounts)
+  count_boxplot(gene_name, full_table, alt_title)
 }
 
-# cd3_mrl <- normcount_table("Cd3d", dds_AM14MRLlpr)
-# count_boxplot("Cd3d", cd3_mrl)
+# T and B cell markers ---------------------------------------------------------
+  multi_boxplot("Cd3d")
+  ggsave(filename = "QC_results/cell_marker_checks/Cd3d.png", width = 8, height = 4, units = "in", dpi = 300)
+  
+  multi_boxplot("Cd3e")
+  ggsave(filename = "QC_results/cell_marker_checks/Cd3e.png", width = 4, height = 4, units = "in", dpi = 300)
+  
+  multi_boxplot("Cd3g")
+  ggsave(filename = "QC_results/cell_marker_checks/Cd3g.png", width = 8, height = 4, units = "in", dpi = 300)
+  
+  multi_boxplot("Cd4")
+  ggsave(filename = "QC_results/cell_marker_checks/Cd4.png", width = 4, height = 4, units = "in", dpi = 300)
+  
+  multi_boxplot("Cd8a")
+  ggsave(filename = "QC_results/cell_marker_checks/Cd8a.png", width = 8, height = 4, units = "in", dpi = 300)
+  
+  multi_boxplot("Cd8b")
+  # ggsave(filename = "QC_results/cell_marker_checks/Cd8b.png", width = 8, height = 4, units = "in", dpi = 300)
+  
+  multi_boxplot("Icos")
+  ggsave(filename = "QC_results/cell_marker_checks/Icos.png", width = 4, height = 4, units = "in", dpi = 300)
+  
+  multi_boxplot("Cd40lg")
+  ggsave(filename = "QC_results/cell_marker_checks/Cd40lg.png", width = 6, height = 4, units = "in", dpi = 300)
+  
+  multi_boxplot("Cd19")
+  ggsave(filename = "QC_results/cell_marker_checks/Cd19.png", width = 8, height = 4, units = "in", dpi = 300)
+  
+  multi_boxplot("Ptprc", "Ptprc (B220)")
+  ggsave(filename = "QC_results/cell_marker_checks/B220.png", width = 8, height = 4, units = "in", dpi = 300)
+  
 
-# test <- normcount_table("Tbx21", dds_AM14MRLlpr)
-# test
+  
+# Genes of interest ------------------------------------------------------------
+  multi_boxplot("Cr2", "Cr2 (CD21)")
+  ggsave(filename = "Output/DEG_barplots/Cr2.png", width = 9, height = 4.5, units = "in", dpi = 300)
+  
+  multi_boxplot("Tbx21", "Tbx21 (T-bet)")
+  ggsave(filename = "Output/DEG_barplots/Tbx21.png", width = 9, height = 4.5, units = "in", dpi = 300)
+  
+  multi_boxplot("Itgax", "Itgax (CD11c)")
+  ggsave(filename = "Output/DEG_barplots/Itgax.png", width = 9, height = 4.5, units = "in", dpi = 300)
+  
+  multi_boxplot("Itgam", "Itgax (CD11b)")
+  ggsave(filename = "Output/DEG_barplots/Itgam.png", width = 9, height = 4.5, units = "in", dpi = 300)
+  
+  multi_boxplot("Cxcr3")
+  ggsave(filename = "Output/DEG_barplots/Cxcr3.png", width = 9, height = 4.5, units = "in", dpi = 300)
+  
+  multi_boxplot("C1qc")
+  ggsave(filename = "Output/DEG_barplots/C1qc.png", width = 9, height = 4.5, units = "in", dpi = 300)
+  
+  multi_boxplot("C1qb")
+  ggsave(filename = "Output/DEG_barplots/C1qb.png", width = 9, height = 4.5, units = "in", dpi = 300)
+  
+  multi_boxplot("Ly6c1")
+  ggsave(filename = "Output/DEG_barplots/Ly6c1.png", width = 9, height = 4.5, units = "in", dpi = 300)
+  
+  multi_boxplot("Batf3")
+  ggsave(filename = "Output/DEG_barplots/Batf3.png", width = 9, height = 4.5, units = "in", dpi = 300)
+  
+  multi_boxplot("Ccl4")
+  ggsave(filename = "Output/DEG_barplots/Ccl4.png", width = 9, height = 4.5, units = "in", dpi = 300)
+  
+  multi_boxplot("Lck")
+  ggsave(filename = "Output/DEG_barplots/Lck.png", width = 9, height = 4.5, units = "in", dpi = 300)
+  
+  multi_boxplot("")
+  ggsave(filename = "Output/DEG_barplots/.png", width = 9, height = 4.5, units = "in", dpi = 300)
+  
+  multi_boxplot("")
+  ggsave(filename = "Output/DEG_barplots/.png", width = 9, height = 4.5, units = "in", dpi = 300)
+  
+  multi_boxplot("")
+  ggsave(filename = "Output/DEG_barplots/.png", width = 9, height = 4.5, units = "in", dpi = 300)
+  
+  multi_boxplot("")
+  ggsave(filename = "Output/DEG_barplots/.png", width = 9, height = 4.5, units = "in", dpi = 300)
 
-multi_boxplot("Tbx21")
-
-multi_boxplot("Cd3d")
-multi_boxplot("Cd8a")
 
 
 # plot_counts <- function(counts_table, summary_df){

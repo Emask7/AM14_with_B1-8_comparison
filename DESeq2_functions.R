@@ -144,6 +144,7 @@
       
       ggplot(pcaData, aes(PC1, PC2, color=Treatment)) +
         geom_point(size=3) +
+        geom_text(aes(label = dds$Mouse_Number), vjust = -0.5) +
         xlab(paste0("PC1: ",percentVar[1],"% variance")) +
         ylab(paste0("PC2: ",percentVar[2],"% variance")) +
         coord_fixed() +
@@ -165,6 +166,7 @@
       
       ggplot(pcaData, aes(PC1, PC2, color=Treatment, shape=Cohort)) +
         geom_point(size=3) +
+        geom_text(aes(label = dds$Mouse_Number), vjust = -0.5) +
         xlab(paste0("PC1: ",percentVar[1],"% variance")) +
         ylab(paste0("PC2: ",percentVar[2],"% variance")) +
         coord_fixed() +

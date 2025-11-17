@@ -115,21 +115,21 @@ getwd()
 # Run QC steps -----------------------------------------------------------------
   setwd("./analysis_with_cohorts_and_treatment_separated/")
   getwd()
-  
-  QC_heatmaps(dds_AM14trans_PL23, "AM14_Adoptive_Transfer_PL23", "AM14 Adoptive Transfer:\nPL2-3 + 2DG vs PL2-3", plot_cohorts = FALSE)
-  QC_heatmaps(dds_AM14trans_R848, "AM14_Adoptive_Transfer_R848", "AM14 Adoptive Transfer:\nR848 + 2DG vs R848", plot_cohorts = FALSE)
-  QC_heatmaps(dds_B18trans, "B18_Adoptive_Transfer", "B1-8 Adoptive Transfer\nNP + 2DG vs NP", plot_cohorts = FALSE)
-  QC_heatmaps(dds_AM14MRLlpr, "AM14_MRLlpr", "AM14 MRL/lpr mice\n2DG vs Control", plot_cohorts = FALSE)
 
-  sample_to_sample_plot(dds_AM14trans_PL23, "AM14_Adoptive_Transfer_PL23", "AM14 Adoptive Transfer (PL2-3 + 2DG vs PL2-3)")
-  sample_to_sample_plot(dds_AM14trans_R848, "AM14_Adoptive_Transfer_R848", "AM14 Adoptive Transfer (R848 + 2DG vs R848)")
-  sample_to_sample_plot(dds_B18trans, "B18_Adoptive_Transfer", "B1-8 Adoptive Transfer")
-  sample_to_sample_plot(dds_AM14MRLlpr, "AM14_MRLlpr", "AM14 MRL/lpr +/- 2DG")
-  
+  # QC_heatmaps(dds_AM14trans_PL23, "AM14_Adoptive_Transfer_PL23", "AM14 Adoptive Transfer:\nPL2-3 + 2DG vs PL2-3", plot_cohorts = FALSE)
+  # QC_heatmaps(dds_AM14trans_R848, "AM14_Adoptive_Transfer_R848", "AM14 Adoptive Transfer:\nR848 + 2DG vs R848", plot_cohorts = FALSE)
+  # QC_heatmaps(dds_B18trans, "B18_Adoptive_Transfer", "B1-8 Adoptive Transfer\nNP + 2DG vs NP", plot_cohorts = FALSE)
+  # QC_heatmaps(dds_AM14MRLlpr, "AM14_MRLlpr", "AM14 MRL/lpr mice\n2DG vs Control", plot_cohorts = FALSE)
+  # 
+  # sample_to_sample_plot(dds_AM14trans_PL23, "AM14_Adoptive_Transfer_PL23", "AM14 Adoptive Transfer (PL2-3 + 2DG vs PL2-3)")
+  # sample_to_sample_plot(dds_AM14trans_R848, "AM14_Adoptive_Transfer_R848", "AM14 Adoptive Transfer (R848 + 2DG vs R848)")
+  # sample_to_sample_plot(dds_B18trans, "B18_Adoptive_Transfer", "B1-8 Adoptive Transfer")
+  # sample_to_sample_plot(dds_AM14MRLlpr, "AM14_MRLlpr", "AM14 MRL/lpr +/- 2DG")
+
   QC_PCAplot(dds_AM14trans_PL23, "AM14_Adoptive_Transfer_PL23", "PL2-3 + 2DG vs PL2-3",
              batch_effect = NULL, draw_ellipse = FALSE)
   dev.off()
-  
+
   QC_PCAplot(dds_AM14trans_R848, "AM14_Adoptive_Transfer_R848", "R848 + 2DG vs R848",
              batch_effect = NULL, draw_ellipse = FALSE)
   dev.off()
@@ -141,6 +141,12 @@ getwd()
   QC_PCAplot(dds_AM14MRLlpr, "AM14_MRLlpr", "AM14 MRL/lpr mice: 2DG vs Control",
              batch_effect = NULL, draw_ellipse = FALSE)
   dev.off()
+  
+
+  
+  
+  
+  
 
 # Get DESeq2 results -----------------------------------------------------------
   deseq_res <- list(
@@ -167,64 +173,63 @@ getwd()
   #             "AM14 transfer - PL2-3 only - DESeq2_norm")
   
 # DEG Heatmaps using default DESeq2 normalization ------------------------------  
-    
-  DEG_heatmap(dds_AM14trans_PL23, deseq_res$AM14transfer_PL23, 
-              c("Treatment"),
-              list(Treatment = c(PL23 = "#0f85a0", PL23_2DG = "#dd4124")),
-              1, 0.05, "norm_counts", NULL,
-              "AM14 Adoptive Transfer: PL2-3 + 2DG vs PL2-3",
-              "AM14 transfer PL2-3 - padj 0.05")
-
-  DEG_heatmap(dds_AM14trans_PL23, deseq_res$AM14transfer_PL23, 
-              c("Treatment"),
-              list(Treatment = c(PL23 = "#0f85a0", PL23_2DG = "#dd4124")),
-              1, 0.01, "norm_counts", NULL,
-              "AM14 Adoptive Transfer: PL2-3 + 2DG vs PL2-3",
-              "AM14 transfer PL2-3 - padj 0.01")
-  
-  DEG_heatmap(dds_AM14trans_R848, deseq_res$AM14transfer_R848, 
-              c("Treatment"),
-              list(Treatment = c(R848 = "#0f85a0", R848_2DG = "#dd4124")),
-              1, 0.05, "norm_counts", NULL,
-              "AM14 Adoptive Transfer: R848 + 2DG vs R848",
-              "AM14 transfer R848 - padj 0.05")
-  
-  DEG_heatmap(dds_AM14trans_R848, deseq_res$AM14transfer_R848, 
-              c("Treatment"),
-              list(Treatment = c(R848 = "#0f85a0", R848_2DG = "#dd4124")),
-              1, 0.01, "norm_counts", NULL,
-              "AM14 Adoptive Transfer: R848 + 2DG vs R848",
-              "AM14 transfer R848 - padj 0.01")
-  
-
-  DEG_heatmap(dds_B18trans, deseq_res$B18transfer, 
-              c("Treatment"),
-              list(Treatment = c(NP = "#0f85a0", NP_2DG = "#dd4124")),
-              1, 0.05, "norm_counts", NULL,
-              "B1-8 Adoptive Transfer: NP + 2DG vs NP",
-              "B1-8 transfer - padj 0.05", h = 1000)
-  
-  DEG_heatmap(dds_B18trans, deseq_res$B18transfer, 
-              c("Treatment"),
-              list(Treatment = c(NP = "#0f85a0", NP_2DG = "#dd4124")),
-              1, 0.01, "norm_counts", NULL,
-              "B1-8 Adoptive Transfer: NP + 2DG vs NP",
-              "B1-8 transfer - padj 0.01", h = 1000)
-  
-  
-  DEG_heatmap(dds_AM14MRLlpr, deseq_res$AM14MRLlpr, 
-              c("Treatment"),
-              list(Treatment = c(Control = "#0f85a0", "2DG" = "#dd4124")),
-              1, 0.05, "norm_counts", NULL,
-              "AM14 MRL/lpr Mice: 2DG vs Control",
-              "AM14 MRLlpr - padj 0.05")
-  
-  DEG_heatmap(dds_AM14MRLlpr, deseq_res$AM14MRLlpr, 
-              c("Treatment"),
-              list(Treatment = c(Control = "#0f85a0", "2DG" = "#dd4124")),
-              1, 0.01, "norm_counts", NULL,
-              "AM14 MRL/lpr Mice: 2DG vs Control",
-              "AM14 MRLlpr - padj 0.01")
+  # DEG_heatmap(dds_AM14trans_PL23, deseq_res$AM14transfer_PL23, 
+  #             c("Treatment"),
+  #             list(Treatment = c(PL23 = "#0f85a0", PL23_2DG = "#dd4124")),
+  #             1, 0.05, "norm_counts", NULL,
+  #             "AM14 Adoptive Transfer: PL2-3 + 2DG vs PL2-3",
+  #             "AM14 transfer PL2-3 - padj 0.05")
+  # 
+  # DEG_heatmap(dds_AM14trans_PL23, deseq_res$AM14transfer_PL23, 
+  #             c("Treatment"),
+  #             list(Treatment = c(PL23 = "#0f85a0", PL23_2DG = "#dd4124")),
+  #             1, 0.01, "norm_counts", NULL,
+  #             "AM14 Adoptive Transfer: PL2-3 + 2DG vs PL2-3",
+  #             "AM14 transfer PL2-3 - padj 0.01")
+  # 
+  # DEG_heatmap(dds_AM14trans_R848, deseq_res$AM14transfer_R848, 
+  #             c("Treatment"),
+  #             list(Treatment = c(R848 = "#0f85a0", R848_2DG = "#dd4124")),
+  #             1, 0.05, "norm_counts", NULL,
+  #             "AM14 Adoptive Transfer: R848 + 2DG vs R848",
+  #             "AM14 transfer R848 - padj 0.05")
+  # 
+  # DEG_heatmap(dds_AM14trans_R848, deseq_res$AM14transfer_R848, 
+  #             c("Treatment"),
+  #             list(Treatment = c(R848 = "#0f85a0", R848_2DG = "#dd4124")),
+  #             1, 0.01, "norm_counts", NULL,
+  #             "AM14 Adoptive Transfer: R848 + 2DG vs R848",
+  #             "AM14 transfer R848 - padj 0.01")
+  # 
+  # 
+  # DEG_heatmap(dds_B18trans, deseq_res$B18transfer, 
+  #             c("Treatment"),
+  #             list(Treatment = c(NP = "#0f85a0", NP_2DG = "#dd4124")),
+  #             1, 0.05, "norm_counts", NULL,
+  #             "B1-8 Adoptive Transfer: NP + 2DG vs NP",
+  #             "B1-8 transfer - padj 0.05", h = 1000)
+  # 
+  # DEG_heatmap(dds_B18trans, deseq_res$B18transfer, 
+  #             c("Treatment"),
+  #             list(Treatment = c(NP = "#0f85a0", NP_2DG = "#dd4124")),
+  #             1, 0.01, "norm_counts", NULL,
+  #             "B1-8 Adoptive Transfer: NP + 2DG vs NP",
+  #             "B1-8 transfer - padj 0.01", h = 1000)
+  # 
+  # 
+  # DEG_heatmap(dds_AM14MRLlpr, deseq_res$AM14MRLlpr, 
+  #             c("Treatment"),
+  #             list(Treatment = c(Control = "#0f85a0", "2DG" = "#dd4124")),
+  #             1, 0.05, "norm_counts", NULL,
+  #             "AM14 MRL/lpr Mice: 2DG vs Control",
+  #             "AM14 MRLlpr - padj 0.05")
+  # 
+  # DEG_heatmap(dds_AM14MRLlpr, deseq_res$AM14MRLlpr, 
+  #             c("Treatment"),
+  #             list(Treatment = c(Control = "#0f85a0", "2DG" = "#dd4124")),
+  #             1, 0.01, "norm_counts", NULL,
+  #             "AM14 MRL/lpr Mice: 2DG vs Control",
+  #             "AM14 MRLlpr - padj 0.01")
   
 # # DEG Heatmaps using Rlog normalization ----------------------------------------  
 #   DEG_heatmap(dds_AM14trans_PL23, deseq_res$AM14transfer_PL23, 
@@ -301,38 +306,38 @@ getwd()
   full_summary
 
 # Save results to an Excel file ----------------------------------------------
-  setwd("Z:/Emma Mask/R_projects/AM14_with_B1-8_comparison/analysis_with_cohorts_and_treatment_separated")
-  getwd()
-  
-  wb <- createWorkbook("Output/DESeq2_results.xlsx")
-  
-  addWorksheet(wb, "DEG Summaries")
-  writeData(wb, "DEG Summaries", full_summary)
-  
-  addWorksheet(wb, "AM14 Co1 - PL23_2DG_vs_Ctrl")
-  addWorksheet(wb, "B1-8 - 2DG_vs_Ctrl")
-  addWorksheet(wb, "AM14 Co2 - R848_2DG_vs_Ctrl")
-  addWorksheet(wb, "AM14 MRLlpr Co2 - 2DG_vs_Ctrl")
-  
-  writeData(wb, "AM14 Co1 - PL23_2DG_vs_Ctrl", deseq_res$AM14transfer_PL23)
-  writeData(wb, "B1-8 - 2DG_vs_Ctrl", deseq_res$B18transfer)
-  writeData(wb, "AM14 Co2 - R848_2DG_vs_Ctrl", deseq_res$AM14transfer_R848)
-  writeData(wb, "AM14 MRLlpr Co2 - 2DG_vs_Ctrl", deseq_res$AM14MRLlpr)
-  
-  saveWorkbook(wb, "Output/DESeq2_results.xlsx", overwrite = TRUE)
-  rm(wb)
-  
-  wb <- createWorkbook("Output/DESeq2_normalized_gene_counts.xlsx")
-
-  addWorksheet(wb, "PL23")
-  addWorksheet(wb, "R848")
-  addWorksheet(wb, "MRLlpr")
-  addWorksheet(wb, "NP")
-
-  writeData(wb, "PL23", counts(dds_AM14trans_PL23, normalized = TRUE), rowNames = TRUE)
-  writeData(wb, "R848", counts(dds_AM14trans_R848, normalized = TRUE), rowNames = TRUE)
-  writeData(wb, "NP", counts(dds_B18trans, normalized = TRUE), rowNames = TRUE)
-  writeData(wb, "MRLlpr", counts(dds_AM14MRLlpr, normalized = TRUE), rowNames = TRUE)
-
-  saveWorkbook(wb, "Output/DESeq2_normalized_gene_counts.xlsx", overwrite = TRUE)
-  rm(wb)
+  # setwd("Z:/Emma Mask/R_projects/AM14_with_B1-8_comparison/analysis_with_cohorts_and_treatment_separated")
+  # getwd()
+  # 
+  # wb <- createWorkbook("Output/DESeq2_results.xlsx")
+  # 
+  # addWorksheet(wb, "DEG Summaries")
+  # writeData(wb, "DEG Summaries", full_summary)
+  # 
+  # addWorksheet(wb, "AM14 Co1 - PL23_2DG_vs_Ctrl")
+  # addWorksheet(wb, "B1-8 - 2DG_vs_Ctrl")
+  # addWorksheet(wb, "AM14 Co2 - R848_2DG_vs_Ctrl")
+  # addWorksheet(wb, "AM14 MRLlpr Co2 - 2DG_vs_Ctrl")
+  # 
+  # writeData(wb, "AM14 Co1 - PL23_2DG_vs_Ctrl", deseq_res$AM14transfer_PL23)
+  # writeData(wb, "B1-8 - 2DG_vs_Ctrl", deseq_res$B18transfer)
+  # writeData(wb, "AM14 Co2 - R848_2DG_vs_Ctrl", deseq_res$AM14transfer_R848)
+  # writeData(wb, "AM14 MRLlpr Co2 - 2DG_vs_Ctrl", deseq_res$AM14MRLlpr)
+  # 
+  # saveWorkbook(wb, "Output/DESeq2_results.xlsx", overwrite = TRUE)
+  # rm(wb)
+  # 
+  # wb <- createWorkbook("Output/DESeq2_normalized_gene_counts.xlsx")
+  # 
+  # addWorksheet(wb, "PL23")
+  # addWorksheet(wb, "R848")
+  # addWorksheet(wb, "MRLlpr")
+  # addWorksheet(wb, "NP")
+  # 
+  # writeData(wb, "PL23", counts(dds_AM14trans_PL23, normalized = TRUE), rowNames = TRUE)
+  # writeData(wb, "R848", counts(dds_AM14trans_R848, normalized = TRUE), rowNames = TRUE)
+  # writeData(wb, "NP", counts(dds_B18trans, normalized = TRUE), rowNames = TRUE)
+  # writeData(wb, "MRLlpr", counts(dds_AM14MRLlpr, normalized = TRUE), rowNames = TRUE)
+  # 
+  # saveWorkbook(wb, "Output/DESeq2_normalized_gene_counts.xlsx", overwrite = TRUE)
+  # rm(wb)
