@@ -95,6 +95,9 @@ getwd()
     rm(keep)
     
 # Run QC steps -----------------------------------------------------------------
+  setwd("./analysis_all_cohorts/")
+  getwd()
+    
   QC_heatmaps(dds_AM14trans, "AM14_Adoptive_Transfer", "AM14 Adoptive Transfer")
   QC_heatmaps(dds_B18trans, "B18_Adoptive_Transfer", "B1-8 Adoptive Transfer")
   QC_heatmaps(dds_AM14MRLlpr, "AM14_MRLlpr", "AM14 MRL/lpr +/- 2DG")
@@ -143,6 +146,9 @@ getwd()
   # head(deseq_res$AM14MRLlpr)
   
   # DEG Heatmaps ---------------------------------------------------------------
+    setwd("./analysis_all_cohorts/")
+    getwd()
+  
     AM14_DEGs <- DEG_list(list(deseq_res$AM14transfer$PL23_2DG_v_Ctrl,
                                deseq_res$AM14transfer$R848_2DG_v_Ctrl,
                                deseq_res$AM14transfer$PL23_vs_R848))
@@ -215,7 +221,10 @@ getwd()
                            type = "full")
   full_summary
 
-# Save results to an Excel file ----------------------------------------------
+# Save results to an Excel file ------------------------------------------------
+  setwd("./analysis_all_cohorts/")
+  getwd()
+  
   wb <- createWorkbook("Output/DESeq2_results.xlsx")
   
   addWorksheet(wb, "DEG Summaries")

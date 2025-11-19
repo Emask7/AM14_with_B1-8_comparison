@@ -1,8 +1,4 @@
-deg_list_for_venn <- function(res, lfc_cutoff){
-  list(up = subset(res, res$padj <= 0.05 & res$log2FoldChange >= lfc_cutoff)[, 1], 
-       down = subset(res, res$padj <= 0.05 & res$log2FoldChange <= (-1*lfc_cutoff))[, 1], 
-       all = subset(res, res$padj <= 0.05 & abs(res$log2FoldChange) >= lfc_cutoff)[, 1])
-}
+# Run "data_visualization_functions.R" script first 
 
 DEG_lists <- list(
   PL23_2DG_vs_Ctrl = deg_list_for_venn(deseq_res$AM14transfer$PL23_2DG_v_Ctrl, 0.5),

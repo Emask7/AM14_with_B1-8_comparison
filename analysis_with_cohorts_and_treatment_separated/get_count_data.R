@@ -6,44 +6,44 @@ find_ensembl_ID <- function(search_name) {
   dat$ensembl_gene_id
 }
 
-get_counts_AM14trans <- function(gene_name){
-  ID <- find_ensembl_ID(gene_name)
-  
-  res_PL23 <- counts(dds_AM14trans_PL23, normalized = TRUE)
-  res_PL23 <- res_PL23[rownames(res_PL23) %in% ID, ]
-  
-  res_R848 <- counts(dds_AM14trans_R848, normalized = TRUE)
-  res_R848 <- res_R848[rownames(res_R848) %in% ID, ]
-  
-  df <- data.frame(res_PL23[1:3], res_PL23[4:6], res_R848[1:3], res_R848[4:6])
-  colnames(df) <- c("PL2-3", "PL2-3+2DG", "R848", "R848+2DG")
-  rownames(df) <- c("a", "b", "c")
-  df
-}
-
-get_counts_AM14MRLlpr <- function(gene_name){
-  ID <- find_ensembl_ID(gene_name)
-  
-  res_AM14MRLlpr <- counts(dds_AM14MRLlpr, normalized = TRUE)
-  res_AM14MRLlpr <- res_AM14MRLlpr[rownames(res_AM14MRLlpr) %in% ID, ]
-  
-  df <- data.frame(c(res_AM14MRLlpr[1:6], "NA"), res_AM14MRLlpr[7:13])
-  colnames(df) <- c("Control", "2DG")
-  rownames(df) <- c("a", "b", "c", "d", "e", "f", "g")
-  df
-}
-
-get_counts_B18trans <- function(gene_name){
-  ID <- find_ensembl_ID(gene_name)
-  
-  res_B18 <- counts(dds_B18trans, normalized = TRUE)
-  res_B18 <- res_B18[rownames(res_B18) %in% ID, ]
-  
-  df <- data.frame(c(res_B18[6:9], "NA"), res_B18[1:5])
-  colnames(df) <- c("NP", "NP+2DG")
-  rownames(df) <- c("a", "b", "c", "d", "e")
-  df
-}
+# get_counts_AM14trans <- function(gene_name){
+#   ID <- find_ensembl_ID(gene_name)
+#   
+#   res_PL23 <- counts(dds_AM14trans_PL23, normalized = TRUE)
+#   res_PL23 <- res_PL23[rownames(res_PL23) %in% ID, ]
+#   
+#   res_R848 <- counts(dds_AM14trans_R848, normalized = TRUE)
+#   res_R848 <- res_R848[rownames(res_R848) %in% ID, ]
+#   
+#   df <- data.frame(res_PL23[1:3], res_PL23[4:6], res_R848[1:3], res_R848[4:6])
+#   colnames(df) <- c("PL2-3", "PL2-3+2DG", "R848", "R848+2DG")
+#   rownames(df) <- c("a", "b", "c")
+#   df
+# }
+# 
+# get_counts_AM14MRLlpr <- function(gene_name){
+#   ID <- find_ensembl_ID(gene_name)
+#   
+#   res_AM14MRLlpr <- counts(dds_AM14MRLlpr, normalized = TRUE)
+#   res_AM14MRLlpr <- res_AM14MRLlpr[rownames(res_AM14MRLlpr) %in% ID, ]
+#   
+#   df <- data.frame(c(res_AM14MRLlpr[1:6], "NA"), res_AM14MRLlpr[7:13])
+#   colnames(df) <- c("Control", "2DG")
+#   rownames(df) <- c("a", "b", "c", "d", "e", "f", "g")
+#   df
+# }
+# 
+# get_counts_B18trans <- function(gene_name){
+#   ID <- find_ensembl_ID(gene_name)
+#   
+#   res_B18 <- counts(dds_B18trans, normalized = TRUE)
+#   res_B18 <- res_B18[rownames(res_B18) %in% ID, ]
+#   
+#   df <- data.frame(c(res_B18[6:9], "NA"), res_B18[1:5])
+#   colnames(df) <- c("NP", "NP+2DG")
+#   rownames(df) <- c("a", "b", "c", "d", "e")
+#   df
+# }
 
   
 # Th1 pathway

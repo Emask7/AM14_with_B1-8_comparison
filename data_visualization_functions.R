@@ -58,3 +58,145 @@
     res
   }
   
+# Heatmaps ---------------------------------------------------------------------
+  zscore_matrix <- function(dds){
+    zscores <- counts(dds, normalized=TRUE)
+    res_colnames <- colnames(zscores)
+    zscores <- t(zscores)
+    zscores <- scale(zscores)
+    zscores <- t(zscores)
+    zscores <- data.frame(rownames(zscores), zscores)
+    zscores <- zscores[rownames(zscores) %in% DEGs, ]
+    colnames(zscores) <- c("ensembl_gene_id", res_colnames)
+    rm(res_colnames)
+    return(zscores)
+  }
+  
+# Normalized gene count bar plots ----------------------------------------------
+  find_ensembl_ID <- function(search_name) {
+    dat <- dplyr::filter(gene_IDs$AM14trans, external_gene_name == search_name)
+    dat$ensembl_gene_id
+  }
+  
+  coldata <- read.csv("raw_data/sample_info.csv")
+  coldata <- coldata[, c(1:3, 5:10)]
+
+  normcount_table <- function(gene_name, dds){
+    ID <- find_ensembl_ID(gene_name)
+    
+    res <- counts(dds, normalized = TRUE)
+    res <- res[rownames(res) %in% ID, ]
+    res <- data.frame(Sample = names(res), counts = res)
+    
+    if(nrow(res) > 0){
+      res <- left_join(res, coldata, by = "Sample")
+      res <- res[ , c(1:2, 4, 6, 8, 9)] %>%
+        group_by(Treatment, Drug, heatmap_col1)
+      
+      colnames(res) <- c("Sample", "counts", "Mouse_Number", "Treatment", "Drug", "Experiment")
+      
+      return(res)
+    } else return(NULL)
+    
+    # summary_df <- res %>%
+      # summarise(mean_counts = mean(counts), sd_counts = sd(counts),
+      #           se_counts = sd_counts / sqrt(n()), .groups = 'drop')
+    # 
+    # anova_result <- aov(counts ~ Treatment, data = res)
+    # tukey_result <- TukeyHSD(anova_result)
+    # 
+    # return(list(counts_table = res, summary = summary_df,
+    #             ANOVA = anova_result, Tukey = tukey_result))
+  }
+  
+  # is_outlier <- function(x){
+  #   return(x < quantile(x, 0.25) - 1.5 * IQR(x) | x > quantile(x, 0.75) + 1.5 * IQR(x))
+  # }
+  
+  count_boxplot <- function(gene_name, counts_table, alt_title){
+    if(missing(alt_title)) alt_title <- NULL
+    
+    if(is.null(alt_title)) alt_title <- gene_name
+    
+    ggboxplot(counts_table, x = "Drug", y = "counts", 
+              # outliers = FALSE,
+              add = c("jitter"), label = "Mouse_Number", repel = TRUE,
+              ggtheme = theme_bw(), ylab = "counts", xlab = "Treatment") +
+      # geom_point(aes(group = Treatment), position = position_jitter(width = 0.3), size = 1.5) +
+      # geom_text(aes(label = Mouse_Number), vjust = -0.5) +
+      labs(title = alt_title) + 
+      facet_wrap( ~ Experiment, scales = 'fixed', ncol = 4)
+  }
+  
+  multi_boxplot <- function(gene_name, alt_title, pl23_dds, mrl_dds, r848_dds, np_dds){
+    if(missing(alt_title)) alt_title <- NULL
+    if(missing(pl23_dds)) pl23_dds <- dds_AM14trans_PL23
+    if(missing(mrl_dds)) mrl_dds <- dds_AM14MRLlpr
+    if(missing(r848_dds)) r848_dds <- dds_AM14trans_R848
+    if(missing(np_dds)) np_dds <- dds_B18trans
+    
+    pl23_normcounts <- normcount_table(gene_name, pl23_dds)
+    mrl_normcounts <- normcount_table(gene_name, mrl_dds)
+    r848_normcounts <- normcount_table(gene_name, r848_dds)
+    np_normcounts <- normcount_table(gene_name, np_dds)
+    
+    if(!is.null(pl23_normcounts)) {
+      full_table <- pl23_normcounts
+      if(!is.null(mrl_normcounts)) full_table <- full_join(full_table, mrl_normcounts)
+      if(!is.null(r848_normcounts)) full_table <- full_join(full_table, r848_normcounts)
+      if(!is.null(np_normcounts)) full_table <- full_join(full_table, np_normcounts)
+    } else if(!is.null(mrl_normcounts)){
+      full_table <- mrl_normcounts
+      if(!is.null(r848_normcounts)) full_table <- full_join(full_table, r848_normcounts)
+      if(!is.null(np_normcounts)) full_table <- full_join(full_table, np_normcounts)
+    } else if(!is.null(r848_normcounts)){
+      full_table <- r848_normcounts
+      if(!is.null(np_normcounts)) full_table <- full_join(full_table, np_normcounts)
+    } else if(!is.null(np_normcounts)) {
+      full_table <- np_normcounts
+    } else {
+      print("gene not found")
+      return(NULL)
+    }
+    
+    count_boxplot(gene_name, full_table, alt_title)
+  }
+  
+  count_table_for_prism <- function(gene_name, dds, dds_results, cols_ctrl, cols_2DG){
+    if(missing(cols_ctrl)) {
+      print("missing cols_ctrl")
+      return(NULL)
+    }
+    if(missing(cols_2DG)) {
+      print("missing cols_2DG")
+      return(NULL)
+    }
+    
+    
+    ID <- find_ensembl_ID(gene_name)
+    gene_counts <- counts(dds, normalized = TRUE)
+    gene_counts <- gene_counts[rownames(gene_counts) %in% ID, ]
+    
+    if(length(cols_ctrl) > length(cols_2DG)){
+      length_diff <- length(cols_ctrl) - length(cols_2DG)
+      
+      ctrl <- gene_counts[cols_ctrl]
+      dg <- c(gene_counts[cols_2DG], rep(NA, length_diff))
+      gene_counts <- data.frame("Control" = ctrl, "2DG" = dg)
+    } else if(length(cols_ctrl) < length(cols_2DG)){
+      length_diff <- length(cols_2DG) - length(cols_ctrl)
+      
+      ctrl <- c(gene_counts[cols_ctrl], rep(NA, length_diff))
+      dg <- gene_counts[cols_2DG]
+      gene_counts <- data.frame("Control" = ctrl, "2DG" = dg)
+    }
+    
+    rownames(gene_counts) <- c(1:nrow(gene_counts))
+    return(gene_counts)
+  }
+  
+  
+  
+  
+  
+  

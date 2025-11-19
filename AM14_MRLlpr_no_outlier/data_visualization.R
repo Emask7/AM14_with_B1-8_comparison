@@ -18,6 +18,8 @@ getwd()
   dev.off()
 
 # DEG overlap heatmap ----------------------------------------------------------
+  # Run "data_visualization_functions.R" script first 
+  
   pl23_DEG_df <- deseq_res$AM14transfer_PL23[, c(1, 2, 8, 11, 12)]
   pl23_DEG_df <- filter(pl23_DEG_df, abs(log2FoldChange) > 0.6 & padj <= 0.05)
   nrow(pl23_DEG_df)
@@ -40,20 +42,6 @@ getwd()
   
   DEGs <- merged_DEG_df_noout$ensembl_gene_id
   head(DEGs)
-  
-  
-  zscore_matrix <- function(dds){
-    zscores <- counts(dds, normalized=TRUE)
-    res_colnames <- colnames(zscores)
-    zscores <- t(zscores)
-    zscores <- scale(zscores)
-    zscores <- t(zscores)
-    zscores <- data.frame(rownames(zscores), zscores)
-    zscores <- zscores[rownames(zscores) %in% DEGs, ]
-    colnames(zscores) <- c("ensembl_gene_id", res_colnames)
-    rm(res_colnames)
-    return(zscores)
-  }
   
   pl23_zscores <- zscore_matrix(dds_AM14trans_PL23)
   head(pl23_zscores)
