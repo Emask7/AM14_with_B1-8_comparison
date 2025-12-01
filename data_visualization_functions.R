@@ -1,3 +1,6 @@
+setwd("Z:/Emma Mask/R_projects/AM14_with_B1-8_comparison/")
+getwd()
+
 # Venn Diagrams ----------------------------------------------------------------
   deg_list_for_venn <- function(res, lfc_cutoff, padj_cutoff){
     if(missing(lfc_cutoff)) lfc_cutoff <- 1
@@ -72,7 +75,52 @@
     return(zscores)
   }
   
-# Normalized gene count bar plots ----------------------------------------------
+# DESeq2 result bar plots ------------------------------------------------------
+  deseq2_expr_barplot <- function(dat, plot_title, lfc_limits, na_color, color_breaks, color_labels){
+    if(missing(plot_title)) plot_title <- ""
+    if(missing(lfc_limits)){
+      print(stri_join("LFC min:  ", min(dat$LFC)))
+      print(stri_join("LFC max:  ", max(dat$LFC)))
+      max_abs_lfc <- max(abs(dat$LFC))
+      lfc_limits <- c(-1*max_abs_lfc, max_abs_lfc)
+    }
+    if(missing(na_color)) na_color <- "gray50"
+    if(missing(color_breaks)) color_breaks <- waiver()
+    if(missing(color_labels)) color_labels <- waiver()
+    
+    ymax <- max(dat$`-log.pval`) + 5
+    
+    res <- ggplot(data = dat, 
+                  # aes(x = factor(ID), y = `-log.pval`, fill = LFC)) +
+                  aes(x = factor(reorder(ID, LFC)), y = `-log.pval`, fill = LFC)) +
+      geom_col() +
+      theme_bw() +
+      theme(panel.grid.minor=element_blank(),
+            axis.text = element_text(color = "black", size = 12),
+            axis.title = element_text(size = 12),
+            legend.text = element_text(size = 12)) +
+      geom_text(aes(label = ifelse(abs(LFC) > max(abs(lfc_limits)), 
+                                   stri_join("LFC: ", round(LFC, digits = 1)), "")), 
+                size = 10 / .pt, hjust = -0.05, color = "gray20") +
+      # scale_fill_gradientn(colors = wes_palette("Zissou1"), 
+      scale_fill_gradientn(colors = pnw_palette("Bay"), 
+                           limits = lfc_limits, na.value = na_color,
+                           breaks = color_breaks, labels = color_labels) +
+      ylab(bquote(~-Log[10] ~ "(p-value)")) +
+      scale_y_continuous(limits = c(0, ymax)) +
+      xlab("") +
+      coord_flip() +
+      geom_hline(yintercept = 1.3, linetype = "dashed", color = "black", size = 0.5) +
+      labs(title = plot_title,
+           subtitle = "(DESeq2 Differential Expression Results)") +
+      facet_wrap( ~ comparison, ncol = 4) +
+      theme(strip.text = element_text(size = 12))
+    
+    return(res)
+  }
+  
+  
+# Normalized gene count box plots ----------------------------------------------
   find_ensembl_ID <- function(search_name) {
     dat <- dplyr::filter(gene_IDs$AM14trans, external_gene_name == search_name)
     dat$ensembl_gene_id

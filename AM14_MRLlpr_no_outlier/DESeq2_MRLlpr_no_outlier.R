@@ -62,9 +62,17 @@ getwd()
   DEG_heatmap(dds_AM14MRLlpr_noout, deseq_res_MRLlpr_noout,
               c("Treatment"),
               list(Treatment = c(Control = "#0f85a0", "2DG" = "#dd4124")),
-              1, 0.05, "norm_counts", NULL,
+              0.6, 0.05, "norm_counts", NULL,
               "AM14 MRL/lpr Mice: 2DG vs Control",
               "AM14 MRLlpr - padj 0.05")
+  
+  DEG_heatmap(dds_AM14MRLlpr_noout, deseq_res_MRLlpr_noout,
+              c("Treatment"),
+              list(Treatment = c(Control = "#0f85a0", "2DG" = "#dd4124")),
+              0, 0.05, "norm_counts", NULL,
+              "AM14 MRL/lpr Mice: 2DG vs Control",
+              "AM14 MRLlpr - padj 0.05 - any LFC")
+  
   
   # DEG_heatmap(dds_AM14MRLlpr_noout, deseq_res_MRLlpr_noout,
   #             c("Treatment"),

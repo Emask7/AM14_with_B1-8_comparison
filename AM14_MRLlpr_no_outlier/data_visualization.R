@@ -4,18 +4,78 @@ getwd()
 # DEG venn diagram -------------------------------------------------------------
   DEG_lists_noout <- list(
     PL23_2DG_vs_Ctrl = deg_list_for_venn(deseq_res$AM14transfer_PL23, 0.6, 0.05),
-    R848_2DG_vs_Ctrl = deg_list_for_venn(deseq_res$AM14transfer_R848, 0.6, 0.05),
-    B18 = deg_list_for_venn(deseq_res$B18transfer, 0.6, 0.05),
-    MRLlpr = deg_list_for_venn(deseq_res_MRLlpr_noout, 0.6, 0.05)
+    MRLlpr_OG = deg_list_for_venn(deseq_res$AM14MRLlpr, 0.6, 0.05),
+    MRLlpr_noout = deg_list_for_venn(deseq_res_MRLlpr_noout, 0.6, 0.05)
   )
   
   all_degs <- venndetail(list("AM14 Transfer: PL2-3 + 2DG vs PL2-3" = DEG_lists_noout$PL23_2DG_vs_Ctrl$all,
-                              # "AM14 Transfer: R848 + 2DG vs R848" = DEG_lists_noout$R848_2DG_vs_Ctrl$all,
-                              # "B1-8 Transfer: NP + 2DG vs NP" = DEG_lists_noout$B18$all,
-                              "AM14 MRL/lpr: 2DG vs Control" = DEG_lists_noout$MRLlpr$all))
-  png(filename = "Output/Venn_diagrams/All_DEGs.png", width = 2000, height = 1500, res = 250)
+                              "AM14 MRL/lpr: original" = DEG_lists_noout$MRLlpr_OG$all,
+                              "AM14 MRL/lpr: no outlier" = DEG_lists_noout$MRLlpr_noout$all))
+  png(filename = "Output/Venn_diagram_All_DEGs.png", width = 1800, height = 1200, res = 300)
   plot(all_degs, type = "upset")
   dev.off()
+  
+  all_degs_less <- venndetail(list("AM14 MRL/lpr: original" = DEG_lists_noout$MRLlpr_OG$all,
+                                   "AM14 MRL/lpr: no outlier" = DEG_lists_noout$MRLlpr_noout$all))
+  png(filename = "Output/Venn_diagram_AM14_MRLlpr_only.png", width = 1800, height = 1200, res = 300)
+  plot(all_degs_less, type = "upset")
+  dev.off()
+  
+# See which DEGs are unique to each AM14 MRLlpr analysis -----------------------
+  original_DEGs <- result(all_degs_less)
+  original_DEGs <- original_DEGs[original_DEGs$Subset == "AM14 MRL/lpr: original", ]
+  colnames(original_DEGs) <- c("comparison", "ensembl_gene_id")
+  original_DEGs <- left_join(original_DEGs, deseq_res$AM14MRLlpr)
+  original_DEGs <- data.frame(comparison = original_DEGs$comparison,
+                              ID = original_DEGs$external_gene_name,
+                              "-log.pval" = -1*log10(original_DEGs$pvalue),
+                              LFC = original_DEGs$log2FoldChange)
+  colnames(original_DEGs) <- c("comparison", "ID", "-log.pval", "LFC")
+  original_DEGs
+  
+  deseq2_expr_barplot(original_DEGs, "DEGs - Original Analysis Only")
+  ggsave(filename = "DEG barplot - AM14 MRLlpr Original Analysis.png", 
+         width = 5, height = 6.5, units = "in", dpi = 600)
+  
+  
+  noout_DEGs <- result(all_degs_less)
+  noout_DEGs <- noout_DEGs[noout_DEGs$Subset == "AM14 MRL/lpr: no outlier", ]
+  colnames(noout_DEGs) <- c("comparison", "ensembl_gene_id")
+  noout_DEGs <- left_join(noout_DEGs, deseq_res_MRLlpr_noout)
+  noout_DEGs <- data.frame(comparison = noout_DEGs$comparison,
+                              ID = noout_DEGs$external_gene_name,
+                              "-log.pval" = -1*log10(noout_DEGs$pvalue),
+                              LFC = noout_DEGs$log2FoldChange)
+  colnames(noout_DEGs) <- c("comparison", "ID", "-log.pval", "LFC")
+  noout_DEGs
+  
+  deseq2_expr_barplot(noout_DEGs, "DEGs - Excluding Outlier")
+  ggsave(filename = "DEG barplot - AM14 MRLlpr - No Outlier.png", 
+         width = 5, height = 8.5, units = "in", dpi = 600)
+  
+  
+  overlap_DEGs <- result(all_degs_less)
+  overlap_DEGs <- overlap_DEGs[overlap_DEGs$Subset == "Shared", ]
+  colnames(overlap_DEGs) <- c("comparison", "ensembl_gene_id")
+  temp_OG <- left_join(overlap_DEGs, deseq_res$AM14MRLlpr)
+  temp_OG <- data.frame(comparison = rep("AM14 MRL/lpr: original", nrow(temp_OG)),
+                        ID = temp_OG$external_gene_name,
+                        "-log.pval" = -1*log10(temp_OG$pvalue), 
+                        LFC = temp_OG$log2FoldChange)
+  temp_noout <- left_join(overlap_DEGs, deseq_res_MRLlpr_noout)
+  temp_noout <- data.frame(comparison = rep("AM14 MRL/lpr: no outlier", nrow(temp_noout)),
+                        ID = temp_noout$external_gene_name,
+                        "-log.pval" = -1*log10(temp_noout$pvalue), 
+                        LFC = temp_noout$log2FoldChange)
+  overlap_DEGs <- full_join(temp_OG, temp_noout)
+  colnames(overlap_DEGs) <- c("comparison", "ID", "-log.pval", "LFC")
+  overlap_DEGs
+  rm(temp_noout, temp_OG)
+  
+  deseq2_expr_barplot(overlap_DEGs, "Overlapping DEGs")
+  ggsave(filename = "DEG barplot - AM14 MRLlpr Overlapping DEGs.png", 
+         width = 7, height = 26, units = "in", dpi = 300)
+  
 
 # DEG overlap heatmap ----------------------------------------------------------
   # Run "data_visualization_functions.R" script first 

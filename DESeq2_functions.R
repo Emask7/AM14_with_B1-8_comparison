@@ -202,7 +202,7 @@ results_wrapper <- function(dds, cons, IDs){
 }
 
 # Make a heatmap of DEGs -------------------------------------------------------
-DEG_heatmap <- function(dds, dds_results, factors, color_list, lfc_cutoff, padj_cutoff, count_type, dds_cols, plot_title, filename, h, w){
+DEG_heatmap <- function(dds, dds_results, factors, color_list, lfc_cutoff, padj_cutoff, count_type, dds_cols, plot_title, filename, h, w, show_DEG_names){
   if(missing(color_list)) {
     color_list <- list(Treatment = c(PL23 = "#0f85a0", PL23_2DG = "#dd4124",
                                       R848 = "#0f85a0", R848_2DG = "#dd4124",
@@ -226,7 +226,8 @@ DEG_heatmap <- function(dds, dds_results, factors, color_list, lfc_cutoff, padj_
   if(missing(filename)) filename <- NULL
   if(missing(h)) h <- 2000
   if(missing(w)) w <- 1500
-
+  if(missing(show_DEG_names)) show_DEG_names <- FALSE
+  
   # make a list of DEGs from the DEG results -----------------------------------
     DEGs <- c()
     for (df in list(dds_results)) {
@@ -235,14 +236,14 @@ DEG_heatmap <- function(dds, dds_results, factors, color_list, lfc_cutoff, padj_
       DEGs <- append(DEGs, res)
     }
     DEGs <- DEGs[!duplicated(DEGs)]
-  
+    
   # Make a vector of count matrix row numbers in decreasing order of row means -
     select <- counts(dds, normalized=TRUE)
     if(!is.null(dds_cols)) select <- select[, dds_cols]
     select <- select[rownames(select) %in% DEGs, ]
     select <- order(rowMeans(select), decreasing=TRUE)
     head(select)
-  
+    
   # Make a dataframe with sample info ------------------------------------------
     # If dds_col is NULL, use all sample info from the dds object
     # Else, only get sample info from rows corresponding to the count columns of interest
@@ -257,57 +258,57 @@ DEG_heatmap <- function(dds, dds_results, factors, color_list, lfc_cutoff, padj_
 
   # Sort the normalized counts by decreasing mean counts -----------------------
     if(count_type == "norm_counts") {
-      if(!is.null(dds_cols)) {
-        htmp_cts <- counts(dds, normalized = TRUE)[select, dds_cols]
-      } else htmp_cts <- counts(dds, normalized = TRUE)[select, ]
+      if(!is.null(dds_cols)) htmp_cts <- counts(dds, normalized = TRUE)[select, dds_cols]
+      else htmp_cts <- counts(dds, normalized = TRUE)[select, ]
     } else if(count_type == "rlog") {
       rld <- rlog(dds)
-      if(!is.null(dds_cols)) {
-        htmp_cts <- assay(rld)[select, dds_cols]
-      } else htmp_cts <- assay(rld)[select, ]
+      if(!is.null(dds_cols)) htmp_cts <- assay(rld)[select, dds_cols]
+      else htmp_cts <- assay(rld)[select, ]
     } else {
       print("Error: count_type must be either norm_counts or rlog")
       return(NULL)
     }
     
-  # Plot heatmap with unsupervised column clustering ---------------------------
+  # Make heatmap with supervised column clustering -----------------------------
+    htmp_sup <- ComplexHeatmap::pheatmap(htmp_cts,
+                                         cluster_rows = TRUE, show_rownames = show_DEG_names,
+                                         cluster_cols = FALSE, show_colnames = FALSE,
+                                         annotation_col = df, scale = "row",
+                                         annotation_colors = color_list,
+                                         heatmap_legend_param = list(title = "Z-score"),
+                                         main = plot_title)
+    
+  # Make heatmap with unsupervised column clustering ---------------------------
+    htmp_unsup <- ComplexHeatmap::pheatmap(htmp_cts,
+                                           cluster_rows = TRUE, show_rownames = show_DEG_names,
+                                           cluster_cols = TRUE, show_colnames = FALSE,
+                                           annotation_col = df, scale = "row",
+                                           annotation_colors = color_list,
+                                           heatmap_legend_param = list(title = "Z-score"),
+                                           main = plot_title)
+    
+  # If filename is not NULL, then save plots -----------------------------------
     if(!is.null(filename)) {
       if(!file.exists("Output/")) dir.create("Output/")
       if(!file.exists("Output/DEG_heatmaps/")) dir.create("Output/DEG_heatmaps/")
       # if there is not already a QC_results/DEG_heatmaps/" folder, create one
       
-      png(filename = stri_join(c("Output/DEG_heatmaps/Unsupervised - ", filename,".png"), collapse = ""),
-          width = w, height = h, units = "px", pointsize = 8, res = 250,
-          bg = "white", family = "", symbolfamily="default")
+      # Supervised clustering --------------------------------------------------
+        png(filename = stri_join(c("Output/DEG_heatmaps/Supervised - ", filename,".png"), collapse = ""),
+            width = w, height = h, units = "px", pointsize = 8, res = 250,
+            bg = "white", family = "", symbolfamily="default")
+        draw(htmp_sup, legend_grouping = "original", merge_legends = TRUE)
+        dev.off()
+        
+      # Unsupervised clustering ------------------------------------------------
+        png(filename = stri_join(c("Output/DEG_heatmaps/Unsupervised - ", filename,".png"), collapse = ""),
+            width = w, height = h, units = "px", pointsize = 8, res = 250,
+            bg = "white", family = "", symbolfamily="default")
+        draw(htmp_unsup, legend_grouping = "original", merge_legends = TRUE)
+        dev.off()
+    } else {
+      return(list(unsupervised = htmp_unsup, supervised = htmp_sup))
     }
-    
-    htmp <- ComplexHeatmap::pheatmap(htmp_cts,
-                                     cluster_rows = TRUE, show_rownames = FALSE,
-                                     cluster_cols = TRUE, show_colnames = FALSE,
-                                     annotation_col = df, scale = "row",
-                                     annotation_colors = color_list,
-                                     heatmap_legend_param = list(title = "Z-score"),
-                                     main = plot_title)
-    draw(htmp, legend_grouping = "original", merge_legends = TRUE)
-    
-    if(!is.null(filename))  dev.off()
-    
-  # Plot heatmap with supervised column clustering -----------------------------
-    if(!is.null(filename)) {
-      png(filename = stri_join(c("Output/DEG_heatmaps/Supervised - ", filename,".png"), collapse = ""),
-          width = w, height = h, units = "px", pointsize = 8, res = 250,
-          bg = "white", family = "", symbolfamily="default")
-    }
-  
-    htmp <- ComplexHeatmap::pheatmap(htmp_cts,
-                                     cluster_rows = TRUE, show_rownames = FALSE,
-                                     cluster_cols = FALSE, show_colnames = FALSE,
-                                     annotation_col = df, scale = "row",
-                                     annotation_colors = color_list,
-                                     heatmap_legend_param = list(title = "Z-score"),
-                                     main = plot_title)
-    draw(htmp, legend_grouping = "original", merge_legends = TRUE)
-    if(!is.null(filename)) dev.off()
 }
 
 summary_wrapper <- function(res, comparison, experiment, p_cutoff, lfc_cutoff){

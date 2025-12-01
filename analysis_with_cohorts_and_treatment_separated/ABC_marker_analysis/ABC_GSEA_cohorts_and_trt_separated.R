@@ -55,20 +55,16 @@ np_genelist <- gsea_format(deseq_res$B18transfer)
   gseaplot2(pl23_ABC_gsea, geneSetID = 5, title = pl23_ABC_gsea$Description[5])
   ggsave(filename = "GSEA_Histograms/GC B cell vs Plasma Cell Up - PL2-3.png", width = 5, height = 4, units = "in", dpi = 600)
   
-  
   gseaplot2(MRLlpr_ABC_gsea, geneSetID = 1, title = stri_join("AM14 MRL/lpr: 2DG vs Control", MRLlpr_ABC_gsea$Description[1], sep = "\n"))
   ggsave(filename = "GSEA_Histograms/Response to IFNG - AM14 MRLlpr.png", width = 5, height = 4, units = "in", dpi = 600)
   
   
   
-  # p1 <- gseaplot2(pl23_ABC_gsea, geneSetID = 1, title = pl23_ABC_gsea$Description[1])
-  # p2 <- gseaplot(pl23_ABC_gsea, geneSetID = 2, title = pl23_ABC_gsea$Description[2])
-  # p3 <- gseaplot(pl23_ABC_gsea, geneSetID = 3, title = pl23_ABC_gsea$Description[4])
-  # p4 <- gseaplot(pl23_ABC_gsea, geneSetID = 8, title = pl23_ABC_gsea$Description[10])
-  # cowplot::plot_grid(p1, p2, p3, p4, ncol=2, labels=LETTERS[1:4])
-  # cowplot::plot_grid(p1, p3, p4)
-  # 
-  # p1 
-  #   # facet_wrap( ~ ID, ncol = 2) +
+  p1 <- gseaplot2(pl23_ABC_gsea, geneSetID = 1, title = pl23_ABC_gsea$Description[1])
+  p2 <- gseaplot2(pl23_ABC_gsea, geneSetID = 2, title = pl23_ABC_gsea$Description[2])
+  p3 <- gseaplot2(pl23_ABC_gsea, geneSetID = 3, title = pl23_ABC_gsea$Description[3])
+  p4 <- gseaplot2(pl23_ABC_gsea, geneSetID = 4, title = pl23_ABC_gsea$Description[4])
+  plot_list(p1, p2, p3, p4, ncol=2, labels=LETTERS[1:4])
+  plot_list(p1, p3, p4)
 
 
