@@ -76,6 +76,40 @@ getwd()
   }
   
 # DESeq2 result bar plots ------------------------------------------------------
+  barplot_counts <- function(gene_list, species_source, include_all_comparisons, alternate_IDs){
+    if(missing(species_source)) species_source <- "mouse"
+    if(missing(include_all_comparisons)) include_all_comparisons <- TRUE
+    if(missing(alternate_IDs)) alternate_IDs <- NULL
+    
+    if(species_source == "human"){
+      gene_list <- gene_IDs_full[gene_IDs_full$hgnc_symbol %in% gene_list, ]
+      gene_list <- gene_list$external_gene_name
+    }
+    
+    if(include_all_comparisons == TRUE){
+      res <- four_way_barplot[four_way_barplot$ID %in% gene_list, ]
+      res$comparison <- factor(res$comparison, levels = c("PL2-3", "MRL/lpr", "R848", "NP"))
+    } else {
+      res <- two_way_barplot[two_way_barplot$ID %in% gene_list, ]
+      res$comparison <- factor(res$comparison, levels = c("PL2-3", "MRL/lpr"))
+    }
+    
+    if(!is.null(alternate_IDs)){
+      gene_IDs <- data.frame(ID = gene_list)
+      gene_IDs <- full_join(gene_IDs, alternate_IDs)
+      
+      for (r in 1:nrow(gene_IDs)) {
+        if(is.na(gene_IDs[r, 2])) gene_IDs[r, 2] = gene_IDs[r, 1]
+      }
+      
+      res <- full_join(gene_IDs, res, by = "ID")
+      res <- res[, c(2:6)]
+      colnames(res) <- c("ID", colnames(res)[2:5])
+    }
+    
+    return(res)
+  }
+  
   deseq2_expr_barplot <- function(dat, plot_title, lfc_limits, na_color, color_breaks, color_labels){
     if(missing(plot_title)) plot_title <- ""
     if(missing(lfc_limits)){
