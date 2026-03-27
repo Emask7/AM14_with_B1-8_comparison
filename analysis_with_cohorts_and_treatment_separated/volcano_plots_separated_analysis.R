@@ -14,17 +14,17 @@ head(vp_data$AM14MRLlpr)
 # confirm_foldchange(dds_PL23vNP, "Lars2", gene_IDs$AM14trans)
 
 volcano_wrapper(vp_data$PL23_2DG_v_Ctrl, "AM14 Transfer: PL2-3 + 2DG vs PL2-3",
-                "Upregulated in PL2-3                                                    Upregulated in PL2-3 + 2DG",
+                "Upregulated in PL2-3                                               Upregulated in PL2-3 + 2DG",
                 0.6, 0.05, "AM14_Transfer-PL2-3_2DG_vs_Control")
 
 volcano_wrapper(vp_data$R848_2DG_v_Ctrl, "AM14 Transfer: R848 + 2DG vs R848", 
-                "Upregulated in R848                                                      Upregulated in R848 + 2DG",
+                "Upregulated in R848                                                Upregulated in R848 + 2DG",
                 0.6, 0.05, "AM14_Transfer-R848_2DG_vs_Control")
 
 volcano_wrapper(vp_data$AM14MRLlpr, "AM14 MRL/lpr: 2DG vs Control",
-                "Upregulated in Control                                                                    Upregulated in 2DG",
+                "Upregulated in Control                                                              Upregulated in 2DG",
                 0.6, 0.05, "AM14_MRLlpr")
 
 volcano_wrapper(vp_data$B18, "B1-8 Transfer: NP + 2DG vs NP",
-                "Upregulated in NP                                                          Upregulated in NP + 2DG",
+                "Upregulated in NP                                                         Upregulated in NP + 2DG",
                 0.6, 0.05, "B18_Transfer")

@@ -51,13 +51,16 @@ rownames(DEG_zscores) <- DEG_zscores$external_gene_name
 DEG_zscores <- as.matrix(DEG_zscores[, c(3:ncol(DEG_zscores))])
 head(DEG_zscores)
 DEG_zscores
-  
+
+overlapping_DEGs_list <- rownames(DEG_zscores)
+overlapping_DEGs_list
+
 coldata_df <- data.frame(Treatment = c(rep("Control", 3), rep("2DG", 3), rep("Control", 6), rep("2DG", 7)),
                          Experiment = c(rep("AM14 + PL2-3", 6), rep("AM14 MRLlpr", 13)))
 coldata_df
 
 png(filename = ("Output/DEG_heatmaps/DEGs common in AM14 PL2-3 and AM14 MRLlpr.png"),
-    width = 2000, height = 3500, units = "px", pointsize = 8, res = 400,
+    width = 4, height = 7, units = "in", pointsize = 6, res = 600,
     bg = "white", family = "", symbolfamily="default")
 
 htmp <- ComplexHeatmap::pheatmap(DEG_zscores,

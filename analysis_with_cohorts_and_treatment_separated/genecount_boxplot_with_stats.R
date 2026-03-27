@@ -70,14 +70,14 @@ getwd()
   multi_boxplot("Lck")
   ggsave(filename = "Output/DEG_barplots/Lck.png", width = 9, height = 4.5, units = "in", dpi = 300)
   
-  multi_boxplot("")
-  ggsave(filename = "Output/DEG_barplots/.png", width = 9, height = 4.5, units = "in", dpi = 300)
+  multi_boxplot("Irf1")
+  ggsave(filename = "Output/DEG_barplots/Irf1.png", width = 9, height = 4.5, units = "in", dpi = 300)
   
-  multi_boxplot("")
-  ggsave(filename = "Output/DEG_barplots/.png", width = 9, height = 4.5, units = "in", dpi = 300)
+  multi_boxplot("Irf4")
+  ggsave(filename = "Output/DEG_barplots/Irf4.png", width = 9, height = 4.5, units = "in", dpi = 300)
   
-  multi_boxplot("")
-  ggsave(filename = "Output/DEG_barplots/.png", width = 9, height = 4.5, units = "in", dpi = 300)
+  multi_boxplot("Irf8")
+  ggsave(filename = "Output/DEG_barplots/Irf8.png", width = 9, height = 4.5, units = "in", dpi = 300)
   
   multi_boxplot("")
   ggsave(filename = "Output/DEG_barplots/.png", width = 9, height = 4.5, units = "in", dpi = 300)

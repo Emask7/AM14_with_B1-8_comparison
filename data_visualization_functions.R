@@ -18,8 +18,8 @@ getwd()
     if(missing(lfc_cutoff)) lfc_cutoff <- 1
     if(missing(padj_cutoff)) padj_cutoff <- 0.05
     if(missing(file_name)) file_name <- NULL
-    if(missing(h)) h <- 2500
-    if(missing(w)) w <- 2500
+    if(missing(h)) h <- 8
+    if(missing(w)) w <- 8
     if(missing(x_limits)) {
       x_min <- min(dat$log2FoldChange)
       x_max <- max(dat$log2FoldChange)
@@ -41,14 +41,15 @@ getwd()
                           caption = cap,
                           # col = wes_palette("Zissou1", type = "continuous"),
                           drawConnectors = TRUE, min.segment.length = 1, 
-                          max.overlaps = 12, labSize = 4)
+                          max.overlaps = 15, labSize = 5,
+                          arrowheads = FALSE)
     
     if(!is.null(file_name)){
         if(!file.exists("Output/")) dir.create("Output/")
         if(!file.exists("Output/Volcano_plots/")) dir.create("Output/Volcano_plots/")
       
         ggsave(stri_join("Output/Volcano_plots/", file_name, ".png"),
-               units = "px", width = w, height = h, dpi = 300)
+               units = "in", width = w, height = h, dpi = 600)
     } 
     vp
   }  
