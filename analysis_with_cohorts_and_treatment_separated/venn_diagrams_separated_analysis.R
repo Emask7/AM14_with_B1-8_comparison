@@ -106,7 +106,7 @@ DEG_lists_lfc0.6 <- list(
                                 "AM14 Transfer: R848 + 2DG vs R848" = DEG_lists_lfc0.6$R848_2DG_vs_Ctrl$all,
                                 "B1-8 Transfer: NP + 2DG vs NP" = DEG_lists_lfc0.6$B18$all,
                                 "AM14 MRL/lpr: 2DG vs Control" = DEG_lists_lfc0.6$MRLlpr$all))
-    png(filename = "Output/Venn_diagrams/All_DEGs_LFC0.6.png", width = 2200, height = 1500, res = 300)
+    png(filename = "Output/Venn_diagrams/All_DEGs_LFC0.6.png", width = 7.5, height = 4, res = 600, units = "in")
     plot(all_degs_0.6, type = "upset")
     dev.off()
     

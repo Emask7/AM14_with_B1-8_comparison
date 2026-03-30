@@ -1,4 +1,4 @@
-# setwd("Z:/Emma Mask/R_projects/AM14_with_B1-8_comparison/")
+setwd("Z:/Emma Mask/R_projects/AM14_with_B1-8_comparison/")
 # # setwd("./analysis_with_cohorts_and_treatment_separated/")
 # getwd()
 
@@ -93,13 +93,13 @@ print("---")
 print(paste("Found", length(abc_up_genes), "up-regulated genes."))
 print(paste("Found", length(abc_down_genes), "down-regulated genes."))
 
-# --- Step 7 (Optional): Save Gene Sets to Files ---
-# This creates simple text files, perfect for input into GSEA software.
-
-write.table(abc_up_genes, file = "Z:/Emma Mask/R_projects/AM14_with_B1-8_comparison/analysis_with_cohorts_and_treatment_separated/ABC_marker_analysis/GSE_lists/GSE99480_ABC_up_regulated_genes.txt",
-            quote = FALSE, row.names = FALSE, col.names = FALSE)
-
-write.table(abc_down_genes, file = "Z:/Emma Mask/R_projects/AM14_with_B1-8_comparison/analysis_with_cohorts_and_treatment_separated/ABC_marker_analysis/GSE_lists/GSE99480_ABC_down_regulated_genes.txt",
-            quote = FALSE, row.names = FALSE, col.names = FALSE)
-
-print("Gene sets have been saved to .txt files in your current R working directory.")
+# # --- Step 7 (Optional): Save Gene Sets to Files ---
+# # This creates simple text files, perfect for input into GSEA software.
+# 
+# write.table(abc_up_genes, file = "Z:/Emma Mask/R_projects/AM14_with_B1-8_comparison/analysis_with_cohorts_and_treatment_separated/ABC_marker_analysis/GSE_lists/GSE99480_ABC_up_regulated_genes.txt",
+#             quote = FALSE, row.names = FALSE, col.names = FALSE)
+# 
+# write.table(abc_down_genes, file = "Z:/Emma Mask/R_projects/AM14_with_B1-8_comparison/analysis_with_cohorts_and_treatment_separated/ABC_marker_analysis/GSE_lists/GSE99480_ABC_down_regulated_genes.txt",
+#             quote = FALSE, row.names = FALSE, col.names = FALSE)
+# 
+# print("Gene sets have been saved to .txt files in your current R working directory.")

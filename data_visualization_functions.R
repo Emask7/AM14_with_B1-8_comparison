@@ -41,7 +41,7 @@ getwd()
                           caption = cap,
                           # col = wes_palette("Zissou1", type = "continuous"),
                           drawConnectors = TRUE, min.segment.length = 1, 
-                          max.overlaps = 15, labSize = 5,
+                          max.overlaps = 25, labSize = 6,
                           arrowheads = FALSE)
     
     if(!is.null(file_name)){

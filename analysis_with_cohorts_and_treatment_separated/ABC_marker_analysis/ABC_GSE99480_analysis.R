@@ -32,8 +32,8 @@ compile_gsea <- function(res_list, names){
 # --- Load your custom gene sets ---
 # read.table reads the single-column file into a data frame,
 # we then extract that column as a vector of gene names.
-abc_up_genes <- read.table("GSE99480_ABC_up_regulated_genes.txt", header = FALSE)$V1
-abc_down_genes <- read.table("GSE99480_ABC_down_regulated_genes.txt", header = FALSE)$V1
+abc_up_genes <- read.table("GSE_lists/GSE99480_ABC_up_regulated_genes.txt", header = FALSE)$V1
+abc_down_genes <- read.table("GSE_lists/GSE99480_ABC_down_regulated_genes.txt", header = FALSE)$V1
 
 abc_gmt <- data.frame(
   "term" = c(rep("ABC Down, FoB Up", length(abc_down_genes)), rep("ABC Up, FoB Down", length(abc_up_genes))),
@@ -81,40 +81,59 @@ abc_down_labels <- genes[genes %in% abc_down_genes]
 abc_down_labels
 
 
-p1 <- gseaplot2(pl23_ABC_gsea, geneSetID = 1, subplots = 1:2, title = "PL2-3 +/- 2DG (ABC Up, FoB Down)", color = c("#dd4124"), rel_heights = c(2, 0.5))
-p2 <- gseaplot2(MRLlpr_ABC_gsea, geneSetID = 1, subplots = 1:2, title = "AM14 MRL/lpr +/- 2DG (ABC Up, FoB Down)", color = c("#dd4124"), rel_heights = c(2, 0.5))
-p3 <- gseaplot2(r848_ABC_gsea, geneSetID = 1, subplots = 1:2, title = "R848 +/- 2DG (ABC Up, FoB Down)", color = c("#dd4124"), rel_heights = c(2, 0.5))
-p4 <- gseaplot2(np_ABC_gsea, geneSetID = 1, subplots = 1:2, title = "NP +/- 2DG (ABC Up, FoB Down)", color = c("#dd4124"), rel_heights = c(2, 0.5))
+# p1 <- gseaplot2(pl23_ABC_gsea, geneSetID = 1, subplots = 1:2, title = "PL2-3 +/- 2DG (ABC Up, FoB Down)", color = c("#dd4124"), rel_heights = c(2, 0.5), base_size = 15)
+# p1[[1]] <- p1[[1]] + geom_gsea_gene(gene = abc_up_labels, geom = ggrepel::geom_label_repel, size = 5)
+# # p1
+# 
+# p2 <- gseaplot2(MRLlpr_ABC_gsea, geneSetID = 1, subplots = 1:2, title = "AM14 MRL/lpr +/- 2DG (ABC Up, FoB Down)", color = c("#dd4124"), rel_heights = c(2, 0.5), base_size = 15)
+# p3 <- gseaplot2(r848_ABC_gsea, geneSetID = 1, subplots = 1:2, title = "R848 +/- 2DG (ABC Up, FoB Down)", color = c("#dd4124"), rel_heights = c(2, 0.5), base_size = 15)
+# p4 <- gseaplot2(np_ABC_gsea, geneSetID = 1, subplots = 1:2, title = "NP +/- 2DG (ABC Up, FoB Down)", color = c("#dd4124"), rel_heights = c(2, 0.5), base_size = 15)
+# 
+# p5 <- gseaplot2(pl23_ABC_gsea, geneSetID = 2, subplots = 1:2, title = "PL2-3 +/- 2DG (ABC Down, FoB Up)", color = c("#0f85a0"), rel_heights = c(2, 0.5), base_size = 15)
+# p6 <- gseaplot2(MRLlpr_ABC_gsea, geneSetID = 2, subplots = 1:2, title = "AM14 MRL/lpr +/- 2DG (ABC Down, FoB Up)", color = c("#0f85a0"), rel_heights = c(2, 0.5), base_size = 15)
+# p7 <- gseaplot2(r848_ABC_gsea, geneSetID = 2, subplots = 1:2, title = "R848 +/- 2DG (ABC Down, FoB Up)", color = c("#0f85a0"), rel_heights = c(2, 0.5), base_size = 15)
+# p8 <- gseaplot2(np_ABC_gsea, geneSetID = 2, subplots = 1:2, title = "NP +/- 2DG (ABC Down, FoB Up)", color = c("#0f85a0"), rel_heights = c(2, 0.5), base_size = 15)
 
-p5 <- gseaplot2(pl23_ABC_gsea, geneSetID = 2, subplots = 1:2, title = "PL2-3 +/- 2DG (ABC Down, FoB Up)", color = c("#0f85a0"), rel_heights = c(2, 0.5))
-p6 <- gseaplot2(MRLlpr_ABC_gsea, geneSetID = 2, subplots = 1:2, title = "AM14 MRL/lpr +/- 2DG (ABC Down, FoB Up)", color = c("#0f85a0"), rel_heights = c(2, 0.5))
-p7 <- gseaplot2(r848_ABC_gsea, geneSetID = 2, subplots = 1:2, title = "R848 +/- 2DG (ABC Down, FoB Up)", color = c("#0f85a0"), rel_heights = c(2, 0.5))
-p8 <- gseaplot2(np_ABC_gsea, geneSetID = 2, subplots = 1:2, title = "NP +/- 2DG (ABC Down, FoB Up)", color = c("#0f85a0"), rel_heights = c(2, 0.5))
 
-p1[[1]] <- p1[[1]] + geom_gsea_gene(gene = abc_up_labels, geom = ggrepel::geom_label_repel)
-p2[[1]] <- p2[[1]] + geom_gsea_gene(gene = abc_up_labels, geom = ggrepel::geom_label_repel)
-p3[[1]] <- p3[[1]] + geom_gsea_gene(gene = abc_up_labels, geom = ggrepel::geom_label_repel)
-p4[[1]] <- p4[[1]] + geom_gsea_gene(gene = abc_up_labels, geom = ggrepel::geom_label_repel)
+p1 <- gseaplot2(pl23_ABC_gsea, geneSetID = 1, subplots = 1:2, title = "PL2-3 +/- 2DG\nNES: -3.040     p.adjust: 2.00E-10", color = c("#dd4124"), rel_heights = c(2.25, 0.25), base_size = 15)
+p1[[1]] <- p1[[1]] + geom_gsea_gene(gene = abc_up_labels, geom = ggrepel::geom_label_repel, size = 5, max.overlaps = Inf, force = 5)
+# p1
 
-p5[[1]] <- p5[[1]] + geom_gsea_gene(gene = abc_down_labels, geom = ggrepel::geom_label_repel)
-p6[[1]] <- p6[[1]] + geom_gsea_gene(gene = abc_down_labels, geom = ggrepel::geom_label_repel)
-p7[[1]] <- p7[[1]] + geom_gsea_gene(gene = abc_down_labels, geom = ggrepel::geom_label_repel)
-p8[[1]] <- p8[[1]] + geom_gsea_gene(gene = abc_down_labels, geom = ggrepel::geom_label_repel)
+p2 <- gseaplot2(MRLlpr_ABC_gsea, geneSetID = 1, subplots = 1:2, title = "AM14 MRL/lpr +/- 2DG\nNES: -2.180     p.adjust: 6.36E-10", color = c("#dd4124"), rel_heights = c(2.25, 0.25), base_size = 15)
+p3 <- gseaplot2(r848_ABC_gsea, geneSetID = 1, subplots = 1:2, title = "R848 +/- 2DG\nNES: -2.503     p.adjust: 2.00E-10", color = c("#dd4124"), rel_heights = c(2.25, 0.25), base_size = 15)
+p4 <- gseaplot2(np_ABC_gsea, geneSetID = 1, subplots = 1:2, title = "NP +/- 2DG\nNES: -1.370     p.adjust: 9.14E-02", color = c("#dd4124"), rel_heights = c(2.25, 0.25), base_size = 15)
 
-plot_list(p1, p2, p3, p4, ncol=2, tag_levels = 'A') 
-plot_list(p1, p2, ncol=1, tag_levels = 'A') 
+p5 <- gseaplot2(pl23_ABC_gsea, geneSetID = 2, subplots = 1:2, title = "PL2-3 +/- 2DG\nNES: -1.285     p.adjust: 5.16E-02", color = c("#0f85a0"), rel_heights = c(2.25, 0.25), base_size = 15)
+p6 <- gseaplot2(MRLlpr_ABC_gsea, geneSetID = 2, subplots = 1:2, title = "AM14 MRL/lpr +/- 2DG\nNES: -1.224     p.adjust: 7.77E-02", color = c("#0f85a0"), rel_heights = c(2.25, 0.25), base_size = 15)
+p7 <- gseaplot2(r848_ABC_gsea, geneSetID = 2, subplots = 1:2, title = "R848 +/- 2DG\nNES: -1.821     p.adjust: 3.34E-04", color = c("#0f85a0"), rel_heights = c(2.25, 0.25), base_size = 15)
+p8 <- gseaplot2(np_ABC_gsea, geneSetID = 2, subplots = 1:2, title = "NP +/- 2DG\nNES: 0.986     p.adjust: 5.12E-01", color = c("#0f85a0"), rel_heights = c(2.25, 0.25), base_size = 15)
 
-plot_list(p1, p2, p5, p6, ncol=2, tag_levels = 'A') 
+
+
+p2[[1]] <- p2[[1]] + geom_gsea_gene(gene = abc_up_labels, geom = ggrepel::geom_label_repel, size = 5, max.overlaps = Inf, force = 5)
+p3[[1]] <- p3[[1]] + geom_gsea_gene(gene = abc_up_labels, geom = ggrepel::geom_label_repel, size = 5, max.overlaps = Inf, force = 5)
+p4[[1]] <- p4[[1]] + geom_gsea_gene(gene = abc_up_labels, geom = ggrepel::geom_label_repel, size = 5, max.overlaps = Inf, force = 5)
+
+p5[[1]] <- p5[[1]] + geom_gsea_gene(gene = abc_down_labels, geom = ggrepel::geom_label_repel, size = 5, max.overlaps = Inf, force = 5)
+p6[[1]] <- p6[[1]] + geom_gsea_gene(gene = abc_down_labels, geom = ggrepel::geom_label_repel, size = 5, max.overlaps = Inf, force = 5)
+p7[[1]] <- p7[[1]] + geom_gsea_gene(gene = abc_down_labels, geom = ggrepel::geom_label_repel, size = 5, max.overlaps = Inf, force = 5)
+p8[[1]] <- p8[[1]] + geom_gsea_gene(gene = abc_down_labels, geom = ggrepel::geom_label_repel, size = 5, max.overlaps = Inf, force = 5)
+
+plot_list(p1, p2, p3, p4, ncol=2, tag_levels = 'A', tag_size = 30) 
+plot_list(p1, p2, ncol=1, tag_levels = 'B') 
+
+plot_list(p1, p2, p5, p6, ncol=2, tag_levels = 'A', tag_size = 30) 
 ggsave(filename = "PL2-3 and AM14 MRLlpr ABC up and down.png", width = 10, height = 8, units = "in", dpi = 600)
 
-plot_list(p1, p2, p5, p6, ncol=2, tag_levels = 'A') 
+plot_list(p1, p2, p5, p6, ncol=2, tag_levels = 'A', tag_size = 30) 
 ggsave(filename = "R848 and NP ABC up and down.png", width = 10, height = 8, units = "in", dpi = 600)
 
-plot_list(p1, p5, p2, p6, p3, p7, p4, p8, ncol=2, tag_levels = 'A') 
-ggsave(filename = "All Comparisons - ABC up and down - vertical.png", width = 10, height = 16, units = "in", dpi = 600)
+plot_list(p1, p5, p2, p6, p3, p7, p4, p8, ncol=2, tag_levels = NULL) 
+ggsave(filename = "All Comparisons - ABC up and down - vertical2.png", width = 12, height = 15, units = "in", dpi = 600)
 
-plot_list(p1, p2, p3, p4, p5, p6, p7, p8, ncol=4, tag_levels = 'A')
-ggsave(filename = "All Comparisons - ABC up and down - horizontal.png", width = 20, height = 10, units = "in", dpi = 600)
+plot_list(p1, p2, p3, p4, p5, p6, p7, p8, ncol=4, tag_levels = 'A', tag_size = 30)
+ggsave(filename = "All Comparisons - ABC up and down - horizontal.png", width = 22, height = 10, units = "in", dpi = 600)
+ggsave(filename = "All Comparisons - ABC up and down - horizontal2.png", width = 22, height = 9, units = "in", dpi = 600)
 
 
 
