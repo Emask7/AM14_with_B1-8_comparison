@@ -32,8 +32,8 @@ compile_gsea <- function(res_list, names){
 # --- Load your custom gene sets ---
 # read.table reads the single-column file into a data frame,
 # we then extract that column as a vector of gene names.
-abc_up_genes <- read.table("GSE_lists/GSE99480_ABC_up_regulated_genes.txt", header = FALSE)$V1
-abc_down_genes <- read.table("GSE_lists/GSE99480_ABC_down_regulated_genes.txt", header = FALSE)$V1
+abc_up_genes <- read.table("../../public_GSE_datasets/GSE_lists/GSE99480_ABC_up_regulated_genes.txt", header = FALSE)$V1
+abc_down_genes <- read.table("../../public_GSE_datasets/GSE_lists/GSE99480_ABC_down_regulated_genes.txt", header = FALSE)$V1
 
 abc_gmt <- data.frame(
   "term" = c(rep("ABC Down, FoB Up", length(abc_down_genes)), rep("ABC Up, FoB Down", length(abc_up_genes))),
