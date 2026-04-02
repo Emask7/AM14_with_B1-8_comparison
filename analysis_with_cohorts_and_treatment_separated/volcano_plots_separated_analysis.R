@@ -42,10 +42,6 @@ volcano_wrapper(vp_data$B18, "B1-8 Transfer: NP + 2DG vs NP",
     abc_up_genes <- read.table("../public_GSE_datasets/GSE_lists/GSE99480_ABC_up_regulated_genes.txt", header = FALSE)$V1
     abc_down_genes <- read.table("../public_GSE_datasets/GSE_lists/GSE99480_ABC_down_regulated_genes.txt", header = FALSE)$V1
 
-    
-    setwd("Z:/Emma Mask/R_projects/AM14_with_B1-8_comparison/ABC_gsea/")
-    getwd()
-    
     jack_gmt_sets <- read.gmt("../public_GSE_datasets/Bcell_subset.human.jack.gmt")
     jack_gmt_sets <- jack_gmt_sets[jack_gmt_sets$gene != "", ]
     head(jack_gmt_sets)
@@ -113,12 +109,18 @@ volcano_wrapper(vp_data$B18, "B1-8 Transfer: NP + 2DG vs NP",
       geom_vline(xintercept = c(0), linetype = "dotted", color = "#555555") +
       # geom_hline(yintercept = c(-0.5, 0.5), linetype = "dashed", color = "#555555") +
       # geom_vline(xintercept = c(-0.5, 0.5), linetype = "dashed", color = "#555555") +
+      geom_text_repel(
+        data = pl23_x_MRLlpr[is.na(pl23_x_MRLlpr$same_direction), ],
+        aes(label = Gene),
+        size = 3,
+        max.overlaps = 20
+      ) +
       geom_label_repel(
         data = pl23_x_MRLlpr[!is.na(pl23_x_MRLlpr$same_direction), ],
         aes(label = Gene),
         size = 3,
         max.overlaps = Inf
-      ) +
+      ) +      
       scale_fill_manual(
         values = c("ABC_up_FoB_down" = "#ed8b00", "ABC_down_FoB_up" = "#78B7C5"),
         na.value = "white"
@@ -131,7 +133,7 @@ volcano_wrapper(vp_data$B18, "B1-8 Transfer: NP + 2DG vs NP",
       theme_classic()
     
     ggsave(filename = "Output/Correlation Scatterplots/AM14 PL2-3 vs AM14 MRLlpr.png", 
-           width = 8, height = 6, units = "in", dpi = 600)
+           width = 8, height = 7, units = "in", dpi = 600)
     
 
   # AM14 PL2-3 vs AM14 R848 ----------------------------------------------------
@@ -150,6 +152,12 @@ volcano_wrapper(vp_data$B18, "B1-8 Transfer: NP + 2DG vs NP",
       geom_vline(xintercept = c(0), linetype = "dotted", color = "#555555") +
       # geom_hline(yintercept = c(-0.5, 0.5), linetype = "dashed", color = "#555555") +
       # geom_vline(xintercept = c(-0.5, 0.5), linetype = "dashed", color = "#555555") +
+      geom_text_repel(
+        data = pl23_x_r848[is.na(pl23_x_r848$same_direction), ],
+        aes(label = Gene),
+        size = 3,
+        max.overlaps = 100
+      ) +
       geom_label_repel(
         data = pl23_x_r848[!is.na(pl23_x_r848$same_direction), ],
         aes(label = Gene),
@@ -188,6 +196,12 @@ volcano_wrapper(vp_data$B18, "B1-8 Transfer: NP + 2DG vs NP",
       geom_vline(xintercept = c(0), linetype = "dotted", color = "#555555") +
       # geom_hline(yintercept = c(-0.5, 0.5), linetype = "dashed", color = "#555555") +
       # geom_vline(xintercept = c(-0.5, 0.5), linetype = "dashed", color = "#555555") +
+      geom_text_repel(
+        data = pl23_x_np[is.na(pl23_x_np$same_direction), ],
+        aes(label = Gene),
+        size = 3,
+        max.overlaps = 100
+      ) +
       geom_label_repel(
         data = pl23_x_np[!is.na(pl23_x_np$same_direction), ],
         aes(label = Gene),
