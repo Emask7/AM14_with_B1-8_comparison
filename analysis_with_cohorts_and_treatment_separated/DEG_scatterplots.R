@@ -19,6 +19,7 @@ head(vp_data$AM14MRLlpr)
 
 abc_up_genes <- read.table("../public_GSE_datasets/GSE_lists/GSE99480_ABC_up_regulated_genes.txt", header = FALSE)$V1
 abc_down_genes <- read.table("../public_GSE_datasets/GSE_lists/GSE99480_ABC_down_regulated_genes.txt", header = FALSE)$V1
+abc_down_genes <- c(abc_down_genes, "Cr2")
 
 jack_gmt_sets <- read.gmt("../public_GSE_datasets/Bcell_subset.human.jack.gmt")
 jack_gmt_sets <- jack_gmt_sets[jack_gmt_sets$gene != "", ]
@@ -27,6 +28,12 @@ head(jack_gmt_sets)
 ABC_signature_in_Lupus_Wu <- jack_gmt_sets[jack_gmt_sets$term == "ABC signature in Lupus (ref: Wu et al.)", ]
 ABC_signature_in_Lupus_Wu <- ABC_signature_in_Lupus_Wu$gene
 ABC_signature_in_Lupus_Wu
+
+# ABC_signature_in_Lupus_Wu[ABC_signature_in_Lupus_Wu %in% toupper(abc_up_genes)]
+# ABC_signature_in_Lupus_Wu[ABC_signature_in_Lupus_Wu %in% toupper(abc_down_genes)]
+# ABC_signature_in_Lupus_Wu[!(ABC_signature_in_Lupus_Wu %in% toupper(abc_down_genes)) &
+#                           !(ABC_signature_in_Lupus_Wu %in% toupper(abc_up_genes))]
+
 
 # Function to find significant genes in two data sets and make one table -----  
 find_DEG_set_overlap <- function(deg1, colname1, deg2, colname2, p_value_cutoff, lfc_cutoff){
@@ -76,10 +83,10 @@ pl23_x_MRLlpr <- find_DEG_set_overlap(vp_data$PL23_2DG_v_Ctrl, "PL23",
                                       # p_value_cutoff = 0.05, lfc_cutoff = 0.6,
                                       vp_data$AM14MRLlpr, "MRLlpr")
 head(pl23_x_MRLlpr)
-# Shapiro-Wilk — best for smaller datasets (n < ~5000)
-# p > 0.05 means you cannot reject normality
-shapiro.test(pl23_x_MRLlpr$PL23)
-shapiro.test(pl23_x_MRLlpr$MRLlpr)
+# # Shapiro-Wilk — best for smaller datasets (n < ~5000)
+# # p > 0.05 means you cannot reject normality
+# shapiro.test(pl23_x_MRLlpr$PL23)
+# shapiro.test(pl23_x_MRLlpr$MRLlpr)
 
 ggplot(pl23_x_MRLlpr, aes(x = PL23, y = MRLlpr, fill = ABC_direction)) +
   geom_point(aes(color = same_direction)) +
@@ -88,18 +95,18 @@ ggplot(pl23_x_MRLlpr, aes(x = PL23, y = MRLlpr, fill = ABC_direction)) +
     na.value = "gray",
     guide = NULL # guide = guide_legend(title = "title")
   ) +
-  geom_smooth(inherit.aes = FALSE,
-              data = pl23_x_MRLlpr,
-              aes(x = PL23, y = MRLlpr),
-              method = "lm", se = TRUE,
-              color = "black", linewidth = 0.5,
-              linetype = "dashed", fill = "lightgray") +
-  stat_cor(inherit.aes = FALSE,
-           data = pl23_x_MRLlpr,
-           aes(x = PL23, y = MRLlpr),
-           method = "pearson",
-           label.x.npc = "left",
-           label.y.npc = "top") +
+  # geom_smooth(inherit.aes = FALSE,
+  #             data = pl23_x_MRLlpr,
+  #             aes(x = PL23, y = MRLlpr),
+  #             method = "lm", se = TRUE,
+  #             color = "black", linewidth = 0.5,
+  #             linetype = "dashed", fill = "lightgray") +
+  # stat_cor(inherit.aes = FALSE,
+  #          data = pl23_x_MRLlpr,
+  #          aes(x = PL23, y = MRLlpr),
+  #          method = "pearson",
+  #          label.x.npc = "left",
+  #          label.y.npc = "top") +
   geom_hline(yintercept = c(0), linetype = "dotted", color = "#555555") +
   geom_vline(xintercept = c(0), linetype = "dotted", color = "#555555") +
   # geom_hline(yintercept = c(-0.5, 0.5), linetype = "dashed", color = "#555555") +
@@ -126,99 +133,99 @@ ggplot(pl23_x_MRLlpr, aes(x = PL23, y = MRLlpr, fill = ABC_direction)) +
     title = "AM14 PL2-3 +/- 2DG vs AM14 MRLlpr +/- 2DG"
   ) +
   theme_classic()
-
-ggsave(filename = "Output/Correlation Scatterplots/AM14 PL2-3 vs AM14 MRLlpr.png", 
-       width = 8, height = 7, units = "in", dpi = 600)
+  
+  ggsave(filename = "Output/Correlation Scatterplots/AM14 PL2-3 vs AM14 MRLlpr.png", 
+         width = 8, height = 7, units = "in", dpi = 600)
 
 
 # AM14 PL2-3 vs AM14 R848 ----------------------------------------------------
-pl23_x_r848 <- find_DEG_set_overlap(vp_data$PL23_2DG_v_Ctrl, "PL23",
-                                    # p_value_cutoff = 0.05, lfc_cutoff = 0.6,
-                                    vp_data$R848_2DG_v_Ctrl, "R848")
-head(pl23_x_r848)
-
-ggplot(pl23_x_r848, aes(x = PL23, y = R848, fill = ABC_direction)) +
-  geom_point(aes(color = same_direction)) +
-  scale_color_manual(
-    values = c("down" = "#00496f", "up" = "#F21A00", "neither" = "darkgray"),
-    na.value = "gray",
-    guide = NULL # guide = guide_legend(title = "title")
-  ) +
-  geom_smooth(method = "lm", se = TRUE, color = "black", linewidth = 0.5,
-              linetype = "dashed", fill = "lightgray") +
-  stat_cor(method = "pearson", label.x.npc = "left", label.y.npc = "top") +
-  geom_hline(yintercept = c(0), linetype = "dotted", color = "#555555") +
-  geom_vline(xintercept = c(0), linetype = "dotted", color = "#555555") +
-  # geom_hline(yintercept = c(-0.5, 0.5), linetype = "dashed", color = "#555555") +
-  # geom_vline(xintercept = c(-0.5, 0.5), linetype = "dashed", color = "#555555") +
-  geom_text_repel(
-    data = pl23_x_r848[is.na(pl23_x_r848$same_direction), ],
-    aes(label = Gene),
-    size = 3,
-    max.overlaps = 100
-  ) +
-  geom_label_repel(
-    data = pl23_x_r848[!is.na(pl23_x_r848$same_direction), ],
-    aes(label = Gene),
-    size = 3,
-    max.overlaps = Inf
-  ) +
-  scale_fill_manual(
-    values = c("ABC_up_FoB_down" = "#ed8b00", "ABC_down_FoB_up" = "#78B7C5"),
-    na.value = "white"
-  ) +
-  labs(
-    x = "LFC: AM14 PL2-3 2DG vs Ctrl",
-    y = "LFC: AM14 R848 2DG vs Ctrl",
-    title = "AM14 PL2-3 +/- 2DG vs AM14 R848 +/- 2DG"
-  ) +
-  # theme_bw()
-  theme_classic()
-
-ggsave(filename = "Output/Correlation Scatterplots/AM14 PL2-3 vs AM14 R848.png", 
-       width = 6, height = 4.5, units = "in", dpi = 600)
-
-
+  pl23_x_r848 <- find_DEG_set_overlap(vp_data$PL23_2DG_v_Ctrl, "PL23",
+                                      # p_value_cutoff = 0.05, lfc_cutoff = 0.6,
+                                      vp_data$R848_2DG_v_Ctrl, "R848")
+  head(pl23_x_r848)
+  
+  ggplot(pl23_x_r848, aes(x = PL23, y = R848, fill = ABC_direction)) +
+    geom_point(aes(color = same_direction)) +
+    scale_color_manual(
+      values = c("down" = "#00496f", "up" = "#F21A00", "neither" = "darkgray"),
+      na.value = "gray",
+      guide = NULL # guide = guide_legend(title = "title")
+    ) +
+    # geom_smooth(method = "lm", se = TRUE, color = "black", linewidth = 0.5,
+    #             linetype = "dashed", fill = "lightgray") +
+    # stat_cor(method = "pearson", label.x.npc = "left", label.y.npc = "top") +
+    geom_hline(yintercept = c(0), linetype = "dotted", color = "#555555") +
+    geom_vline(xintercept = c(0), linetype = "dotted", color = "#555555") +
+    # geom_hline(yintercept = c(-0.5, 0.5), linetype = "dashed", color = "#555555") +
+    # geom_vline(xintercept = c(-0.5, 0.5), linetype = "dashed", color = "#555555") +
+    geom_text_repel(
+      data = pl23_x_r848[is.na(pl23_x_r848$same_direction), ],
+      aes(label = Gene),
+      size = 3,
+      max.overlaps = 25
+    ) +
+    geom_label_repel(
+      data = pl23_x_r848[!is.na(pl23_x_r848$same_direction), ],
+      aes(label = Gene),
+      size = 3,
+      max.overlaps = Inf
+    ) +
+    scale_fill_manual(
+      values = c("ABC_up_FoB_down" = "#ed8b00", "ABC_down_FoB_up" = "#78B7C5"),
+      na.value = "white"
+    ) +
+    labs(
+      x = "LFC: AM14 PL2-3 2DG vs Ctrl",
+      y = "LFC: AM14 R848 2DG vs Ctrl",
+      title = "AM14 PL2-3 +/- 2DG vs AM14 R848 +/- 2DG"
+    ) +
+    # theme_bw()
+    theme_classic()
+  
+  ggsave(filename = "Output/Correlation Scatterplots/AM14 PL2-3 vs AM14 R848.png", 
+         width = 6, height = 4.5, units = "in", dpi = 600)
+  
+  
 # AM14 PL2-3 vs B1-8 NP-OVA --------------------------------------------------
-pl23_x_np <- find_DEG_set_overlap(vp_data$PL23_2DG_v_Ctrl, "PL23",
-                                  # p_value_cutoff = 0.05, lfc_cutoff = 0.6,
-                                  vp_data$B18, "NP")
-head(pl23_x_np)
-
-ggplot(pl23_x_np, aes(x = PL23, y = NP, fill = ABC_direction)) +
-  geom_point(aes(color = same_direction)) +
-  scale_color_manual(
-    values = c("down" = "#00496f", "up" = "#F21A00", "neither" = "darkgray"),
-    na.value = "gray",
-    guide = NULL # guide = guide_legend(title = "title")
-  ) +
-  geom_hline(yintercept = c(0), linetype = "dotted", color = "#555555") +
-  geom_vline(xintercept = c(0), linetype = "dotted", color = "#555555") +
-  # geom_hline(yintercept = c(-0.6, 0.6), linetype = "dashed", color = "#555555") +
-  # geom_vline(xintercept = c(-0.6, 0.6), linetype = "dashed", color = "#555555") +
-  geom_text_repel(
-    data = pl23_x_np[is.na(pl23_x_np$same_direction), ],
-    aes(label = Gene),
-    size = 3,
-    max.overlaps = 100
-  ) +
-  geom_label_repel(
-    data = pl23_x_np[!is.na(pl23_x_np$same_direction), ],
-    aes(label = Gene),
-    size = 3,
-    max.overlaps = Inf
-  ) +
-  scale_fill_manual(
-    values = c("ABC_up_FoB_down" = "#ed8b00", "ABC_down_FoB_up" = "#78B7C5"),
-    na.value = "white"
-  ) +
-  labs(
-    x = "LFC: AM14 PL2-3 2DG vs Ctrl",
-    y = "LFC: B1-8 NP-OVA 2DG vs Ctrl",
-    title = "AM14 PL2-3 +/- 2DG vs B1-8 NP-OVA +/- 2DG"
-  ) +
-  # theme_bw()
-  theme_classic()
-
-ggsave(filename = "Output/Correlation Scatterplots/AM14 PL2-3 vs B1-8 NP-OVA.png", 
-       width = 6, height = 4.5, units = "in", dpi = 600)
+  pl23_x_np <- find_DEG_set_overlap(vp_data$PL23_2DG_v_Ctrl, "PL23",
+                                    # p_value_cutoff = 0.05, lfc_cutoff = 0.6,
+                                    vp_data$B18, "NP")
+  head(pl23_x_np)
+  
+  ggplot(pl23_x_np, aes(x = PL23, y = NP, fill = ABC_direction)) +
+    geom_point(aes(color = same_direction)) +
+    scale_color_manual(
+      values = c("down" = "#00496f", "up" = "#F21A00", "neither" = "darkgray"),
+      na.value = "gray",
+      guide = NULL # guide = guide_legend(title = "title")
+    ) +
+    geom_hline(yintercept = c(0), linetype = "dotted", color = "#555555") +
+    geom_vline(xintercept = c(0), linetype = "dotted", color = "#555555") +
+    # geom_hline(yintercept = c(-0.6, 0.6), linetype = "dashed", color = "#555555") +
+    # geom_vline(xintercept = c(-0.6, 0.6), linetype = "dashed", color = "#555555") +
+    geom_text_repel(
+      data = pl23_x_np[is.na(pl23_x_np$same_direction), ],
+      aes(label = Gene),
+      size = 3,
+      max.overlaps = 100
+    ) +
+    geom_label_repel(
+      data = pl23_x_np[!is.na(pl23_x_np$same_direction), ],
+      aes(label = Gene),
+      size = 3,
+      max.overlaps = Inf
+    ) +
+    scale_fill_manual(
+      values = c("ABC_up_FoB_down" = "#ed8b00", "ABC_down_FoB_up" = "#78B7C5"),
+      na.value = "white"
+    ) +
+    labs(
+      x = "LFC: AM14 PL2-3 2DG vs Ctrl",
+      y = "LFC: B1-8 NP-OVA 2DG vs Ctrl",
+      title = "AM14 PL2-3 +/- 2DG vs B1-8 NP-OVA +/- 2DG"
+    ) +
+    # theme_bw()
+    theme_classic()
+  
+  ggsave(filename = "Output/Correlation Scatterplots/AM14 PL2-3 vs B1-8 NP-OVA.png", 
+         width = 6, height = 4.5, units = "in", dpi = 600)
