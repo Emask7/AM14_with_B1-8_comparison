@@ -207,7 +207,7 @@ ggplot(pl23_x_MRLlpr, aes(x = PL23, y = MRLlpr, fill = ABC_direction)) +
       data = pl23_x_np[is.na(pl23_x_np$same_direction), ],
       aes(label = Gene),
       size = 3,
-      max.overlaps = 100
+      max.overlaps = 25
     ) +
     geom_label_repel(
       data = pl23_x_np[!is.na(pl23_x_np$same_direction), ],
