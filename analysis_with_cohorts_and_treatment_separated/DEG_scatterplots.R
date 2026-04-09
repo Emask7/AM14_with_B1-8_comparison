@@ -111,18 +111,18 @@ ggplot(pl23_x_MRLlpr, aes(x = PL23, y = MRLlpr, fill = ABC_direction)) +
   geom_vline(xintercept = c(0), linetype = "dotted", color = "#555555") +
   # geom_hline(yintercept = c(-0.5, 0.5), linetype = "dashed", color = "#555555") +
   # geom_vline(xintercept = c(-0.5, 0.5), linetype = "dashed", color = "#555555") +
-  geom_text_repel(
-    data = pl23_x_MRLlpr[is.na(pl23_x_MRLlpr$same_direction), ],
-    aes(label = Gene),
-    size = 3,
-    max.overlaps = 20
-  ) +
-  geom_label_repel(
-    data = pl23_x_MRLlpr[!is.na(pl23_x_MRLlpr$same_direction), ],
-    aes(label = Gene),
-    size = 3,
-    max.overlaps = Inf
-  ) +      
+  # geom_text_repel(
+  #   data = pl23_x_MRLlpr[is.na(pl23_x_MRLlpr$same_direction), ],
+  #   aes(label = Gene),
+  #   size = 3,
+  #   max.overlaps = 20
+  # ) +
+  # geom_label_repel(
+  #   data = pl23_x_MRLlpr[!is.na(pl23_x_MRLlpr$same_direction), ],
+  #   aes(label = Gene),
+  #   size = 3,
+  #   max.overlaps = Inf
+  # ) +      
   scale_fill_manual(
     values = c("ABC_up_FoB_down" = "#ed8b00", "ABC_down_FoB_up" = "#78B7C5"),
     na.value = "white"
