@@ -1,5 +1,5 @@
 setwd("Z:/Emma Mask/R_projects/AM14_with_B1-8_comparison/analysis_with_cohorts_and_treatment_separated/ABC_marker_analysis/")
-# setwd("./analysis_with_cohorts_and_treatment_separated/ABC_marker_analysis/")
+setwd("../analysis_with_cohorts_and_treatment_separated/ABC_marker_analysis/")
 getwd()
 
 # Load the necessary libraries
@@ -120,7 +120,7 @@ p7[[1]] <- p7[[1]] + geom_gsea_gene(gene = abc_down_labels, geom = ggrepel::geom
 p8[[1]] <- p8[[1]] + geom_gsea_gene(gene = abc_down_labels, geom = ggrepel::geom_label_repel, size = 5, max.overlaps = Inf, force = 5)
 
 plot_list(p1, p2, p3, p4, ncol=2, tag_levels = 'A', tag_size = 30) 
-plot_list(p1, p2, ncol=1, tag_levels = 'B') 
+plot_list(p1, p2, ncol=1, tag_levels = 'A') 
 
 plot_list(p1, p2, p5, p6, ncol=2, tag_levels = 'A', tag_size = 30) 
 ggsave(filename = "PL2-3 and AM14 MRLlpr ABC up and down.png", width = 10, height = 8, units = "in", dpi = 600)
@@ -128,8 +128,9 @@ ggsave(filename = "PL2-3 and AM14 MRLlpr ABC up and down.png", width = 10, heigh
 plot_list(p1, p2, p5, p6, ncol=2, tag_levels = 'A', tag_size = 30) 
 ggsave(filename = "R848 and NP ABC up and down.png", width = 10, height = 8, units = "in", dpi = 600)
 
-plot_list(p1, p5, p2, p6, p3, p7, p4, p8, ncol=2, tag_levels = NULL) 
-ggsave(filename = "All Comparisons - ABC up and down - vertical2.png", width = 12, height = 15, units = "in", dpi = 600)
+plot_list(p1, p5, p2, p6, p3, p7, p4, p8, ncol=2, tag_levels = 'A') 
+plot_list(p1, p5, p2, p6, p3, p7, p4, p8, ncol=2) 
+ggsave(filename = "All Comparisons - ABC up and down - vertical2.png", width = 10, height = 18, units = "in", dpi = 600)
 
 plot_list(p1, p2, p3, p4, p5, p6, p7, p8, ncol=4, tag_levels = 'A', tag_size = 30)
 ggsave(filename = "All Comparisons - ABC up and down - horizontal.png", width = 22, height = 10, units = "in", dpi = 600)

@@ -1,4 +1,5 @@
-setwd("Z:/Emma Mask/R_projects/AM14_with_B1-8_comparison/analysis_with_cohorts_and_treatment_separated")
+# setwd("Z:/Emma Mask/R_projects/AM14_with_B1-8_comparison/analysis_with_cohorts_and_treatment_separated")
+setwd("/Users/emma_personal/Desktop/AM14_with_B1-8_comparison/analysis_with_cohorts_and_treatment_separated")
 getwd()
 
 vp_data = list(
@@ -188,7 +189,7 @@ find_DEG_set_overlap <- function(deg1, colname1, deg2, colname2, p_value_cutoff,
       theme_classic()
     
     ggsave(filename = "Output/Correlation Scatterplots/AM14 PL2-3 vs AM14 MRLlpr - ABC labels only.png", 
-           width = 8, height = 7, units = "in", dpi = 600)
+           width = 8, height = 6, units = "in", dpi = 600)
     
 
 # AM14 PL2-3 vs AM14 R848 ----------------------------------------------------
