@@ -220,7 +220,8 @@ getwd()
     # pca_B18
 
   # Show all PCA plots together ------------------------------------------------
-    pca_all <- plot_grid(pca_PL23, pca_R848, pca_B18, pca_MRLlpr, nrow = 2)
+    pca_all <- plot_grid(pca_PL23, pca_R848, pca_B18, pca_MRLlpr, 
+                         nrow = 2, labels = "AUTO", label_size = 18)
     pca_all <- plot_grid(pca_all, shared_legend, ncol = 2, rel_widths = c(1, 0.15))
     pca_all
     ggsave2("QC_results/PCA_plots/All_PCA_plots.png", plot = pca_all, 
@@ -297,18 +298,30 @@ getwd()
   
   pushViewport(viewport(layout.pos.row = 1, layout.pos.col = 1))
   draw(htmp_PL23$unsupervised, newpage = FALSE)
+  grid.text("A", x = unit(0.02, "npc"), y = unit(0.98, "npc"),
+            just = c("left", "top"),
+            gp = gpar(fontsize = 20, fontface = "bold"))
   popViewport()
   
   pushViewport(viewport(layout.pos.row = 1, layout.pos.col = 3))
   draw(htmp_R848$unsupervised, newpage = FALSE)
+  grid.text("B", x = unit(0.02, "npc"), y = unit(0.98, "npc"),
+            just = c("left", "top"),
+            gp = gpar(fontsize = 20, fontface = "bold"))
   popViewport()
   
   pushViewport(viewport(layout.pos.row = 2, layout.pos.col = 1))
   draw(htmp_B18$unsupervised, newpage = FALSE)
+  grid.text("C", x = unit(0.02, "npc"), y = unit(0.98, "npc"),
+            just = c("left", "top"),
+            gp = gpar(fontsize = 20, fontface = "bold"))
   popViewport()
   
   pushViewport(viewport(layout.pos.row = 2, layout.pos.col = 3))
   draw(htmp_MRLlpr$unsupervised, newpage = FALSE)
+  grid.text("D", x = unit(0.02, "npc"), y = unit(0.98, "npc"),
+            just = c("left", "top"),
+            gp = gpar(fontsize = 20, fontface = "bold"))
   popViewport()
   
   pushViewport(viewport(layout.pos.row = 1:2, layout.pos.col = 4))
