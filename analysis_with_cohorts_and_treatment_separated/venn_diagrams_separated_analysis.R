@@ -106,50 +106,94 @@ DEG_lists_lfc0.6 <- list(
                                 "AM14 Transfer: R848 + 2DG vs R848" = DEG_lists_lfc0.6$R848_2DG_vs_Ctrl$all,
                                 "B1-8 Transfer: NP + 2DG vs NP" = DEG_lists_lfc0.6$B18$all,
                                 "AM14 MRL/lpr: 2DG vs Control" = DEG_lists_lfc0.6$MRLlpr$all))
-    png(filename = "Output/Venn_diagrams/All_DEGs_LFC0.6.png", width = 7.5, height = 4, res = 600, units = "in")
-    plot(all_degs_0.6, type = "upset")
-    dev.off()
+    # png(filename = "Output/Venn_diagrams/All_DEGs_LFC0.6.png", width = 7.5, height = 4, res = 600, units = "in")
+    # plot(all_degs_0.6, type = "upset")
+    # dev.off()
     
     up_degs_0.6 <- venndetail(list("AM14 Transfer: PL2-3 + 2DG vs PL2-3" = DEG_lists_lfc0.6$PL23_2DG_vs_Ctrl$up,
                                "AM14 Transfer: R848 + 2DG vs R848" = DEG_lists_lfc0.6$R848_2DG_vs_Ctrl$up,
                                "B1-8 Transfer: NP + 2DG vs NP" = DEG_lists_lfc0.6$B18$up,
                                "AM14 MRL/lpr: 2DG vs Control" = DEG_lists_lfc0.6$MRLlpr$up))
-    png(filename = "Output/Venn_diagrams/Upregulated_DEGs_LFC0.6.png", width = 2000, height = 1500, res = 250)
-    plot(up_degs_0.6, type = "upset")
-    dev.off()
+    # png(filename = "Output/Venn_diagrams/Upregulated_DEGs_LFC0.6.png", width = 2000, height = 1500, res = 250)
+    # plot(up_degs_0.6, type = "upset")
+    # dev.off()
     
     down_degs_0.6 <- venndetail(list("AM14 Transfer: PL2-3 + 2DG vs PL2-3" = DEG_lists_lfc0.6$PL23_2DG_vs_Ctrl$down,
                                  "AM14 Transfer: R848 + 2DG vs R848" = DEG_lists_lfc0.6$R848_2DG_vs_Ctrl$down,
                                  "B1-8 Transfer: NP + 2DG vs NP" = DEG_lists_lfc0.6$B18$down,
                                  "AM14 MRL/lpr: 2DG vs Control" = DEG_lists_lfc0.6$MRLlpr$down))
-    png(filename = "Output/Venn_diagrams/Downregulated_DEGs_LFC0.6.png", width = 2000, height = 1500, res = 250)
-    plot(down_degs_0.6, type = "upset")
-    dev.off()
+    # png(filename = "Output/Venn_diagrams/Downregulated_DEGs_LFC0.6.png", width = 2000, height = 1500, res = 250)
+    # plot(down_degs_0.6, type = "upset")
+    # dev.off()
   
-  
-    
-    all_degs_0.6 <- venndetail(list("AM14 Transfer:\nPL2-3 + 2DG\nvs PL2-3\n" = DEG_lists_lfc0.6$PL23_2DG_vs_Ctrl$all,
-                                    "AM14 Transfer:\nR848 + 2DG\nvs R848\n" = DEG_lists_lfc0.6$R848_2DG_vs_Ctrl$all,
-                                    "B1-8 Transfer:\nNP + 2DG vs NP" = DEG_lists_lfc0.6$B18$all,
-                                    "AM14 MRL/lpr:\n2DG vs Control" = DEG_lists_lfc0.6$MRLlpr$all))
-    plot(all_degs_0.6, margin = 0.07, cat.cex = 1.1, cex = 1.2,
-         filename = "Output/Venn_diagrams/All_DEGs_LFC0.6_venn.png")
 
-    up_degs_0.6 <- venndetail(list("AM14 Transfer:\nPL2-3 + 2DG\nvs PL2-3\n" = DEG_lists_lfc0.6$PL23_2DG_vs_Ctrl$up,
-                                   "AM14 Transfer:\nR848 + 2DG\nvs R848\n" = DEG_lists_lfc0.6$R848_2DG_vs_Ctrl$up,
-                                   "B1-8 Transfer:\nNP + 2DG vs NP" = DEG_lists_lfc0.6$B18$up,
-                                   "AM14 MRL/lpr:\n2DG vs Control" = DEG_lists_lfc0.6$MRLlpr$up))
-    plot(up_degs_0.6, margin = 0.07, cat.cex = 1.1, cex = 1.2,
-         filename = "Output/Venn_diagrams/Upregulated_DEGs_LFC0.6_venn.png")
-    
-    
-    down_degs_0.6 <- venndetail(list("AM14 Transfer:\nPL2-3 + 2DG\nvs PL2-3\n" = DEG_lists_lfc0.6$PL23_2DG_vs_Ctrl$down,
-                                     "AM14 Transfer:\nR848 + 2DG\nvs R848\n" = DEG_lists_lfc0.6$R848_2DG_vs_Ctrl$down,
-                                     "B1-8 Transfer:\nNP + 2DG vs NP" = DEG_lists_lfc0.6$B18$down,
-                                     "AM14 MRL/lpr:\n2DG vs Control" = DEG_lists_lfc0.6$MRLlpr$down))
-    plot(down_degs_0.6, margin = 0.07, cat.cex = 1.1, cex = 1.2,
-         filename = "Output/Venn_diagrams/Downregulated_DEGs_LFC0.6_venn.png")
-    
+    # Set all 3 venn diagrams in one figure ------------------------------------
+      # Save each plot to a temp file
+      tmp_all  <- tempfile(fileext = ".png")
+      tmp_up   <- tempfile(fileext = ".png")
+      tmp_down <- tempfile(fileext = ".png")
+      
+      png(tmp_all,  width = 7.5, height = 4, res = 300, units = "in")
+      plot(all_degs_0.6,  type = "upset")
+      dev.off()
+      
+      png(tmp_up,   width = 7.5, height = 4, res = 300, units = "in")
+      plot(up_degs_0.6,   type = "upset")
+      dev.off()
+      
+      png(tmp_down, width = 7.5, height = 4, res = 300, units = "in")
+      plot(down_degs_0.6, type = "upset")
+      dev.off()
+
+      p_all <- ggdraw() +
+        draw_grob(rasterGrob(as.raster(image_read(tmp_all)), interpolate = TRUE)) +
+        draw_label("A", x = 0.05, y = 0.98, vjust = 1, fontface = "bold", size = 20) +
+        draw_label("All DEGs", x = 0.3, y = 0.95, vjust = 1, fontface = "bold", size = 14) +
+        draw_label("(p-adj < 0.05, |LFC| > 0.6)", x = 0.3, y = 0.9, vjust = 1, size = 12)
+      
+      p_up <- ggdraw() +
+        draw_grob(rasterGrob(as.raster(image_read(tmp_up)), interpolate = TRUE)) +
+        draw_label("B", x = 0.05, y = 0.98, vjust = 1, fontface = "bold", size = 20) +
+        draw_label("Upregulated DEGs", x = 0.3, y = 0.95, vjust = 1, fontface = "bold", size = 14) +
+        draw_label("(p-adj < 0.05, LFC > 0.6)", x = 0.3, y = 0.9, vjust = 1, size = 12)
+      
+      p_down <- ggdraw() +
+        draw_grob(rasterGrob(as.raster(image_read(tmp_down)), interpolate = TRUE)) +
+        draw_label("C", x = 0.05, y = 0.98, vjust = 1, fontface = "bold", size = 20) +
+        draw_label("Downregulated DEGs", x = 0.3, y = 0.95, vjust = 1, fontface = "bold", size = 14) +
+        draw_label("(p-adj < 0.05, LFC < -0.6)", x = 0.3, y = 0.9, vjust = 1, size = 12)
+      
+      combined <- p_all / p_up / p_down 
+
+      ggsave("Output/Venn_diagrams/Combined_DEGs_LFC0.6.png",
+             plot = combined,
+             width = 7, height = 12, dpi = 600, units = "in",
+             bg = "white")
+      
+      
+      
+    # all_degs_0.6 <- venndetail(list("AM14 Transfer:\nPL2-3 + 2DG\nvs PL2-3\n" = DEG_lists_lfc0.6$PL23_2DG_vs_Ctrl$all,
+    #                                 "AM14 Transfer:\nR848 + 2DG\nvs R848\n" = DEG_lists_lfc0.6$R848_2DG_vs_Ctrl$all,
+    #                                 "B1-8 Transfer:\nNP + 2DG vs NP" = DEG_lists_lfc0.6$B18$all,
+    #                                 "AM14 MRL/lpr:\n2DG vs Control" = DEG_lists_lfc0.6$MRLlpr$all))
+    # plot(all_degs_0.6, margin = 0.07, cat.cex = 1.1, cex = 1.2,
+    #      filename = "Output/Venn_diagrams/All_DEGs_LFC0.6_venn.png")
+    # 
+    # up_degs_0.6 <- venndetail(list("AM14 Transfer:\nPL2-3 + 2DG\nvs PL2-3\n" = DEG_lists_lfc0.6$PL23_2DG_vs_Ctrl$up,
+    #                                "AM14 Transfer:\nR848 + 2DG\nvs R848\n" = DEG_lists_lfc0.6$R848_2DG_vs_Ctrl$up,
+    #                                "B1-8 Transfer:\nNP + 2DG vs NP" = DEG_lists_lfc0.6$B18$up,
+    #                                "AM14 MRL/lpr:\n2DG vs Control" = DEG_lists_lfc0.6$MRLlpr$up))
+    # plot(up_degs_0.6, margin = 0.07, cat.cex = 1.1, cex = 1.2,
+    #      filename = "Output/Venn_diagrams/Upregulated_DEGs_LFC0.6_venn.png")
+    # 
+    # 
+    # down_degs_0.6 <- venndetail(list("AM14 Transfer:\nPL2-3 + 2DG\nvs PL2-3\n" = DEG_lists_lfc0.6$PL23_2DG_vs_Ctrl$down,
+    #                                  "AM14 Transfer:\nR848 + 2DG\nvs R848\n" = DEG_lists_lfc0.6$R848_2DG_vs_Ctrl$down,
+    #                                  "B1-8 Transfer:\nNP + 2DG vs NP" = DEG_lists_lfc0.6$B18$down,
+    #                                  "AM14 MRL/lpr:\n2DG vs Control" = DEG_lists_lfc0.6$MRLlpr$down))
+    # plot(down_degs_0.6, margin = 0.07, cat.cex = 1.1, cex = 1.2,
+    #      filename = "Output/Venn_diagrams/Downregulated_DEGs_LFC0.6_venn.png")
+    # 
     
     
   # DEGs with LFC > +/- 0.6 (no AM14 MRL/lpr) ----------------------------------

@@ -12,9 +12,10 @@ getwd()
   }
 
 # Volcano Plots ----------------------------------------------------------------
-  volcano_wrapper <- function(dat, plot_title, cap, lfc_cutoff, padj_cutoff, file_name, h, w, x_limits, y_limits){
-    if(missing(plot_title)) plot_title <- "Plot Title"
+  volcano_wrapper <- function(dat, plot_title, cap, sub_title, lfc_cutoff, padj_cutoff, file_name, h, w, x_limits, y_limits){
+    if(missing(plot_title)) plot_title <- " "
     if(missing(cap)) cap <- " "
+    if(missing(sub_title)) sub_title <- "(Adjusted p-values)"
     if(missing(lfc_cutoff)) lfc_cutoff <- 1
     if(missing(padj_cutoff)) padj_cutoff <- 0.05
     if(missing(file_name)) file_name <- NULL
@@ -37,7 +38,7 @@ getwd()
                           FCcutoff = lfc_cutoff, pCutoff = padj_cutoff,
                           x = 'log2FoldChange', y = 'padj', 
                           xlim = x_limits, ylim = y_limits, 
-                          title = plot_title, subtitle = "(Adjusted p-values)", 
+                          title = plot_title, subtitle = sub_title, 
                           caption = cap,
                           # col = wes_palette("Zissou1", type = "continuous"),
                           drawConnectors = TRUE, min.segment.length = 1, 
