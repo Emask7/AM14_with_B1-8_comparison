@@ -153,7 +153,8 @@ getwd()
             legend.title = element_text(size = 14),
             legend.text = element_text(size = 12),
             legend.background = element_rect(color = "black", linewidth = 0.5),
-            legend.box.background = element_rect(color = "black", linewidth = 0.5))
+            legend.box.background = element_rect(color = "black", linewidth = 0.5),
+            plot.margin = margin(10, 15, 15, 10))
     
     shared_legend <- get_legend(pca_PL23)
     pca_PL23 <- pca_PL23 + theme(legend.position = "none")
@@ -175,7 +176,8 @@ getwd()
       theme(panel.grid.minor=element_blank(),
             axis.text = element_text(color = "black"),
             axis.title = element_text(size = 12),
-            legend.position = "none") 
+            legend.position = "none",
+            plot.margin = margin(10, 10, 15, 15)) 
     # pca_R848
     
   # AM14 MRLlpr PCA Plot -------------------------------------------------------
@@ -193,7 +195,8 @@ getwd()
       theme(panel.grid.minor=element_blank(),
             axis.text = element_text(color = "black"),
             axis.title = element_text(size = 12),
-            legend.position = "none") 
+            legend.position = "none",
+            plot.margin = margin(15, 10, 10, 15)) 
     # pca_MRLlpr
 
   # B1-8 PCA Plot --------------------------------------------------------------
@@ -212,7 +215,8 @@ getwd()
       theme(panel.grid.minor=element_blank(),
             axis.text = element_text(color = "black"),
             axis.title = element_text(size = 12),
-            legend.position = "none") 
+            legend.position = "none",
+            plot.margin = margin(15, 15, 10, 10)) 
     # pca_B18
 
   # Show all PCA plots together ------------------------------------------------
@@ -227,12 +231,6 @@ getwd()
     rm(MRLlpr_vsd, MRLlpr_pcaData, MRLlpr_percentVar, pca_MRLlpr)
     rm(B18_vsd, B18_pcaData, B18_percentVar, pca_B18)
     
-
-  
-  
-  
-  
-
 # Get DESeq2 results -----------------------------------------------------------
   deseq_res <- list(
     AM14transfer_PL23 = results_wrapper(dds_AM14trans_PL23, c("Treatment", "PL23_2DG", "PL23"), gene_IDs$AM14trans),
@@ -246,135 +244,82 @@ getwd()
   head(deseq_res$B18transfer)
   head(deseq_res$AM14MRLlpr)
   
-  # DEG Heatmaps ---------------------------------------------------------------
-  # # DEG_heatmap <- function(dds, dds_results, factors, color_list, lfc_cutoff, padj_cutoff, count_type, dds_cols, plot_title, filename, h, w){
-  # 
-  # DEG_heatmap(dds_AM14trans, deseq_res$AM14transfer$PL23_2DG_v_Ctrl,
-  #             c("Treatment", "Cohort"), 
-  #             list(Treatment = c(PL23 = "#0f85a0", PL23_2DG = "#dd4124"),
-  #                  Cohort = c(A1 = "#00496f", A2 = "#edd746")),
-  #             1, 0.05, "norm_counts", c(1:10),
-  #             "AM14 Adoptive Transfer\n(PL2-3 +/- 2DG Significant DEGs)",
-  #             "AM14 transfer - PL2-3 only - DESeq2_norm")
-  
 # DEG Heatmaps using default DESeq2 normalization ------------------------------  
-  # DEG_heatmap(dds_AM14trans_PL23, deseq_res$AM14transfer_PL23, 
-  #             c("Treatment"),
-  #             list(Treatment = c(PL23 = "#0f85a0", PL23_2DG = "#dd4124")),
-  #             1, 0.05, "norm_counts", NULL,
-  #             "AM14 Adoptive Transfer: PL2-3 + 2DG vs PL2-3",
-  #             "AM14 transfer PL2-3 - padj 0.05")
-  # 
-  # DEG_heatmap(dds_AM14trans_PL23, deseq_res$AM14transfer_PL23, 
-  #             c("Treatment"),
-  #             list(Treatment = c(PL23 = "#0f85a0", PL23_2DG = "#dd4124")),
-  #             1, 0.01, "norm_counts", NULL,
-  #             "AM14 Adoptive Transfer: PL2-3 + 2DG vs PL2-3",
-  #             "AM14 transfer PL2-3 - padj 0.01")
-  # 
-  # DEG_heatmap(dds_AM14trans_R848, deseq_res$AM14transfer_R848, 
-  #             c("Treatment"),
-  #             list(Treatment = c(R848 = "#0f85a0", R848_2DG = "#dd4124")),
-  #             1, 0.05, "norm_counts", NULL,
-  #             "AM14 Adoptive Transfer: R848 + 2DG vs R848",
-  #             "AM14 transfer R848 - padj 0.05")
-  # 
-  # DEG_heatmap(dds_AM14trans_R848, deseq_res$AM14transfer_R848, 
-  #             c("Treatment"),
-  #             list(Treatment = c(R848 = "#0f85a0", R848_2DG = "#dd4124")),
-  #             1, 0.01, "norm_counts", NULL,
-  #             "AM14 Adoptive Transfer: R848 + 2DG vs R848",
-  #             "AM14 transfer R848 - padj 0.01")
-  # 
-  # 
-  # DEG_heatmap(dds_B18trans, deseq_res$B18transfer, 
-  #             c("Treatment"),
-  #             list(Treatment = c(NP = "#0f85a0", NP_2DG = "#dd4124")),
-  #             1, 0.05, "norm_counts", NULL,
-  #             "B1-8 Adoptive Transfer: NP + 2DG vs NP",
-  #             "B1-8 transfer - padj 0.05", h = 1000)
-  # 
-  # DEG_heatmap(dds_B18trans, deseq_res$B18transfer, 
-  #             c("Treatment"),
-  #             list(Treatment = c(NP = "#0f85a0", NP_2DG = "#dd4124")),
-  #             1, 0.01, "norm_counts", NULL,
-  #             "B1-8 Adoptive Transfer: NP + 2DG vs NP",
-  #             "B1-8 transfer - padj 0.01", h = 1000)
-  # 
-  # 
-  # DEG_heatmap(dds_AM14MRLlpr, deseq_res$AM14MRLlpr, 
-  #             c("Treatment"),
-  #             list(Treatment = c(Control = "#0f85a0", "2DG" = "#dd4124")),
-  #             1, 0.05, "norm_counts", NULL,
-  #             "AM14 MRL/lpr Mice: 2DG vs Control",
-  #             "AM14 MRLlpr - padj 0.05")
-  # 
-  # DEG_heatmap(dds_AM14MRLlpr, deseq_res$AM14MRLlpr, 
-  #             c("Treatment"),
-  #             list(Treatment = c(Control = "#0f85a0", "2DG" = "#dd4124")),
-  #             1, 0.01, "norm_counts", NULL,
-  #             "AM14 MRL/lpr Mice: 2DG vs Control",
-  #             "AM14 MRLlpr - padj 0.01")
+  htmp_PL23 <- DEG_heatmap(dds = dds_AM14trans_PL23, 
+                                dds_results = deseq_res$AM14transfer_PL23,
+                                lfc_cutoff = 1, 
+                                padj_cutoff = 0.05, 
+                                count_type = "norm_counts", 
+                                plot_title = "AM14 Transfer:\nPL2-3 + 2DG vs PL2-3",
+                                add_legend = FALSE)
+  htmp_PL23$unsupervised
   
-# # DEG Heatmaps using Rlog normalization ----------------------------------------  
-#   DEG_heatmap(dds_AM14trans_PL23, deseq_res$AM14transfer_PL23, 
-#               c("Treatment"),
-#               list(Treatment = c(PL23 = "#0f85a0", PL23_2DG = "#dd4124")),
-#               1, 0.05, "rlog", NULL,
-#               "AM14 Adoptive Transfer: PL2-3 + 2DG vs PL2-3",
-#               "AM14 transfer PL2-3 - padj 0.05 - Rlog_norm")
-#   
-#   DEG_heatmap(dds_AM14trans_PL23, deseq_res$AM14transfer_PL23, 
-#               c("Treatment"),
-#               list(Treatment = c(PL23 = "#0f85a0", PL23_2DG = "#dd4124")),
-#               1, 0.01, "rlog", NULL,
-#               "AM14 Adoptive Transfer: PL2-3 + 2DG vs PL2-3",
-#               "AM14 transfer PL2-3 - padj 0.01 - Rlog_norm")
-#   
-#   DEG_heatmap(dds_AM14trans_R848, deseq_res$AM14transfer_R848, 
-#               c("Treatment"),
-#               list(Treatment = c(R848 = "#0f85a0", R848_2DG = "#dd4124")),
-#               1, 0.05, "rlog", NULL,
-#               "AM14 Adoptive Transfer: R848 + 2DG vs R848",
-#               "AM14 transfer R848 - padj 0.05 - Rlog_norm")
-#   
-#   DEG_heatmap(dds_AM14trans_R848, deseq_res$AM14transfer_R848, 
-#               c("Treatment"),
-#               list(Treatment = c(R848 = "#0f85a0", R848_2DG = "#dd4124")),
-#               1, 0.01, "rlog", NULL,
-#               "AM14 Adoptive Transfer: R848 + 2DG vs R848",
-#               "AM14 transfer R848 - padj 0.01 - Rlog_norm")
-#   
-#   DEG_heatmap(dds_B18trans, deseq_res$B18transfer, 
-#               c("Treatment"),
-#               list(Treatment = c(NP = "#0f85a0", NP_2DG = "#dd4124")),
-#               1, 0.05, "rlog", NULL,
-#               "B1-8 Adoptive Transfer: NP + 2DG vs NP",
-#               "B1-8 transfer - padj 0.05 - RLog Normalization")
-#   
-#   DEG_heatmap(dds_B18trans, deseq_res$B18transfer, 
-#               c("Treatment"),
-#               list(Treatment = c(NP = "#0f85a0", NP_2DG = "#dd4124")),
-#               1, 0.01, "rlog", NULL,
-#               "B1-8 Adoptive Transfer: NP + 2DG vs NP",
-#               "B1-8 transfer - padj 0.01 - RLog Normalization")
-#   
-#   
-#   DEG_heatmap(dds_AM14MRLlpr, deseq_res$AM14MRLlpr, 
-#               c("Treatment"),
-#               list(Treatment = c(Control = "#0f85a0", "2DG" = "#dd4124")),
-#               1, 0.05, "rlog", NULL,
-#               "AM14 MRL/lpr Mice: 2DG vs Control",
-#               "AM14 MRLlpr - padj 0.05 - RLog Normalization")
-#   
-#   DEG_heatmap(dds_AM14MRLlpr, deseq_res$AM14MRLlpr, 
-#               c("Treatment"),
-#               list(Treatment = c(Control = "#0f85a0", "2DG" = "#dd4124")),
-#               1, 0.01, "rlog", NULL,
-#               "AM14 MRL/lpr Mice: 2DG vs Control",
-#               "AM14 MRLlpr - padj 0.01 - RLog Normalization")
+  htmp_R848 <- DEG_heatmap(dds = dds_AM14trans_R848, 
+                                dds_results = deseq_res$AM14transfer_R848,
+                                lfc_cutoff = 1, 
+                                padj_cutoff = 0.05, 
+                                count_type = "norm_counts", 
+                                plot_title = "AM14 Transfer:\nR848 + 2DG vs R848",
+                                add_legend = FALSE)
+  htmp_R848$unsupervised
   
+  htmp_B18 <- DEG_heatmap(dds = dds_B18trans, 
+                               dds_results = deseq_res$B18transfer,
+                               lfc_cutoff = 1, 
+                               padj_cutoff = 0.05, 
+                               count_type = "norm_counts", 
+                               plot_title = "B1-8 Transfer:\nNP + 2DG vs NP",
+                               add_legend = FALSE)
+  htmp_B18$unsupervised
   
+  htmp_MRLlpr <- DEG_heatmap(dds = dds_AM14MRLlpr, 
+                                  dds_results = deseq_res$AM14MRLlpr,
+                                  lfc_cutoff = 1, 
+                                  padj_cutoff = 0.05, 
+                                  count_type = "norm_counts", 
+                                  plot_title = "AM14 MRL/lpr:\n2DG vs Control",
+                                  add_legend = FALSE)
+  htmp_MRLlpr$unsupervised
+  
+  lgd_annotation <- Legend(
+    labels = c("Control", "2DG"),   # your annotation levels
+    title = "Treatment",
+    legend_gp = gpar(fill = c("#0f85a0", "#dd4124")),  # match your annotation colors
+    labels_gp = gpar(fontsize = 12),               # label text size
+    title_gp = gpar(fontsize = 14, fontface = "bold")  # title text size
+  )
+  
+  png("Output/DEG_heatmaps/combined_heatmaps.png", width = 7, height = 9, units = "in", res = 600)
+  
+  grid.newpage()
+  pushViewport(viewport(layout = grid.layout(nrow = 2,ncol = 4,
+                                             widths = unit(c(0.39, 0.02, 0.39, 0.2), "npc"))))
+  
+  pushViewport(viewport(layout.pos.row = 1, layout.pos.col = 1))
+  draw(htmp_PL23$unsupervised, newpage = FALSE)
+  popViewport()
+  
+  pushViewport(viewport(layout.pos.row = 1, layout.pos.col = 3))
+  draw(htmp_R848$unsupervised, newpage = FALSE)
+  popViewport()
+  
+  pushViewport(viewport(layout.pos.row = 2, layout.pos.col = 1))
+  draw(htmp_B18$unsupervised, newpage = FALSE)
+  popViewport()
+  
+  pushViewport(viewport(layout.pos.row = 2, layout.pos.col = 3))
+  draw(htmp_MRLlpr$unsupervised, newpage = FALSE)
+  popViewport()
+  
+  pushViewport(viewport(layout.pos.row = 1:2, layout.pos.col = 4))
+  draw(lgd_annotation)
+  popViewport()
+  
+  dev.off()
+  
+  rm(htmp_PL23, htmp_R848, htmp_MRLlpr, htmp_B18)
+  
+# DEG Heatmaps using Rlog normalization ----------------------------------------
   
     
 

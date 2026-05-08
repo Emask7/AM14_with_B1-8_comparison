@@ -203,28 +203,21 @@ results_wrapper <- function(dds, cons, IDs){
 }
 
 # Make a heatmap of DEGs -------------------------------------------------------
-DEG_heatmap <- function(dds, dds_results, factors, color_list, lfc_cutoff, padj_cutoff, count_type, dds_cols, plot_title, filename, h, w, show_DEG_names){
+DEG_heatmap <- function(dds, dds_results, color_list, lfc_cutoff, padj_cutoff, count_type, plot_title, add_legend, filename, h, w, show_DEG_names){
   if(missing(color_list)) {
     color_list <- list(Treatment = c(PL23 = "#0f85a0", PL23_2DG = "#dd4124",
-                                      R848 = "#0f85a0", R848_2DG = "#dd4124",
+                                     R848 = "#0f85a0", R848_2DG = "#dd4124",
                                      NP = "#0f85a0", NP_2DG = "#dd4124",
                                      Control = "#0f85a0", "2DG" = "#dd4124"),
                         Cohort = c(A1 = "#00496f", A2 = "#edd746", B1 = "#00496f",
                                    M1 = "#00496f", M2 = "#edd746"))
-    
-    # color_list <- list(Treatment = c(PL23 = "#00496f", PL23_2DG = "#0f85a0", 
-    #                                  R848 = "#ed8b00", R848_2DG = "#dd4124",
-    #                                  NP = "#0f85a0", NP_2DG = "#dd4124",
-    #                                  Control = "#0f85a0", "2DG" = "#dd4124"),
-    #                    Cohort = c(A1 = "#00496f", A2 = "#edd746", B1 = "#00496f", 
-    #                               M1 = "#00496f", M2 = "#edd746"))
   }
   if(missing(lfc_cutoff)) lfc_cutoff <- 1
   if(missing(padj_cutoff)) padj_cutoff <- 0.05
   if(missing(count_type)) count_type <- "norm_counts"
-  if(missing(dds_cols)) dds_cols <- NULL
   if(missing(plot_title)) plot_title <- "Plot Title"
   if(missing(filename)) filename <- NULL
+  if(missing(add_legend)) add_legend <- TRUE
   if(missing(h)) h <- 2000
   if(missing(w)) w <- 1500
   if(missing(show_DEG_names)) show_DEG_names <- FALSE
@@ -237,45 +230,36 @@ DEG_heatmap <- function(dds, dds_results, factors, color_list, lfc_cutoff, padj_
       DEGs <- append(DEGs, res)
     }
     DEGs <- DEGs[!duplicated(DEGs)]
-    
+
   # Make a vector of count matrix row numbers in decreasing order of row means -
     select <- counts(dds, normalized=TRUE)
-    if(!is.null(dds_cols)) select <- select[, dds_cols]
     select <- select[rownames(select) %in% DEGs, ]
     select <- order(rowMeans(select), decreasing=TRUE)
     head(select)
-    
+
   # Make a dataframe with sample info ------------------------------------------
-    # If dds_col is NULL, use all sample info from the dds object
-    # Else, only get sample info from rows corresponding to the count columns of interest
-    if(is.null(dds_cols)) {
-      df <- as.data.frame(colData(dds)[, factors])
-      rownames(df) <- rownames(as.data.frame(colData(dds)))
-    } else {
-      df <- as.data.frame(colData(dds)[dds_cols, factors])
-      rownames(df) <- rownames(as.data.frame(colData(dds)))[dds_cols]
-    }
-    colnames(df) <- factors
+    df <- as.data.frame(colData(dds)[, c("Treatment")])
+    rownames(df) <- rownames(as.data.frame(colData(dds)))
+    colnames(df) <- c("Treatment")
 
   # Sort the normalized counts by decreasing mean counts -----------------------
     if(count_type == "norm_counts") {
-      if(!is.null(dds_cols)) htmp_cts <- counts(dds, normalized = TRUE)[select, dds_cols]
-      else htmp_cts <- counts(dds, normalized = TRUE)[select, ]
+      htmp_cts <- counts(dds, normalized = TRUE)[select, ]
     } else if(count_type == "rlog") {
       rld <- rlog(dds)
-      if(!is.null(dds_cols)) htmp_cts <- assay(rld)[select, dds_cols]
-      else htmp_cts <- assay(rld)[select, ]
+      htmp_cts <- assay(rld)[select, ]
     } else {
       print("Error: count_type must be either norm_counts or rlog")
       return(NULL)
     }
-    
+
   # Make heatmap with supervised column clustering -----------------------------
     htmp_sup <- ComplexHeatmap::pheatmap(htmp_cts,
                                          cluster_rows = TRUE, show_rownames = show_DEG_names,
                                          cluster_cols = FALSE, show_colnames = FALSE,
                                          annotation_col = df, scale = "row",
                                          annotation_colors = color_list,
+                                         annotation_legend = add_legend,
                                          heatmap_legend_param = list(title = "Z-score"),
                                          main = plot_title)
     
@@ -283,8 +267,11 @@ DEG_heatmap <- function(dds, dds_results, factors, color_list, lfc_cutoff, padj_
     htmp_unsup <- ComplexHeatmap::pheatmap(htmp_cts,
                                            cluster_rows = TRUE, show_rownames = show_DEG_names,
                                            cluster_cols = TRUE, show_colnames = FALSE,
+                                           treeheight_row = 30,
+                                           treeheight_col = 30,
                                            annotation_col = df, scale = "row",
                                            annotation_colors = color_list,
+                                           annotation_legend = add_legend,
                                            heatmap_legend_param = list(title = "Z-score"),
                                            main = plot_title)
     
