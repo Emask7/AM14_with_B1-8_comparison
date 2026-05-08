@@ -116,32 +116,117 @@ getwd()
   setwd("./analysis_with_cohorts_and_treatment_separated/")
   getwd()
 
+  # QC_heatmaps(dds_AM14trans_PL23, NULL, "AM14 Adoptive Transfer:\nPL2-3 + 2DG vs PL2-3", plot_cohorts = FALSE)
+  # QC_heatmaps(dds_AM14trans_R848, NULL, "AM14 Adoptive Transfer:\nR848 + 2DG vs R848", plot_cohorts = FALSE)
+  # QC_heatmaps(dds_B18trans, NULL, "B1-8 Adoptive Transfer\nNP + 2DG vs NP", plot_cohorts = FALSE)
+  # QC_heatmaps(dds_AM14MRLlpr, NULL, "AM14 MRL/lpr mice\n2DG vs Control", plot_cohorts = FALSE)
+  # 
   # QC_heatmaps(dds_AM14trans_PL23, "AM14_Adoptive_Transfer_PL23", "AM14 Adoptive Transfer:\nPL2-3 + 2DG vs PL2-3", plot_cohorts = FALSE)
   # QC_heatmaps(dds_AM14trans_R848, "AM14_Adoptive_Transfer_R848", "AM14 Adoptive Transfer:\nR848 + 2DG vs R848", plot_cohorts = FALSE)
   # QC_heatmaps(dds_B18trans, "B18_Adoptive_Transfer", "B1-8 Adoptive Transfer\nNP + 2DG vs NP", plot_cohorts = FALSE)
   # QC_heatmaps(dds_AM14MRLlpr, "AM14_MRLlpr", "AM14 MRL/lpr mice\n2DG vs Control", plot_cohorts = FALSE)
-  # 
-  # sample_to_sample_plot(dds_AM14trans_PL23, "AM14_Adoptive_Transfer_PL23", "AM14 Adoptive Transfer (PL2-3 + 2DG vs PL2-3)")
-  # sample_to_sample_plot(dds_AM14trans_R848, "AM14_Adoptive_Transfer_R848", "AM14 Adoptive Transfer (R848 + 2DG vs R848)")
-  # sample_to_sample_plot(dds_B18trans, "B18_Adoptive_Transfer", "B1-8 Adoptive Transfer")
-  # sample_to_sample_plot(dds_AM14MRLlpr, "AM14_MRLlpr", "AM14 MRL/lpr +/- 2DG")
-
-  # QC_PCAplot(dds_AM14trans_PL23, "AM14_Adoptive_Transfer_PL23", "PL2-3 + 2DG vs PL2-3",
-  #            batch_effect = NULL, draw_ellipse = FALSE)
-  # dev.off()
-  # 
-  # QC_PCAplot(dds_AM14trans_R848, "AM14_Adoptive_Transfer_R848", "R848 + 2DG vs R848",
-  #            batch_effect = NULL, draw_ellipse = FALSE)
-  # dev.off()
-  # 
-  # QC_PCAplot(dds_B18trans, "B1-8_Adoptive_Transfer", "NP + 2DG vs NP",
-  #            batch_effect = NULL, draw_ellipse = FALSE)
-  # dev.off()
-  # 
-  # QC_PCAplot(dds_AM14MRLlpr, "AM14_MRLlpr", "AM14 MRL/lpr mice: 2DG vs Control",
-  #            batch_effect = NULL, draw_ellipse = FALSE)
-  # dev.off()
   
+  sample_to_sample_plot(dds_AM14trans_PL23, "AM14_Adoptive_Transfer_PL23", "AM14 Adoptive Transfer (PL2-3 + 2DG vs PL2-3)")
+  sample_to_sample_plot(dds_AM14trans_R848, "AM14_Adoptive_Transfer_R848", "AM14 Adoptive Transfer (R848 + 2DG vs R848)")
+  sample_to_sample_plot(dds_B18trans, "B18_Adoptive_Transfer", "B1-8 Adoptive Transfer")
+  sample_to_sample_plot(dds_AM14MRLlpr, "AM14_MRLlpr", "AM14 MRL/lpr +/- 2DG")
+
+  
+  
+
+  # PL2-3 PCA Plot -------------------------------------------------------------
+    PL23_vsd <- vst(dds_AM14trans_PL23)
+    PL23_pcaData <- plotPCA(PL23_vsd, intgroup=c("Treatment"), returnData=TRUE)
+    PL23_percentVar <- round(100 * attr(PL23_pcaData, "percentVar"))
+    pca_PL23 <- ggplot(PL23_pcaData, aes(PC1, PC2, color=Treatment)) +
+      geom_point(size=3) +
+      scale_color_manual(values = c("PL23" = "#0f85a0", "PL23_2DG" = "#dd4124"),
+                         labels = c("PL23" = "Control", "PL23_2DG" = "2DG")) +
+      geom_text_repel(aes(label = dds_AM14trans_PL23$Mouse_Number), show.legend = FALSE) +
+      xlab(paste0("PC1: ",PL23_percentVar[1],"% variance")) +
+      ylab(paste0("PC2: ",PL23_percentVar[2],"% variance")) +
+      labs(title = "AM14 Transfer: PL2-3 + 2DG vs PL2-3") +
+      theme_bw() +
+      theme(panel.grid.minor=element_blank(),
+            axis.text = element_text(color = "black"),
+            axis.title = element_text(size = 12),
+            legend.title = element_text(size = 14),
+            legend.text = element_text(size = 12),
+            legend.background = element_rect(color = "black", linewidth = 0.5),
+            legend.box.background = element_rect(color = "black", linewidth = 0.5))
+    
+    shared_legend <- get_legend(pca_PL23)
+    pca_PL23 <- pca_PL23 + theme(legend.position = "none")
+    # pca_PL23
+
+  # R848 PCA Plot --------------------------------------------------------------
+    R848_vsd <- vst(dds_AM14trans_R848)
+    R848_pcaData <- plotPCA(R848_vsd, intgroup=c("Treatment"), returnData=TRUE)
+    R848_percentVar <- round(100 * attr(R848_pcaData, "percentVar"))
+    pca_R848 <- ggplot(R848_pcaData, aes(PC1, PC2, color=Treatment)) +
+      geom_point(size=3) +
+      scale_color_manual(values = c("R848" = "#0f85a0", "R848_2DG" = "#dd4124")) +
+                         # labels = c("R848" = "Control", "R848_2DG" = "2DG")) +
+      geom_text_repel(aes(label = dds_AM14trans_R848$Mouse_Number), show.legend = FALSE) +
+      xlab(paste0("PC1: ",R848_percentVar[1],"% variance")) +
+      ylab(paste0("PC2: ",R848_percentVar[2],"% variance")) +
+      labs(title = "AM14 Transfer: R848 + 2DG vs R848") +
+      theme_bw() +
+      theme(panel.grid.minor=element_blank(),
+            axis.text = element_text(color = "black"),
+            axis.title = element_text(size = 12),
+            legend.position = "none") 
+    # pca_R848
+    
+  # AM14 MRLlpr PCA Plot -------------------------------------------------------
+    MRLlpr_vsd <- vst(dds_AM14MRLlpr)
+    MRLlpr_pcaData <- plotPCA(MRLlpr_vsd, intgroup=c("Treatment"), returnData=TRUE)
+    MRLlpr_percentVar <- round(100 * attr(MRLlpr_pcaData, "percentVar"))
+    pca_MRLlpr <- ggplot(MRLlpr_pcaData, aes(PC1, PC2, color=Treatment)) +
+      geom_point(size=3) +
+      scale_color_manual(values = c("Control" = "#0f85a0", "2DG" = "#dd4124")) +
+      geom_text_repel(aes(label = dds_AM14MRLlpr$Mouse_Number), show.legend = FALSE) +
+      xlab(paste0("PC1: ",MRLlpr_percentVar[1],"% variance")) +
+      ylab(paste0("PC2: ",MRLlpr_percentVar[2],"% variance")) +
+      labs(title = "AM14 MRL/lpr: 2DG vs Control") +
+      theme_bw() +
+      theme(panel.grid.minor=element_blank(),
+            axis.text = element_text(color = "black"),
+            axis.title = element_text(size = 12),
+            legend.position = "none") 
+    # pca_MRLlpr
+
+  # B1-8 PCA Plot --------------------------------------------------------------
+    B18_vsd <- vst(dds_B18trans)
+    B18_pcaData <- plotPCA(B18_vsd, intgroup=c("Treatment"), returnData=TRUE)
+    B18_percentVar <- round(100 * attr(B18_pcaData, "percentVar"))
+    pca_B18 <- ggplot(B18_pcaData, aes(PC1, PC2, color=Treatment)) +
+      geom_point(size=3) +
+      scale_color_manual(values = c("NP" = "#0f85a0", "NP_2DG" = "#dd4124"),
+                         labels = c("NP" = "Control", "NP_2DG" = "2DG")) +
+      geom_text_repel(aes(label = dds_B18trans$Mouse_Number), show.legend = FALSE) +
+      xlab(paste0("PC1: ",B18_percentVar[1],"% variance")) +
+      ylab(paste0("PC2: ",B18_percentVar[2],"% variance")) +
+      labs(title = "B1-8 Transfer: NP + 2DG vs NP") +
+      theme_bw() +
+      theme(panel.grid.minor=element_blank(),
+            axis.text = element_text(color = "black"),
+            axis.title = element_text(size = 12),
+            legend.position = "none") 
+    # pca_B18
+
+  # Show all PCA plots together ------------------------------------------------
+    pca_all <- plot_grid(pca_PL23, pca_R848, pca_B18, pca_MRLlpr, nrow = 2)
+    pca_all <- plot_grid(pca_all, shared_legend, ncol = 2, rel_widths = c(1, 0.15))
+    pca_all
+    ggsave2("QC_results/PCA_plots/All_PCA_plots.png", plot = pca_all, 
+            units = "in", width = 10, height = 7, dpi = 600)
+    
+    rm(PL23_vsd, PL23_pcaData, PL23_percentVar, pca_PL23)
+    rm(R848_vsd, R848_pcaData, R848_percentVar, pca_R848)
+    rm(MRLlpr_vsd, MRLlpr_pcaData, MRLlpr_percentVar, pca_MRLlpr)
+    rm(B18_vsd, B18_pcaData, B18_percentVar, pca_B18)
+    
 
   
   

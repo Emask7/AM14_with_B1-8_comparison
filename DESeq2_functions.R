@@ -113,69 +113,70 @@
   }
   
 
-# Generate PCA plots for quality control ---------------------------------------
-## Function inputs:
-### dds = a DESeqDataSet object
-### filename_start = the beginning of whatever you want the resulting images to be saved as
-### plot_title = the title of the plots
-### batch_effect = a TRUE, FALSE, or NULL value indicating whether to run batch effect correction
-#### (use batch_effects = NULL if the experiment does not contain batches)
-### draw_ellipse = a TRUE or FALSE value indicating whether to draw ellipses around the groups
-#### (if missing, this value will be set to FALSE)
-## if you use NULL for filename_start, the image won't save but it'll appear in RStudio (this is good if you're running it for the first time and want to try things out)
-  QC_PCAplot <- function(dds, filename_start, plot_title, batch_effect, draw_ellipse){
-    if(missing(batch_effect)) batch_effect <- NULL
-    if(missing(draw_ellipse)) draw_ellipse <- FALSE
-    vsd <- vst(dds)
-    
-    if(!is.null(filename_start)){
-      if(!file.exists("QC_results/")) dir.create("QC_results/")
-      if(!file.exists("QC_results/PCA_plots/")) dir.create("QC_results/PCA_plots/")
-      # if there is not already a QC_results/PCA_plots/" folder, create one
-
-      png(filename = stri_join(c("./QC_results/PCA_plots/", filename_start, ".png"), collapse = ""),
-          width = 1800, height = 1800, units = "px", pointsize = 10, res = 350,
-          bg = "white", family = "", symbolfamily="default")
-    }
-    
-    if(is.null(batch_effect)){
-      pcaData <- plotPCA(vsd, intgroup=c("Treatment"), returnData=TRUE)
-      percentVar <- round(100 * attr(pcaData, "percentVar"))
-      
-      ggplot(pcaData, aes(PC1, PC2, color=Treatment)) +
-        geom_point(size=3) +
-        geom_text(aes(label = dds$Mouse_Number), vjust = -0.5) +
-        xlab(paste0("PC1: ",percentVar[1],"% variance")) +
-        ylab(paste0("PC2: ",percentVar[2],"% variance")) +
-        coord_fixed() +
-        labs(title = plot_title) +
-        if(draw_ellipse == TRUE) stat_ellipse(aes(group = Treatment)) else {}
-    } else {
-      if(batch_effect == TRUE){
-        mat <- assay(vsd)
-        mm <- model.matrix(~Treatment, colData(vsd))
-        mat <- removeBatchEffect(mat, batch=vsd$Cohort, design=mm)
-        assay(vsd) <- mat
-      } else if(batch_effect != FALSE){
-        print("batch_effect must be either TRUE or FALSE")
-        return(NULL)
-      }
-      
-      pcaData <- plotPCA(vsd, intgroup=c("Treatment", "Cohort"), returnData=TRUE)
-      percentVar <- round(100 * attr(pcaData, "percentVar"))
-      
-      ggplot(pcaData, aes(PC1, PC2, color=Treatment, shape=Cohort)) +
-        geom_point(size=3) +
-        geom_text(aes(label = dds$Mouse_Number), vjust = -0.5) +
-        xlab(paste0("PC1: ",percentVar[1],"% variance")) +
-        ylab(paste0("PC2: ",percentVar[2],"% variance")) +
-        coord_fixed() +
-        theme(legend.position = 'bottom') +
-        labs(title = plot_title) +
-        labs(title = plot_title) +
-          if(draw_ellipse == TRUE) stat_ellipse(aes(group = Treatment)) else {}
-    } 
-  }
+# # Generate PCA plots for quality control ---------------------------------------
+# ## Function inputs:
+# ### dds = a DESeqDataSet object
+# ### filename_start = the beginning of whatever you want the resulting images to be saved as
+# ### plot_title = the title of the plots
+# ### batch_effect = a TRUE, FALSE, or NULL value indicating whether to run batch effect correction
+# #### (use batch_effects = NULL if the experiment does not contain batches)
+# ### draw_ellipse = a TRUE or FALSE value indicating whether to draw ellipses around the groups
+# #### (if missing, this value will be set to FALSE)
+# ## if you use NULL for filename_start, the image won't save but it'll appear in RStudio (this is good if you're running it for the first time and want to try things out)
+#   QC_PCAplot <- function(dds, filename_start, plot_title, batch_effect, draw_ellipse){
+#     if(missing(batch_effect)) batch_effect <- NULL
+#     if(missing(draw_ellipse)) draw_ellipse <- FALSE
+#     vsd <- vst(dds)
+#     
+#     if(!is.null(filename_start)){
+#       if(!file.exists("QC_results/")) dir.create("QC_results/")
+#       if(!file.exists("QC_results/PCA_plots/")) dir.create("QC_results/PCA_plots/")
+#       # if there is not already a QC_results/PCA_plots/" folder, create one
+# 
+#       png(filename = stri_join(c("./QC_results/PCA_plots/", filename_start, ".png"), collapse = ""),
+#           width = 1800, height = 1800, units = "px", pointsize = 10, res = 350,
+#           bg = "white", family = "", symbolfamily="default")
+#     }
+#     
+#     if(is.null(batch_effect)){
+#       pcaData <- plotPCA(vsd, intgroup=c("Treatment"), returnData=TRUE)
+#       percentVar <- round(100 * attr(pcaData, "percentVar"))
+#       
+#       ggplot(pcaData, aes(PC1, PC2, color=Treatment)) +
+#         geom_point(size=3) +
+#         geom_text(aes(label = dds$Mouse_Number), vjust = -0.5) +
+#         xlab(paste0("PC1: ",percentVar[1],"% variance")) +
+#         ylab(paste0("PC2: ",percentVar[2],"% variance")) +
+#         coord_fixed() +
+#         labs(title = plot_title) +
+#         theme_bw() +
+#         if(draw_ellipse == TRUE) stat_ellipse(aes(group = Treatment)) else {}
+#     } else {
+#       if(batch_effect == TRUE){
+#         mat <- assay(vsd)
+#         mm <- model.matrix(~Treatment, colData(vsd))
+#         mat <- removeBatchEffect(mat, batch=vsd$Cohort, design=mm)
+#         assay(vsd) <- mat
+#       } else if(batch_effect != FALSE){
+#         print("batch_effect must be either TRUE or FALSE")
+#         return(NULL)
+#       }
+#       
+#       pcaData <- plotPCA(vsd, intgroup=c("Treatment", "Cohort"), returnData=TRUE)
+#       percentVar <- round(100 * attr(pcaData, "percentVar"))
+#       
+#       ggplot(pcaData, aes(PC1, PC2, color=Treatment, shape=Cohort)) +
+#         geom_point(size=3) +
+#         geom_text(aes(label = dds$Mouse_Number), vjust = -0.5) +
+#         xlab(paste0("PC1: ",percentVar[1],"% variance")) +
+#         ylab(paste0("PC2: ",percentVar[2],"% variance")) +
+#         coord_fixed() +
+#         theme(legend.position = 'bottom') +
+#         labs(title = plot_title) +
+#         labs(title = plot_title) +
+#           if(draw_ellipse == TRUE) stat_ellipse(aes(group = Treatment)) else {}
+#     } 
+#   }
 
 # Wrapper for the DESeq2 results() function ------------------------------------
 ## Function inputs:
