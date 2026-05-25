@@ -151,7 +151,8 @@ find_DEG_set_overlap <- function(deg1, colname1, deg2, colname2, p_value_cutoff,
            width = 8, height = 7, units = "in", dpi = 600)
 
   # AM14 PL2-3 vs AM14 MRLlpr - labeling only ABC genes ------------------------
-    ggplot(pl23_x_MRLlpr, aes(x = PL23, y = MRLlpr, fill = ABC_direction)) +
+    # ggplot(pl23_x_MRLlpr, aes(x = PL23, y = MRLlpr, fill = ABC_direction)) +
+    ggplot(pl23_x_MRLlpr, aes(x = PL23, y = MRLlpr)) +
       geom_point(aes(color = same_direction)) +
       scale_color_manual(
         values = c("signif_down" = "#00496F", 
@@ -166,29 +167,33 @@ find_DEG_set_overlap <- function(deg1, colname1, deg2, colname2, p_value_cutoff,
         name = "DEG Direction"
         # guide = NULL # guide = guide_legend(title = "title")
       ) +
-      geom_hline(yintercept = c(-0.6, 0.6), linetype = "dotted", color = "black") +
-      geom_vline(xintercept = c(-0.6, 0.6), linetype = "dotted", color = "black") +
+      geom_hline(yintercept = c(0), linetype = "dotted", color = "black") +
+      geom_vline(xintercept = c(0), linetype = "dotted", color = "black") +
+      # geom_hline(yintercept = c(-0.6, 0.6), linetype = "dotted", color = "black") +
+      # geom_vline(xintercept = c(-0.6, 0.6), linetype = "dotted", color = "black") +
       scale_x_continuous(breaks = sort(c(scales::breaks_pretty()(pl23_x_MRLlpr$PL23), -0.6, 0.6))) +
       scale_y_continuous(breaks = c(-2, -1, -0.6, 0, 0.6, 1)) +
       geom_label_repel(
-        data = pl23_x_MRLlpr[!is.na(pl23_x_MRLlpr$ABC_direction), ],
+        # data = pl23_x_MRLlpr[!is.na(pl23_x_MRLlpr$ABC_direction), ],
+        data = pl23_x_MRLlpr[(!is.na(pl23_x_MRLlpr$ABC_direction) & !is.na(pl23_x_MRLlpr$same_direction)), ],
         aes(label = Gene),
         size = 3.5,
         max.overlaps = Inf
       ) +
-      scale_fill_manual(
-        values = c("Up" = "#F8A54F", "Down" = "#7EB1C2"),
-        name = "Direction in ABCs\nvs Follicular B Cells"
-        # na.value = NA
-      ) +
+      # scale_fill_manual(
+      #   values = c("Up" = "#F8A54F", "Down" = "#7EB1C2"),
+      #   name = "Direction in ABCs\nvs Follicular B Cells"
+      #   # na.value = NA
+      # ) +
       labs(
         x = "LFC: AM14 PL2-3 2DG vs Ctrl",
         y = "LFC: AM14 MRL/lpr 2DG vs Ctrl",
-        title = "AM14 PL2-3 +/- 2DG vs AM14 MRLlpr +/- 2DG"
+        title = "AM14 PL2-3 +/- 2DG vs AM14 MRLlpr +/- 2DG",
+        subtitle = "(DEGs with p-adj < 0.05 in both comparisons)"
       ) +
       theme_classic()
     
-    ggsave(filename = "Output/Correlation Scatterplots/AM14 PL2-3 vs AM14 MRLlpr - ABC labels only.png", 
+    ggsave(filename = "Output/Correlation Scatterplots/AM14 PL2-3 vs AM14 MRLlpr - ABC labels only - no label color.png", 
            width = 8, height = 6, units = "in", dpi = 600)
     
 
